@@ -20,7 +20,7 @@
 
 package common
 
-var version = "v1.0-pre"
+var version = "v1.0-beta.1"
 
 //VersionString returns the version string for holo-build.
 func VersionString() string {
