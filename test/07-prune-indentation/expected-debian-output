@@ -1,0 +1,50 @@
+ar archive
+    >> control.tar.gz is regular file (mode: 644, owner: 0, group: 0), content is GZip-compressed POSIX tar archive
+        >> ./ is directory (mode: 755, owner: 0, group: 0)
+        >> ./control is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+            Package: prune-indentation
+            Version: 1.0.0-1
+            Architecture: all
+            Maintainer: Holo Build <holo.build@example.org>
+            Installed-Size: 8
+            Section: misc
+            Priority: optional
+            Description: prune-indentation
+             prune-indentation
+        >> ./md5sums is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+            19336acc49f29b8dedbcf7321f19f726  etc/no-indent.conf
+            f46695565a30f8ccadafde741d7d8309  etc/noprune-explicitly.conf
+            88a7007e9dca45b095e46fb3ff81f6ca  etc/noprune-inconsistent-indent.conf
+            19336acc49f29b8dedbcf7321f19f726  etc/prune-indent-with-spaces.conf
+            651828373f84935a002f1305ef961835  etc/prune-indent-with-tabs.conf
+            be44856380472dc06370ce47f741bf89  etc/prune-mixed-indent.conf
+    >> data.tar.xz is regular file (mode: 644, owner: 0, group: 0), content is XZ-compressed POSIX tar archive
+        >> ./ is directory (mode: 755, owner: 0, group: 0)
+        >> ./etc/ is directory (mode: 755, owner: 0, group: 0)
+        >> ./etc/no-indent.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+            foo foo
+                qux qux
+            bar bar
+        >> ./etc/noprune-explicitly.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+                foo foo
+                    qux qux
+                bar bar
+        >> ./etc/noprune-inconsistent-indent.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+            	foo foo
+            		qux qux
+                bar bar
+        >> ./etc/prune-indent-with-spaces.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+            foo foo
+                qux qux
+            bar bar
+        >> ./etc/prune-indent-with-tabs.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+            foo foo
+            	qux qux
+            bar bar
+        >> ./etc/prune-mixed-indent.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+            foo foo
+              	qux
+            bar bar
+    >> debian-binary is regular file (mode: 644, owner: 0, group: 0) at archive position 0, content is data as shown below
+        2.0
+

@@ -1,0 +1,1 @@
+!! cannot build foo_1.0.2.3-1_any.deb: version constraints on "Provides: foo-bar" are not allowed for Debian packages

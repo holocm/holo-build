@@ -1,0 +1,51 @@
+# This testcase covers all the basic syntax elements of package definitions.
+
+[package]
+name = "foo"
+version = "1.0.2.3"
+description = "my foo bar package"
+author = "Holo Build <holo.build@example.org>"
+requires = ["bar>=2.1", "bar<3.0", "baz"]
+provides = ["foo-bar", "foo-baz"]
+conflicts = ["qux>2.0", "qux<=1.2.0"]
+replaces = ["foo-bar<2.1"]
+setupScript = """
+echo setup
+echo setup
+"""
+cleanupScript = """
+echo cleanup
+echo cleanup
+"""
+
+[[symlink]]
+path = "/etc/links/foo.conf"
+target = "/etc/files/foo.conf"
+
+[[symlink]]
+path = "/etc/links/bar.conf"
+target = "bar.target"
+
+[[directory]]
+path = "/var/lib/foo/bar"
+mode = "0700"
+owner = 4242
+group = 2323
+
+[[directory]]
+path = "/var/lib/foo/baz"
+
+[[file]]
+path = "/etc/files/foo.conf"
+content = """
+foo
+foo
+"""
+
+[[file]]
+path = "/etc/files/foo.toml"
+contentFrom = "input.toml"
+owner = "foouser"
+group = "foogroup"
+
+

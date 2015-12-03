@@ -1,0 +1,60 @@
+# This testcase checks that consistent indentation inside file contents is
+# pruned (unless explicitly disabled with raw=true).
+#
+# WARNING: Be very careful when editing this file, to not have your editor
+# mangle the indentation (it's sometimes with tabs, sometimes with spaces,
+# sometimes both at the same time, and that's desired).
+
+[package]
+name    = "prune-indentation"
+version = "1.0.0"
+author  = "Holo Build <holo.build@example.org>"
+
+[[file]]
+path = "/etc/no-indent.conf"
+content = """
+foo foo
+    qux qux
+bar bar
+"""
+
+[[file]]
+path = "/etc/prune-indent-with-spaces.conf"
+content = """
+    foo foo
+        qux qux
+    bar bar
+"""
+
+[[file]]
+path = "/etc/prune-indent-with-tabs.conf"
+content = """
+	foo foo
+		qux qux
+	bar bar
+"""
+
+[[file]]
+path = "/etc/prune-mixed-indent.conf"
+content = """
+	  foo foo
+	    	qux
+	  bar bar
+"""
+
+[[file]]
+path = "/etc/noprune-inconsistent-indent.conf"
+content = """
+	foo foo
+		qux qux
+    bar bar
+"""
+
+[[file]]
+path = "/etc/noprune-explicitly.conf"
+content = """
+    foo foo
+        qux qux
+    bar bar
+"""
+raw = true

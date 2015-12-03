@@ -1,0 +1,100 @@
+ar archive
+    >> control.tar.gz is regular file (mode: 644, owner: 0, group: 0), content is GZip-compressed POSIX tar archive
+        >> ./ is directory (mode: 755, owner: 0, group: 0)
+        >> ./control is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+            Package: foo
+            Version: 1.0.2.3-1
+            Architecture: all
+            Maintainer: Holo Build <holo.build@example.org>
+            Installed-Size: 36
+            Section: misc
+            Priority: optional
+            Depends: bar (>= 2.1), bar (<< 3.0), baz
+            Provides: foo-bar, foo-baz
+            Conflicts: qux (>> 2.0), qux (<= 1.2.0)
+            Replaces: foo-bar (<< 2.1)
+            Description: my foo bar package
+             my foo bar package
+        >> ./md5sums is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+            5fb7ba7e8447a836e774b66155f5776a  etc/files/foo.conf
+            f972aeea05bf32a5ae7e0322a0e6ca01  etc/files/foo.toml
+        >> ./postinst is regular file (mode: 755, owner: 0, group: 0), content is data as shown below
+            #!/bin/bash
+            chown foouser /etc/files/foo.toml
+            chgrp foogroup /etc/files/foo.toml
+            echo setup
+            echo setup
+        >> ./postrm is regular file (mode: 755, owner: 0, group: 0), content is data as shown below
+            #!/bin/bash
+            echo cleanup
+            echo cleanup
+    >> data.tar.xz is regular file (mode: 644, owner: 0, group: 0), content is XZ-compressed POSIX tar archive
+        >> ./ is directory (mode: 755, owner: 0, group: 0)
+        >> ./etc/ is directory (mode: 755, owner: 0, group: 0)
+        >> ./etc/files/ is directory (mode: 755, owner: 0, group: 0)
+        >> ./etc/files/foo.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+            foo
+            foo
+        >> ./etc/files/foo.toml is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+            # This testcase covers all the basic syntax elements of package definitions.
+            
+            [package]
+            name = "foo"
+            version = "1.0.2.3"
+            description = "my foo bar package"
+            author = "Holo Build <holo.build@example.org>"
+            requires = ["bar>=2.1", "bar<3.0", "baz"]
+            provides = ["foo-bar", "foo-baz"]
+            conflicts = ["qux>2.0", "qux<=1.2.0"]
+            replaces = ["foo-bar<2.1"]
+            setupScript = """
+            echo setup
+            echo setup
+            """
+            cleanupScript = """
+            echo cleanup
+            echo cleanup
+            """
+            
+            [[symlink]]
+            path = "/etc/links/foo.conf"
+            target = "/etc/files/foo.conf"
+            
+            [[symlink]]
+            path = "/etc/links/bar.conf"
+            target = "bar.target"
+            
+            [[directory]]
+            path = "/var/lib/foo/bar"
+            mode = "0700"
+            owner = 4242
+            group = 2323
+            
+            [[directory]]
+            path = "/var/lib/foo/baz"
+            
+            [[file]]
+            path = "/etc/files/foo.conf"
+            content = """
+            foo
+            foo
+            """
+            
+            [[file]]
+            path = "/etc/files/foo.toml"
+            contentFrom = "input.toml"
+            owner = "foouser"
+            group = "foogroup"
+            
+            
+        >> ./etc/links/ is directory (mode: 755, owner: 0, group: 0)
+        >> ./etc/links/bar.conf is symlink to bar.target
+        >> ./etc/links/foo.conf is symlink to /etc/files/foo.conf
+        >> ./var/ is directory (mode: 755, owner: 0, group: 0)
+        >> ./var/lib/ is directory (mode: 755, owner: 0, group: 0)
+        >> ./var/lib/foo/ is directory (mode: 755, owner: 0, group: 0)
+        >> ./var/lib/foo/bar/ is directory (mode: 700, owner: 4242, group: 2323)
+        >> ./var/lib/foo/baz/ is directory (mode: 755, owner: 0, group: 0)
+    >> debian-binary is regular file (mode: 644, owner: 0, group: 0) at archive position 0, content is data as shown below
+        2.0
+

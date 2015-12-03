@@ -1,0 +1,35 @@
+# This testcase checks the generation of an entity definition file with users
+# and groups from the corresponding sections in a package definition file.
+
+[package]
+name    = "holo-entities"
+version = "1.0"
+author  = "Holo Build <holo.build@example.org>"
+definitionFile = "/usr/share/holo/users-groups/08-holo-entities.toml"
+
+[[group]]
+name = "foogroup"
+gid  = 101
+
+[[group]]
+name   = "bargroup"
+system = true
+
+[[group]]
+name = "minimalgroup"
+
+[[user]]
+name    = "foouser"
+comment = "The Foo User"
+uid     = 1001
+home    = "/home/foo"
+group   = "foogroup"
+groups  = ["users", "video"]
+shell   = "/usr/bin/zsh"
+
+[[user]]
+name   = "baruser"
+system = true
+
+[[user]]
+name = "minimaluser"

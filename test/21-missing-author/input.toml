@@ -1,0 +1,6 @@
+# This testcase is like 01-minimal, but without the package.author field, to
+# validate that this field is only required by the Debian generator.
+
+[package]
+name = "the-package"
+version = "1.0"

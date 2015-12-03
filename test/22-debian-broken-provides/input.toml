@@ -1,0 +1,12 @@
+# This testcase checks that package.provides with a specific version work for
+# --pacman, but fail for --debian.
+
+[package]
+name = "foo"
+version = "1.0.2.3"
+description = "my foo bar package"
+author = "Holo Build <holo.build@example.org>"
+requires = ["bar>=2.1", "bar<3.0", "baz"]
+provides = ["foo-bar=2.1", "foo-baz"]
+conflicts = ["qux>2.0", "qux<=1.2.0"]
+replaces = ["foo-bar<2.1"]

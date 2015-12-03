@@ -1,0 +1,21 @@
+# This testcase checks a special feature of the --pacman generator:
+# package.requires may reference a whole package group which is expanded by
+# holo-build into the members of the package group.
+#
+# Since the testcase must be able to run without a pacman(8) binary present,
+# the mock implementation for package group resolution splits the group name on
+# dashes, so e.g. "group:foo-bar" resolves into packages "foo" and "bar".
+
+[package]
+name    = "pacman-group-dependencies"
+version = "1.0.0"
+author  = "Holo Build <holo.build@example.org>"
+requires = [
+    "eee",
+    "group:aaa-bbbb-cc-ddd-gg",
+    "except:bbbb",
+    "except:gg",
+    "except:something-else",
+    "except:group:bbbb-ddd",
+    "fff",
+]

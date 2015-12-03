@@ -1,0 +1,8 @@
+# artifacts from failing testcases
+holo-build-*-*
+# artifacts from successful testcases
+suggested-filenames
+debian-output
+debian-error-output
+pacman-output
+pacman-error-output

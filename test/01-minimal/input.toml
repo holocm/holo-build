@@ -1,0 +1,10 @@
+# This testcase should only contain the minimal set of required fields, to
+# validate that all other fields are indeed optional.
+#
+# The package.author field is only required for Debian packages. This is
+# validated by the 21-missing-author testcase.
+
+[package]
+name = "the-package"
+version = "1.0"
+author = "Holo Build <holo.build@example.org>"

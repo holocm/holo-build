@@ -1,0 +1,13 @@
+# This testcase checks the error case that file.mode is given as an integer
+# rather than a string. This should belong into the 05-invalid-fields testcase,
+# but it causes the whole parser to stop, thus obscuring the other errors in
+# there.
+
+[package]
+name = "foo"
+version = "1.0"
+author = "Holo Build <holo.build@example.org>"
+
+[[file]]
+path = "/etc/foo.conf"
+mode = 0666 # unacceptable type

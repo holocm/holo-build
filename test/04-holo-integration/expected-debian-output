@@ -1,0 +1,35 @@
+ar archive
+    >> control.tar.gz is regular file (mode: 644, owner: 0, group: 0), content is GZip-compressed POSIX tar archive
+        >> ./ is directory (mode: 755, owner: 0, group: 0)
+        >> ./control is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+            Package: holo-integration
+            Version: 1.0-1
+            Architecture: all
+            Maintainer: Holo Build <holo.build@example.org>
+            Installed-Size: 28
+            Section: misc
+            Priority: optional
+            Depends: holo-files
+            Description: holo-integration
+             holo-integration
+        >> ./md5sums is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+            098f6bcd4621d373cade4e832627b4f6  usr/share/holo/files/01-first/etc/foo.conf
+        >> ./postinst is regular file (mode: 755, owner: 0, group: 0), content is data as shown below
+            #!/bin/bash
+            holo apply
+        >> ./postrm is regular file (mode: 755, owner: 0, group: 0), content is data as shown below
+            #!/bin/bash
+            holo apply
+    >> data.tar.xz is regular file (mode: 644, owner: 0, group: 0), content is XZ-compressed POSIX tar archive
+        >> ./ is directory (mode: 755, owner: 0, group: 0)
+        >> ./usr/ is directory (mode: 755, owner: 0, group: 0)
+        >> ./usr/share/ is directory (mode: 755, owner: 0, group: 0)
+        >> ./usr/share/holo/ is directory (mode: 755, owner: 0, group: 0)
+        >> ./usr/share/holo/files/ is directory (mode: 755, owner: 0, group: 0)
+        >> ./usr/share/holo/files/01-first/ is directory (mode: 755, owner: 0, group: 0)
+        >> ./usr/share/holo/files/01-first/etc/ is directory (mode: 755, owner: 0, group: 0)
+        >> ./usr/share/holo/files/01-first/etc/foo.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+            test
+    >> debian-binary is regular file (mode: 644, owner: 0, group: 0) at archive position 0, content is data as shown below
+        2.0
+

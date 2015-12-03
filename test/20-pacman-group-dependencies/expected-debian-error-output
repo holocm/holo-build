@@ -1,0 +1,5 @@
+!! Package name "group:aaa-bbbb-cc-ddd-gg" is not acceptable for Debian packages (found in requires)
+!! Package name "except:bbbb" is not acceptable for Debian packages (found in requires)
+!! Package name "except:gg" is not acceptable for Debian packages (found in requires)
+!! Package name "except:something-else" is not acceptable for Debian packages (found in requires)
+!! Package name "except:group:bbbb-ddd" is not acceptable for Debian packages (found in requires)

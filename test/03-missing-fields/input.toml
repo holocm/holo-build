@@ -1,0 +1,45 @@
+# This testcase checks that the correct error messages are generated when
+# required fields are missing, and it also checks that all errors are reported
+# at once (instead of the parser aborting after the first error).
+
+[package]
+# name =
+# version =
+description = "not enough"
+definitionFile = "/usr/share/holo/users-groups/03-missing-fields.toml"
+
+[[file]]
+path = "/etc/this-is-ok.conf"
+content = "something"
+
+[[file]]
+# path = "/etc/this-not.conf"
+content = "nothing important"
+
+[[file]]
+path = "/etc/this-not-either.conf"
+# content = "missing"
+
+[[symlink]]
+# path = "/etc/its-getting-worse.conf"
+target = "something"
+
+[[symlink]]
+path = "/etc/and-better-again.conf"
+target = "nothing important"
+
+[[directory]]
+path = "/var/lib/how-about-this"
+mode = "0666"
+
+[[directory]]
+# path = "/var/lib/certainly-not-this"
+owner = "test"
+
+[[user]]
+# name =
+uid = 1000
+
+[[group]]
+# name =
+gid = 1000

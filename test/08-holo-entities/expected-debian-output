@@ -1,0 +1,58 @@
+ar archive
+    >> control.tar.gz is regular file (mode: 644, owner: 0, group: 0), content is GZip-compressed POSIX tar archive
+        >> ./ is directory (mode: 755, owner: 0, group: 0)
+        >> ./control is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+            Package: holo-entities
+            Version: 1.0-1
+            Architecture: all
+            Maintainer: Holo Build <holo.build@example.org>
+            Installed-Size: 20
+            Section: misc
+            Priority: optional
+            Depends: holo-users-groups
+            Description: holo-entities
+             holo-entities
+        >> ./md5sums is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+            89164e38542babd6b83461b130f1c432  usr/share/holo/users-groups/08-holo-entities.toml
+        >> ./postinst is regular file (mode: 755, owner: 0, group: 0), content is data as shown below
+            #!/bin/bash
+            holo apply
+        >> ./postrm is regular file (mode: 755, owner: 0, group: 0), content is data as shown below
+            #!/bin/bash
+            holo apply
+    >> data.tar.xz is regular file (mode: 644, owner: 0, group: 0), content is XZ-compressed POSIX tar archive
+        >> ./ is directory (mode: 755, owner: 0, group: 0)
+        >> ./usr/ is directory (mode: 755, owner: 0, group: 0)
+        >> ./usr/share/ is directory (mode: 755, owner: 0, group: 0)
+        >> ./usr/share/holo/ is directory (mode: 755, owner: 0, group: 0)
+        >> ./usr/share/holo/users-groups/ is directory (mode: 755, owner: 0, group: 0)
+        >> ./usr/share/holo/users-groups/08-holo-entities.toml is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+            [[group]]
+              name = "foogroup"
+              gid = 101
+            
+            [[group]]
+              name = "bargroup"
+              system = true
+            
+            [[group]]
+              name = "minimalgroup"
+            
+            [[user]]
+              name = "foouser"
+              comment = "The Foo User"
+              uid = 1001
+              home = "/home/foo"
+              group = "foogroup"
+              groups = ["users", "video"]
+              shell = "/usr/bin/zsh"
+            
+            [[user]]
+              name = "baruser"
+              system = true
+            
+            [[user]]
+              name = "minimaluser"
+    >> debian-binary is regular file (mode: 644, owner: 0, group: 0) at archive position 0, content is data as shown below
+        2.0
+
