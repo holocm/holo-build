@@ -4,6 +4,11 @@ sudo: false
 go:
     - 1.5
 
+addons:
+    apt:
+        packages:
+            - bsdtar
+
 install:
     - go get -u github.com/golang/lint/golint
     - go get -u github.com/GeertJohan/fgt
