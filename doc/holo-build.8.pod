@@ -466,7 +466,7 @@ previous example is functionally equivalent to:
     """
 
 The actual syntax and semantics of C<[[user]]> and C<[[group]]> sections is
-described in L<holo(8)>.
+described in L<holo-users-groups(8)>.
 
 =for Comment
 ################################################################################
