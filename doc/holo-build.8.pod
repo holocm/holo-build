@@ -85,9 +85,9 @@ targeted distribution:
     version = "1.0"
 
     $ holo-build --suggest-filename --debian < input.toml
-    the-package_1.0-1_any.deb
+    foo_1.0-1_any.deb
     $ holo-build --suggest-filename --pacman < input.toml
-    the-package-1.0-1-any.pkg.tar.xz
+    foo-1.0-1-any.pkg.tar.xz
 
 This option can be used when auto-generating Makefiles, where the output
 filename needs to be known before C<holo-build> runs (for purposes of dependency
@@ -127,7 +127,7 @@ This section is required and contains global properties for the package.
 
     [package]
     name    = "example-package"
-    version = "1.2.5-alpha.2"
+    version = "1.2.5"
     epoch   = 2
     release = 3
     description = "An example package"
@@ -163,7 +163,6 @@ dots:
     version = "1.2.3"
     version = "0.10"
     version = "20151015"
-    version = "2015.10.15"
 
 =item B<epoch> (unsigned integer)
 
@@ -211,7 +210,7 @@ is implied automatically.
 For C<--pacman> only, a special syntax is allowed to require complete package
 groups (by giving the groupname with a C<group:> prefix), and to exclude
 certain packages or package groups from this group requirement (by prefixing the
-dependency with C<not:>). For example, to have the package require all packages
+dependency with C<except:>). For example, to have the package require all packages
 from the C<xorg> group, except for the C<xorg-drivers> group and the
 C<xorg-docs> package:
 
@@ -220,8 +219,8 @@ C<xorg-docs> package:
         # require all packages from the xorg group
         "group:xorg",
         # except for xorg-docs and all packages in the xorg-drivers group
-        "not:xorg-docs",
-        "not:group:xorg-drivers",
+        "except:xorg-docs",
+        "except:group:xorg-drivers",
     ]
 
 =item B<provides> (array of strings)
@@ -448,7 +447,7 @@ previous example is functionally equivalent to:
     [package]
     name          = "foobar"
     version       = "1.0"
-    depends       = ["holo"]
+    depends       = ["holo-users-groups"]
     setupScript   = "holo apply"
     cleanupScript = "holo apply"
 
