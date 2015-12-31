@@ -34,6 +34,8 @@ import (
 func (pkg *Package) Build(generator Generator, printToStdout bool, buildReproducibly bool) error {
 	//do magical Holo integration tasks
 	pkg.doMagicalHoloIntegration()
+	//move unmaterializable filesystem metadata into the setupScript
+	pkg.postponeUnmaterializableFSMetadata()
 
 	//choose root directory in such a way that the user can easily find and
 	//inspect it in the case that an error occurs
@@ -126,9 +128,42 @@ func (pkg *Package) doMagicalHoloIntegration() {
 	pkg.CleanupScript = "holo apply\n" + pkg.CleanupScript
 }
 
-func (pkg *Package) materializeFSEntries(rootPath string, buildReproducibly bool) error {
+func (pkg *Package) postponeUnmaterializableFSMetadata() {
+	//When an FSEntry identifies its Owner/Group by name, we cannot materialize
+	//that at build time since we don't know the UID/GID to write into the archive.
+	//Therefore, remove the Owner/Group from the FS entry and add a chown(1) call
+	//to the setupScript to apply ownership at install time.
 	var additionalSetupScript string
 
+	for _, entry := range pkg.FSEntries {
+		var ownerStr, groupStr string
+		if entry.Owner != nil && entry.Owner.Str != "" {
+			ownerStr = entry.Owner.Str
+			entry.Owner = nil
+		}
+		if entry.Group != nil && entry.Group.Str != "" {
+			groupStr = entry.Group.Str
+			entry.Group = nil
+		}
+
+		if ownerStr != "" {
+			if groupStr != "" {
+				additionalSetupScript += fmt.Sprintf("chown %s:%s %s\n", ownerStr, groupStr, entry.Path)
+			} else {
+				additionalSetupScript += fmt.Sprintf("chown %s %s\n", ownerStr, entry.Path)
+			}
+		} else {
+			if groupStr != "" {
+				additionalSetupScript += fmt.Sprintf("chgrp %s %s\n", groupStr, entry.Path)
+			}
+		}
+	}
+
+	//ensure that ownership is correct before running the actual setup script
+	pkg.SetupScript = additionalSetupScript + pkg.SetupScript
+}
+
+func (pkg *Package) materializeFSEntries(rootPath string, buildReproducibly bool) error {
 	for _, entry := range pkg.FSEntries {
 		//find the path within the rootPath for this entry
 		path, _ := filepath.Rel("/", entry.Path)
@@ -162,18 +197,10 @@ func (pkg *Package) materializeFSEntries(rootPath string, buildReproducibly bool
 		var uid C.__uid_t
 		var gid C.__gid_t
 		if entry.Owner != nil {
-			if entry.Owner.Str == "" {
-				uid = C.__uid_t(entry.Owner.Int)
-			} else {
-				additionalSetupScript += fmt.Sprintf("chown %s %s\n", entry.Owner.Str, entry.Path)
-			}
+			uid = C.__uid_t(entry.Owner.Int)
 		}
 		if entry.Group != nil {
-			if entry.Group.Str == "" {
-				gid = C.__gid_t(entry.Group.Int)
-			} else {
-				additionalSetupScript += fmt.Sprintf("chgrp %s %s\n", entry.Group.Str, entry.Path)
-			}
+			gid = C.__gid_t(entry.Group.Int)
 		}
 		if uid != 0 || gid != 0 {
 			//cannot use os.Chown(); os.Chown calls into syscall.Chown and thus
@@ -184,11 +211,6 @@ func (pkg *Package) materializeFSEntries(rootPath string, buildReproducibly bool
 				return err
 			}
 		}
-	}
-
-	if additionalSetupScript != "" {
-		//ensure that ownership is correct before running the actual setup script
-		pkg.SetupScript = additionalSetupScript + pkg.SetupScript
 	}
 
 	//if a reproducible build has been requested, set all timestamps for all FS

@@ -20,8 +20,7 @@ ar archive
             f972aeea05bf32a5ae7e0322a0e6ca01  etc/files/foo.toml
         >> ./postinst is regular file (mode: 755, owner: 0, group: 0), content is data as shown below
             #!/bin/bash
-            chown foouser /etc/files/foo.toml
-            chgrp foogroup /etc/files/foo.toml
+            chown foouser:foogroup /etc/files/foo.toml
             echo setup
             echo setup
         >> ./postrm is regular file (mode: 755, owner: 0, group: 0), content is data as shown below
