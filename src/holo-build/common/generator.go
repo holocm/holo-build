@@ -53,9 +53,29 @@ type Generator interface {
 	//If `buildReproducibly` is true, the package must be built such that every
 	//run (even across systems) produces an identical result. For example, no
 	//timestamps or generator version information may be included.
+	//
+	//Each generator need to support only one of Build() and BuildInMemory(),
+	//the other one should return the UnsupportedBuildMethodError.
 	Build(pkg *Package, rootPath string, buildReproducibly bool) ([]byte, error)
+	//BuildInMemory is the same as Build(), but filesystem entries are not
+	//materialized in some rootPath. Instead, the generator is expected the
+	//archive from memory, using the pkg.FSEntries structure as only input.
+	//
+	//Other than that, the method is functionally identical to Build().
+	BuildInMemory(pkg *Package, buildReproducibly bool) ([]byte, error)
 	//Generate the recommended file name for this package. Distributions
 	//usually have guidelines for this sort of thing. The string returned must
 	//be a plain file name, not a path.
 	RecommendedFileName(pkg *Package) string
+}
+
+type unsupportedBuildMethodError struct{}
+
+//UnsupportedBuildMethodError is returned by Generator.Build() and
+//Generator.BuildInMemory() when the other build method needs to be used.
+var UnsupportedBuildMethodError = &unsupportedBuildMethodError{}
+
+//Error implements the `error` interface.
+func (e *unsupportedBuildMethodError) Error() string {
+	return "UnsupportedBuildMethodError"
 }

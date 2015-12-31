@@ -37,38 +37,47 @@ func (pkg *Package) Build(generator Generator, printToStdout bool, buildReproduc
 	//move unmaterializable filesystem metadata into the setupScript
 	pkg.postponeUnmaterializableFSMetadata()
 
-	//choose root directory in such a way that the user can easily find and
-	//inspect it in the case that an error occurs
-	rootPath := fmt.Sprintf("./holo-build-%s-%s", pkg.Name, pkg.Version)
-
-	//if the root directory exists from a previous run, remove it recursively
-	err := os.RemoveAll(rootPath)
-	if err != nil {
+	//try to build package in memory
+	pkgBytes, err := generator.BuildInMemory(pkg, buildReproducibly)
+	if err != nil && err != UnsupportedBuildMethodError {
 		return err
 	}
 
-	//create the root directory
-	err = os.MkdirAll(rootPath, 0755)
-	if err != nil {
-		return err
-	}
+	//if this is not supported, build package from a materialized filesystem tree
+	if err == UnsupportedBuildMethodError {
+		//choose root directory in such a way that the user can easily find and
+		//inspect it in the case that an error occurs
+		rootPath := fmt.Sprintf("./holo-build-%s-%s", pkg.Name, pkg.Version)
 
-	//materialize FS entries in the root directory
-	err = pkg.materializeFSEntries(rootPath, buildReproducibly)
-	if err != nil {
-		return err
-	}
+		//if the root directory exists from a previous run, remove it recursively
+		err = os.RemoveAll(rootPath)
+		if err != nil {
+			return err
+		}
 
-	//build package
-	pkgBytes, err := generator.Build(pkg, rootPath, buildReproducibly)
-	if err != nil {
-		return err
-	}
+		//create the root directory
+		err = os.MkdirAll(rootPath, 0755)
+		if err != nil {
+			return err
+		}
 
-	//if requested, cleanup the target directory
-	err = os.RemoveAll(rootPath)
-	if err != nil {
-		return err
+		//materialize FS entries in the root directory
+		err = pkg.materializeFSEntries(rootPath, buildReproducibly)
+		if err != nil {
+			return err
+		}
+
+		//build package
+		pkgBytes, err = generator.Build(pkg, rootPath, buildReproducibly)
+		if err != nil {
+			return err
+		}
+
+		//if requested, cleanup the target directory
+		err = os.RemoveAll(rootPath)
+		if err != nil {
+			return err
+		}
 	}
 
 	//write package, either to stdout or to the working directory

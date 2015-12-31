@@ -45,6 +45,11 @@ func (g *Generator) RecommendedFileName(pkg *common.Package) string {
 	return fmt.Sprintf("%s_%s_any.deb", pkg.Name, fullVersionString(pkg))
 }
 
+//BuildInMemory implements the common.Generator interface.
+func (g *Generator) BuildInMemory(pkg *common.Package, buildReproducibly bool) ([]byte, error) {
+	return nil, common.UnsupportedBuildMethodError
+}
+
 func fullVersionString(pkg *common.Package) string {
 	str := fmt.Sprintf("%s-%d", pkg.Version, pkg.Release)
 	if pkg.Epoch > 0 {

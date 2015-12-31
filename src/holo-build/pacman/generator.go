@@ -44,6 +44,11 @@ func (g *Generator) RecommendedFileName(pkg *common.Package) string {
 	return fmt.Sprintf("%s-%s-any.pkg.tar.xz", pkg.Name, fullVersionString(pkg))
 }
 
+//BuildInMemory implements the common.Generator interface.
+func (g *Generator) BuildInMemory(pkg *common.Package, buildReproducibly bool) ([]byte, error) {
+	return nil, common.UnsupportedBuildMethodError
+}
+
 //Build implements the common.Generator interface.
 func (g *Generator) Build(pkg *common.Package, rootPath string, buildReproducibly bool) ([]byte, error) {
 	//write .PKGINFO
