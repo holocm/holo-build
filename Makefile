@@ -1,18 +1,20 @@
 default: prepare-build
 default: build/holo-build build/man/holo-build.8
 
+VERSION := $(shell git describe --tags --dirty)
+
 prepare-build:
 	@mkdir -p build/man
 build/holo-build: src/holo-build/main.go src/holo-build/*/*.go
-	go build -o $@ $<
+	go build --ldflags "-X _$(CURDIR)/src/holo-build/common.version=$(VERSION)" -o $@ $<
 build/dump-package: src/dump-package/main.go src/dump-package/*/*.go
 	go build -o $@ $<
 
 # manpages are generated using pod2man (which comes with Perl and therefore
 # should be readily available on almost every Unix system)
-build/man/%: doc/%.pod src/holo-build/common/version.go
-	pod2man --name="$(shell echo $* | cut -d. -f1)" --section=$(shell echo $* | cut -d. -f2) --center="Configuration Management" \
-		--release="holo-build $(shell grep 'var version =' src/holo-build/common/version.go | cut -d'"' -f2)" \
+build/man/%: doc/%.pod
+	pod2man --name="$(shell echo $* | cut -d. -f1)" --section=$(shell echo $* | cut -d. -f2) \
+		--center="Configuration Management" --release="holo-build $(vERSION)" \
 		$< $@
 
 test: check # just a synonym

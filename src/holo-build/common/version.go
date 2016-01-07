@@ -20,7 +20,8 @@
 
 package common
 
-var version = "v1.0"
+//this is populated at compile time, see Makefile
+var version string
 
 //VersionString returns the version string for holo-build.
 func VersionString() string {
