@@ -127,10 +127,10 @@ func compileEntityDefinitions(pkg PackageSection, groups []GroupSection, users [
 	content := pruneRx.ReplaceAllString(string(buf.Bytes()), "")
 
 	return &FSEntry{
-		Type:    FSEntryTypeRegular,
-		Path:    pkg.DefinitionFile,
-		Content: content,
-		Mode:    0644,
+		Type:     FSEntryTypeRegular,
+		Path:     pkg.DefinitionFile,
+		Content:  content,
+		Metadata: &FSNodeMetadata{Mode: 0644},
 	}
 }
 

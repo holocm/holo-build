@@ -20,8 +20,6 @@
 
 package common
 
-import "os"
-
 //Package contains all information about a single package. This representation
 //will be passed into the generator backends.
 type Package struct {
@@ -112,19 +110,10 @@ const (
 	FSEntryTypeDirectory
 )
 
-//IntOrString is used for FsEntry.Owner and FSEntry.Group that can be either
-//int or string.
-type IntOrString struct {
-	Int uint32
-	Str string
-}
-
 //FSEntry represents a file, directory or symlink in the package.
 type FSEntry struct {
-	Type    int
-	Path    string
-	Content string       //except directories (has content for regular files, target for symlinks)
-	Mode    os.FileMode  //except symlinks
-	Owner   *IntOrString //except symlinks
-	Group   *IntOrString //except symlinks
+	Type     int
+	Path     string
+	Content  string          //except directories (has content for regular files, target for symlinks)
+	Metadata *FSNodeMetadata //except symlinks
 }

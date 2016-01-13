@@ -20,8 +20,6 @@
 
 package common
 
-//#include <unistd.h>
-import "C"
 import (
 	"fmt"
 	"io/ioutil"
@@ -145,14 +143,18 @@ func (pkg *Package) postponeUnmaterializableFSMetadata() {
 	var additionalSetupScript string
 
 	for _, entry := range pkg.FSEntries {
-		var ownerStr, groupStr string
-		if entry.Owner != nil && entry.Owner.Str != "" {
-			ownerStr = entry.Owner.Str
-			entry.Owner = nil
+		if entry.Metadata == nil {
+			continue
 		}
-		if entry.Group != nil && entry.Group.Str != "" {
-			groupStr = entry.Group.Str
-			entry.Group = nil
+
+		var ownerStr, groupStr string
+		if entry.Metadata.Owner != nil && entry.Metadata.Owner.Str != "" {
+			ownerStr = entry.Metadata.Owner.Str
+			entry.Metadata.Owner = nil
+		}
+		if entry.Metadata.Group != nil && entry.Metadata.Group.Str != "" {
+			groupStr = entry.Metadata.Group.Str
+			entry.Metadata.Group = nil
 		}
 
 		if ownerStr != "" {
@@ -187,9 +189,9 @@ func (pkg *Package) materializeFSEntries(rootPath string, buildReproducibly bool
 		//write entry
 		switch entry.Type {
 		case FSEntryTypeRegular:
-			err = ioutil.WriteFile(path, []byte(entry.Content), entry.Mode)
+			err = ioutil.WriteFile(path, []byte(entry.Content), entry.Metadata.Mode)
 		case FSEntryTypeDirectory:
-			err = os.Mkdir(path, entry.Mode)
+			err = os.Mkdir(path, entry.Metadata.Mode)
 		case FSEntryTypeSymlink:
 			err = os.Symlink(entry.Content, path)
 		}
@@ -197,26 +199,10 @@ func (pkg *Package) materializeFSEntries(rootPath string, buildReproducibly bool
 			return err
 		}
 
-		//ownership only applies to files and directories
-		if entry.Type == FSEntryTypeSymlink {
-			continue
-		}
-
 		//apply ownership (numeric ownership can be written into the package directly; ownership by name will be applied in the setupScript)
-		var uid C.__uid_t
-		var gid C.__gid_t
-		if entry.Owner != nil {
-			uid = C.__uid_t(entry.Owner.Int)
-		}
-		if entry.Group != nil {
-			gid = C.__gid_t(entry.Group.Int)
-		}
-		if uid != 0 || gid != 0 {
-			//cannot use os.Chown(); os.Chown calls into syscall.Chown and thus
-			//does a direct syscall which cannot be intercepted by fakeroot; I
-			//need to call chown(2) via cgo
-			result, err := C.chown(C.CString(path), uid, gid)
-			if result != 0 && err != nil {
+		if entry.Metadata != nil {
+			err = entry.Metadata.ApplyTo(path)
+			if err != nil {
 				return err
 			}
 		}

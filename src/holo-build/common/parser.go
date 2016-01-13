@@ -185,11 +185,13 @@ func ParsePackageDefinition(input io.Reader) (*Package, []error) {
 
 		entryDesc := fmt.Sprintf("directory \"%s\"", path)
 		pkg.FSEntries = append(pkg.FSEntries, FSEntry{
-			Type:  FSEntryTypeDirectory,
-			Path:  path,
-			Mode:  parseFileMode(dirSection.Mode, 0755, ec, entryDesc),
-			Owner: parseUserOrGroupRef(dirSection.Owner, ec, entryDesc),
-			Group: parseUserOrGroupRef(dirSection.Group, ec, entryDesc),
+			Type: FSEntryTypeDirectory,
+			Path: path,
+			Metadata: &FSNodeMetadata{
+				Mode:  parseFileMode(dirSection.Mode, 0755, ec, entryDesc),
+				Owner: parseUserOrGroupRef(dirSection.Owner, ec, entryDesc),
+				Group: parseUserOrGroupRef(dirSection.Group, ec, entryDesc),
+			},
 		})
 	}
 
@@ -202,9 +204,11 @@ func ParsePackageDefinition(input io.Reader) (*Package, []error) {
 			Type:    FSEntryTypeRegular,
 			Path:    path,
 			Content: parseFileContent(fileSection.Content, fileSection.ContentFrom, fileSection.Raw, ec, entryDesc),
-			Mode:    parseFileMode(fileSection.Mode, 0644, ec, entryDesc),
-			Owner:   parseUserOrGroupRef(fileSection.Owner, ec, entryDesc),
-			Group:   parseUserOrGroupRef(fileSection.Group, ec, entryDesc),
+			Metadata: &FSNodeMetadata{
+				Mode:  parseFileMode(fileSection.Mode, 0644, ec, entryDesc),
+				Owner: parseUserOrGroupRef(fileSection.Owner, ec, entryDesc),
+				Group: parseUserOrGroupRef(fileSection.Group, ec, entryDesc),
+			},
 		})
 	}
 
