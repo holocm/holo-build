@@ -95,11 +95,13 @@ func compileEntityDefinitions(pkg PackageSection, groups []GroupSection, users [
 	}
 
 	//needs a valid definition file name
+	path = pkg.DefinitionFile
 	switch {
-	case pkg.DefinitionFile == "":
+	case path == "":
 		ec.Addf("Cannot declare users/groups when package.definitionFile field is missing")
-	case !definitionFileRx.MatchString(pkg.DefinitionFile):
-		ec.Addf("\"%s\" is not an acceptable definition file (should look like \"/usr/share/holo/users-groups/01-foo.toml\")", pkg.DefinitionFile)
+	case !definitionFileRx.MatchString(path):
+		ec.Addf("\"%s\" is not an acceptable definition file (should look like \"/usr/share/holo/users-groups/01-foo.toml\")", path)
+		path = "" //indicate broken path to caller
 	}
 
 	//validate users/groups
@@ -118,7 +120,7 @@ func compileEntityDefinitions(pkg PackageSection, groups []GroupSection, users [
 	var buf bytes.Buffer
 	err := toml.NewEncoder(&buf).Encode(&s)
 	if err != nil {
-		ec.Addf("encoding of \"%s\" failed: %s", pkg.DefinitionFile, err.Error())
+		ec.Addf("encoding of \"%s\" failed: %s", path, err.Error())
 		return nil, ""
 	}
 
@@ -129,7 +131,7 @@ func compileEntityDefinitions(pkg PackageSection, groups []GroupSection, users [
 	return &FSRegularFile{
 		Content:  content,
 		Metadata: FSNodeMetadata{Mode: 0644},
-	}, pkg.DefinitionFile
+	}, path
 }
 
 func validateGroup(group GroupSection, ec *ErrorCollector, entryIdx int) {

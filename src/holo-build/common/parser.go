@@ -169,7 +169,7 @@ func ParsePackageDefinition(input io.Reader) (*Package, []error) {
 
 	//compile entity definition file
 	entityNode, entityPath := compileEntityDefinitions(p.Package, p.Group, p.User, ec)
-	if entityNode != nil {
+	if entityNode != nil && entityPath != "" {
 		pkg.InsertFSNode(entityNode, entityPath, ec)
 	}
 
