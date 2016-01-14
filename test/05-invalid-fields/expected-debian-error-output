@@ -21,6 +21,6 @@
 !! file "foo/bar.conf" is invalid: cannot use both `content` and `contentFrom`
 !! file "foo/bar.conf" is invalid: "owner"/"group" attributes must be strings or integers, found type bool
 !! file "foo/bar.conf" is invalid: "owner"/"group" attributes must be strings or integers, found type []interface {}
-!! multiple entries for path "/etc/foo"
 !! file "/etc/foo" is invalid: "john+doe" is not an acceptable user or group name
 !! file "/etc/foo" is invalid: "$users" is not an acceptable user or group name
+!! failed to insert "/etc/foo" into the package file system: duplicate entry

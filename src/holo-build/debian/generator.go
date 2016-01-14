@@ -28,7 +28,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"sort"
 	"strings"
 	"time"
 
@@ -233,32 +232,24 @@ func compilePackageRelations(relType string, rels []common.PackageRelation) (str
 
 func writeMD5SumsFile(pkg *common.Package, controlPath string, buildReproducibly bool) error {
 	//calculate MD5 sums for all regular files in this package
-	paths := make([]string, 0, len(pkg.FSEntries))
-	md5ForPath := make(map[string]string, len(pkg.FSEntries))
-
-	for _, entry := range pkg.FSEntries {
-		if entry.Type != common.FSEntryTypeRegular {
-			continue
+	var lines []string
+	pkg.WalkFSWithRelativePaths(func(path string, node common.FSNode) error {
+		file, ok := node.(*common.FSRegularFile)
+		if !ok {
+			return nil //look only at regular files
 		}
-		paths = append(paths, entry.Path)
-
 		//the following is equivalent to sum := md5.Sum([]byte(entry.Content)),
 		//but also is backwards-compatible to Go 1.1
 		digest := md5.New()
-		digest.Write([]byte(entry.Content))
+		digest.Write([]byte(file.Content))
 		sum := digest.Sum(nil)
 
-		md5ForPath[entry.Path] = hex.EncodeToString(sum[:])
-	}
+		sumStr := hex.EncodeToString(sum[:])
+		lines = append(lines, fmt.Sprintf("%s  %s\n", sumStr, path))
+		return nil
+	})
 
-	//order by path for deterministic behavior
-	sort.Strings(paths)
-	lines := make([]string, len(paths))
-	for _, path := range paths {
-		lines = append(lines, fmt.Sprintf("%s  %s\n", md5ForPath[path], strings.TrimPrefix(path, "/")))
-	}
 	contents := strings.Join(lines, "")
-
 	return common.WriteFile(filepath.Join(controlPath, "md5sums"), []byte(contents), 0644, buildReproducibly)
 }
 

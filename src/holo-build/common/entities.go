@@ -88,10 +88,10 @@ func parseUserOrGroupRef(value interface{}, ec *ErrorCollector, entryDesc string
 
 var definitionFileRx = regexp.MustCompile(`^/usr/share/holo/users-groups/[^/]+.toml$`)
 
-func compileEntityDefinitions(pkg PackageSection, groups []GroupSection, users []UserSection, ec *ErrorCollector) *FSEntry {
+func compileEntityDefinitions(pkg PackageSection, groups []GroupSection, users []UserSection, ec *ErrorCollector) (node FSNode, path string) {
 	//only add an entity definition file if it is required
 	if len(groups) == 0 && len(users) == 0 {
-		return nil
+		return nil, ""
 	}
 
 	//needs a valid definition file name
@@ -119,19 +119,17 @@ func compileEntityDefinitions(pkg PackageSection, groups []GroupSection, users [
 	err := toml.NewEncoder(&buf).Encode(&s)
 	if err != nil {
 		ec.Addf("encoding of \"%s\" failed: %s", pkg.DefinitionFile, err.Error())
-		return nil
+		return nil, ""
 	}
 
 	//toml.Encode does not support the omitempty flag yet, so remove unset fields manually
 	pruneRx := regexp.MustCompile(`(?m:^\s*[a-z]+ = (?:0|""|false)$)\n`)
 	content := pruneRx.ReplaceAllString(string(buf.Bytes()), "")
 
-	return &FSEntry{
-		Type:     FSEntryTypeRegular,
-		Path:     pkg.DefinitionFile,
+	return &FSRegularFile{
 		Content:  content,
-		Metadata: &FSNodeMetadata{Mode: 0644},
-	}
+		Metadata: FSNodeMetadata{Mode: 0644},
+	}, pkg.DefinitionFile
 }
 
 func validateGroup(group GroupSection, ec *ErrorCollector, entryIdx int) {

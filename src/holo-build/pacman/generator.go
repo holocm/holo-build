@@ -145,11 +145,15 @@ func writePKGINFO(pkg *common.Package, rootPath string, buildReproducibly bool) 
 
 func compileBackupMarkers(pkg *common.Package) string {
 	var lines []string
-	for _, entry := range pkg.FSEntries {
-		if entry.Type == common.FSEntryTypeRegular && !strings.HasPrefix(entry.Path, "/usr/share/holo/") {
-			lines = append(lines, fmt.Sprintf("backup = %s\n", strings.TrimPrefix(entry.Path, "/")))
+	pkg.WalkFSWithRelativePaths(func(path string, node common.FSNode) error {
+		if _, ok := node.(*common.FSRegularFile); !ok {
+			return nil //look only at regular files
 		}
-	}
+		if !strings.HasPrefix(path, "usr/share/holo/") {
+			lines = append(lines, fmt.Sprintf("backup = %s\n", path))
+		}
+		return nil
+	})
 	sort.Strings(lines)
 	return strings.Join(lines, "")
 }

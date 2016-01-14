@@ -53,12 +53,6 @@ func (pkg *Package) Build(generator Generator, printToStdout bool, buildReproduc
 			return err
 		}
 
-		//create the root directory
-		err = os.MkdirAll(rootPath, 0755)
-		if err != nil {
-			return err
-		}
-
 		//materialize FS entries in the root directory
 		err = pkg.materializeFSEntries(rootPath, buildReproducibly)
 		if err != nil {
@@ -101,16 +95,16 @@ func (pkg *Package) Build(generator Generator, printToStdout bool, buildReproduc
 func (pkg *Package) doMagicalHoloIntegration() {
 	//does this package need to provision stuff with Holo plugins?
 	plugins := make(map[string]bool)
-	for _, entry := range pkg.FSEntries {
-		if strings.HasPrefix(entry.Path, "/usr/share/holo/") {
+	pkg.WalkFSWithAbsolutePaths(func(path string, node FSNode) error {
+		if strings.HasPrefix(path, "/usr/share/holo/") {
 			//extract the plugin ID from the path
-			pathParts := strings.Split(entry.Path, "/")
+			pathParts := strings.Split(path, "/")
 			if len(pathParts) > 4 {
 				plugins[pathParts[4]] = true
 			}
-			break
 		}
-	}
+		return nil
+	})
 	if len(plugins) == 0 {
 		return
 	}
@@ -142,70 +136,26 @@ func (pkg *Package) postponeUnmaterializableFSMetadata() {
 	//to the setupScript to apply ownership at install time.
 	var additionalSetupScript string
 
-	for _, entry := range pkg.FSEntries {
-		if entry.Metadata == nil {
-			continue
+	pkg.WalkFSWithAbsolutePaths(func(path string, node FSNode) error {
+		switch n := node.(type) {
+		case *FSDirectory:
+			additionalSetupScript += n.Metadata.PostponeUnmaterializable(path)
+		case *FSRegularFile:
+			additionalSetupScript += n.Metadata.PostponeUnmaterializable(path)
+		default:
+			//don't do anything for FSNodes that don't have metadata
 		}
-
-		var ownerStr, groupStr string
-		if entry.Metadata.Owner != nil && entry.Metadata.Owner.Str != "" {
-			ownerStr = entry.Metadata.Owner.Str
-			entry.Metadata.Owner = nil
-		}
-		if entry.Metadata.Group != nil && entry.Metadata.Group.Str != "" {
-			groupStr = entry.Metadata.Group.Str
-			entry.Metadata.Group = nil
-		}
-
-		if ownerStr != "" {
-			if groupStr != "" {
-				additionalSetupScript += fmt.Sprintf("chown %s:%s %s\n", ownerStr, groupStr, entry.Path)
-			} else {
-				additionalSetupScript += fmt.Sprintf("chown %s %s\n", ownerStr, entry.Path)
-			}
-		} else {
-			if groupStr != "" {
-				additionalSetupScript += fmt.Sprintf("chgrp %s %s\n", groupStr, entry.Path)
-			}
-		}
-	}
+		return nil
+	})
 
 	//ensure that ownership is correct before running the actual setup script
 	pkg.SetupScript = additionalSetupScript + pkg.SetupScript
 }
 
 func (pkg *Package) materializeFSEntries(rootPath string, buildReproducibly bool) error {
-	for _, entry := range pkg.FSEntries {
-		//find the path within the rootPath for this entry
-		path, _ := filepath.Rel("/", entry.Path)
-		path = filepath.Join(rootPath, path)
-
-		//mkdir -p $(dirname $entry_path)
-		err := os.MkdirAll(filepath.Dir(path), 0755)
-		if err != nil {
-			return err
-		}
-
-		//write entry
-		switch entry.Type {
-		case FSEntryTypeRegular:
-			err = ioutil.WriteFile(path, []byte(entry.Content), entry.Metadata.Mode)
-		case FSEntryTypeDirectory:
-			err = os.Mkdir(path, entry.Metadata.Mode)
-		case FSEntryTypeSymlink:
-			err = os.Symlink(entry.Content, path)
-		}
-		if err != nil {
-			return err
-		}
-
-		//apply ownership (numeric ownership can be written into the package directly; ownership by name will be applied in the setupScript)
-		if entry.Metadata != nil {
-			err = entry.Metadata.ApplyTo(path)
-			if err != nil {
-				return err
-			}
-		}
+	err := pkg.FSRoot.Materialize(rootPath)
+	if err != nil {
+		return err
 	}
 
 	//if a reproducible build has been requested, set all timestamps for all FS
