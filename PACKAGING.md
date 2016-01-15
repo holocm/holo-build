@@ -4,7 +4,7 @@
 
 Run-time dependencies for this repo:
 
-* `fakeroot`
+* `xz`
 
 Build-time dependencies for this repo:
 

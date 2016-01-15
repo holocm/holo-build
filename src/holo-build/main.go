@@ -24,25 +24,11 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"syscall"
 
 	"./common"
 	"./debian"
 	"./pacman"
 )
-
-func main() {
-	//holo-build needs to run in a fakeroot(1)
-	if os.Getenv("FAKEROOTKEY") != "" {
-		//already running in fakeroot, commence normal operation
-		actualMain()
-		return
-	}
-
-	//not running in fakeroot -> exec self with fakeroot
-	args := append([]string{"/usr/bin/fakeroot"}, os.Args...)
-	syscall.Exec(args[0], args, os.Environ())
-}
 
 type options struct {
 	generator     common.Generator
@@ -51,7 +37,7 @@ type options struct {
 	filenameOnly  bool
 }
 
-func actualMain() {
+func main() {
 	opts, earlyExit := parseArgs()
 	if earlyExit {
 		return
