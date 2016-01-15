@@ -24,6 +24,7 @@ package common
 import "C"
 import (
 	"crypto/md5"
+	"crypto/sha256"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -297,6 +298,17 @@ func (f *FSRegularFile) MD5Digest() string {
 	//the following is equivalent to sum := md5.Sum([]byte(f.Content)),
 	//but also is backwards-compatible to Go 1.1
 	digest := md5.New()
+	digest.Write([]byte(f.Content))
+	sum := digest.Sum(nil)
+
+	return hex.EncodeToString(sum[:])
+}
+
+//SHA256Digest returns the SHA256 digest of this file's contents.
+func (f *FSRegularFile) SHA256Digest() string {
+	//the following is equivalent to sum := sha256.Sum([]byte(f.Content)),
+	//but also is backwards-compatible to Go 1.1
+	digest := sha256.New()
 	digest.Write([]byte(f.Content))
 	sum := digest.Sum(nil)
 
