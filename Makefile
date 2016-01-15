@@ -14,7 +14,7 @@ build/dump-package: src/dump-package/main.go src/dump-package/*/*.go
 # should be readily available on almost every Unix system)
 build/man/%: doc/%.pod
 	pod2man --name="$(shell echo $* | cut -d. -f1)" --section=$(shell echo $* | cut -d. -f2) \
-		--center="Configuration Management" --release="holo-build $(vERSION)" \
+		--center="Configuration Management" --release="holo-build $(VERSION)" \
 		$< $@
 
 test: check # just a synonym
