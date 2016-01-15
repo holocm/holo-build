@@ -1,0 +1,21 @@
+# This testcase checks behavior related to implicit directory entries. See README.
+
+[package]
+name = "implicit-dirs"
+version = "1.0"
+description = "implicit directories"
+author = "Holo Build <holo.build@example.org>"
+
+# NOTE: order of [[directory]] is important!
+
+[[directory]]
+path = "/etc/foo/bar"
+mode = "0700"
+
+[[directory]]
+path = "/etc/foo"
+mode = "0700"
+
+[[directory]]
+path = "/etc"
+mode = "0700"

@@ -1,0 +1,22 @@
+ar archive
+    >> control.tar.gz is regular file (mode: 644, owner: 0, group: 0), content is GZip-compressed POSIX tar archive
+        >> ./ is directory (mode: 755, owner: 0, group: 0)
+        >> ./control is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+            Package: implicit-dirs
+            Version: 1.0-1
+            Architecture: all
+            Maintainer: Holo Build <holo.build@example.org>
+            Installed-Size: 16
+            Section: misc
+            Priority: optional
+            Description: implicit directories
+             implicit directories
+        >> ./md5sums is regular file (mode: 644, owner: 0, group: 0), content is empty file
+    >> data.tar.xz is regular file (mode: 644, owner: 0, group: 0), content is XZ-compressed POSIX tar archive
+        >> ./ is directory (mode: 755, owner: 0, group: 0)
+        >> ./etc/ is directory (mode: 700, owner: 0, group: 0)
+        >> ./etc/foo/ is directory (mode: 700, owner: 0, group: 0)
+        >> ./etc/foo/bar/ is directory (mode: 700, owner: 0, group: 0)
+    >> debian-binary is regular file (mode: 644, owner: 0, group: 0) at archive position 0, content is data as shown below
+        2.0
+
