@@ -27,7 +27,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
 	"time"
 
@@ -71,7 +70,7 @@ func (g *Generator) Build(pkg *common.Package, rootPath string, buildReproducibl
 	}
 
 	//prepare a directory into which to assemble the metadata files for control.tar.gz
-	controlTar, err := buildControlTar(pkg, rootPath, buildReproducibly)
+	controlTar, err := buildControlTar(pkg, buildReproducibly)
 	if err != nil {
 		return nil, err
 	}
@@ -98,59 +97,41 @@ func buildDataTar(rootPath string) ([]byte, error) {
 	return cmd.Output()
 }
 
-func buildControlTar(pkg *common.Package, rootPath string, buildReproducibly bool) ([]byte, error) {
+func buildControlTar(pkg *common.Package, buildReproducibly bool) ([]byte, error) {
 	//prepare a directory into which to put all these files
-	controlPath := filepath.Join(rootPath, ".control")
-	err := os.MkdirAll(controlPath, 0755)
-	if err != nil {
-		return nil, err
-	}
+	controlDir := common.NewFSDirectory()
 
 	//place all the required files in there (NOTE: using the conffiles file
 	//does not seem to be appropriate for our use-case, although I'll let more
 	//experienced Debian users judge this one)
-	err = writeControlFile(pkg, rootPath, controlPath, buildReproducibly)
+	err := writeControlFile(pkg, controlDir, buildReproducibly)
 	if err != nil {
 		return nil, err
 	}
-	err = writeMD5SumsFile(pkg, controlPath, buildReproducibly)
-	if err != nil {
-		return nil, err
-	}
+	writeMD5SumsFile(pkg, controlDir, buildReproducibly)
 
 	//write postinst script if necessary
 	if strings.TrimSpace(pkg.SetupScript) != "" {
 		script := "#!/bin/bash\n" + strings.TrimSuffix(pkg.SetupScript, "\n") + "\n"
-		err = common.WriteFile(filepath.Join(controlPath, "postinst"), []byte(script), 0755, buildReproducibly)
-		if err != nil {
-			return nil, err
+		controlDir.Entries["postinst"] = &common.FSRegularFile{
+			Content:  script,
+			Metadata: common.FSNodeMetadata{Mode: 0755},
 		}
 	}
 
 	//write postrm script if necessary
 	if strings.TrimSpace(pkg.CleanupScript) != "" {
 		script := "#!/bin/bash\n" + strings.TrimSuffix(pkg.CleanupScript, "\n") + "\n"
-		err = common.WriteFile(filepath.Join(controlPath, "postrm"), []byte(script), 0755, buildReproducibly)
-		if err != nil {
-			return nil, err
+		controlDir.Entries["postrm"] = &common.FSRegularFile{
+			Content:  script,
+			Metadata: common.FSNodeMetadata{Mode: 0755},
 		}
 	}
 
-	//compress directory
-	cmd := exec.Command(
-		//using standardized language settings...
-		"env", "LANG=C",
-		//...generate a .tar.gz archive...
-		"tar", "czf", "-",
-		//...of the working directory (== controlPath)
-		".",
-	)
-	cmd.Dir = controlPath
-	cmd.Stderr = os.Stderr
-	return cmd.Output()
+	return controlDir.ToTarGZArchive(true, buildReproducibly)
 }
 
-func writeControlFile(pkg *common.Package, rootPath, controlPath string, buildReproducibly bool) error {
+func writeControlFile(pkg *common.Package, controlDir *common.FSDirectory, buildReproducibly bool) error {
 	//reference for this file:
 	//https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-binarycontrolfiles
 	contents := fmt.Sprintf("Package: %s\n", pkg.Name)
@@ -193,7 +174,11 @@ func writeControlFile(pkg *common.Package, rootPath, controlPath string, buildRe
 	}
 	contents += fmt.Sprintf("Description: %s\n %s\n", desc, desc)
 
-	return common.WriteFile(filepath.Join(controlPath, "control"), []byte(contents), 0644, buildReproducibly)
+	controlDir.Entries["control"] = &common.FSRegularFile{
+		Content:  contents,
+		Metadata: common.FSNodeMetadata{Mode: 0644},
+	}
+	return nil
 }
 
 func compilePackageRelations(relType string, rels []common.PackageRelation) (string, error) {
@@ -230,7 +215,7 @@ func compilePackageRelations(relType string, rels []common.PackageRelation) (str
 	return fmt.Sprintf("%s: %s\n", relType, strings.Join(entries, ", ")), nil
 }
 
-func writeMD5SumsFile(pkg *common.Package, controlPath string, buildReproducibly bool) error {
+func writeMD5SumsFile(pkg *common.Package, controlDir *common.FSDirectory, buildReproducibly bool) {
 	//calculate MD5 sums for all regular files in this package
 	var lines []string
 	pkg.WalkFSWithRelativePaths(func(path string, node common.FSNode) error {
@@ -249,8 +234,10 @@ func writeMD5SumsFile(pkg *common.Package, controlPath string, buildReproducibly
 		return nil
 	})
 
-	contents := strings.Join(lines, "")
-	return common.WriteFile(filepath.Join(controlPath, "md5sums"), []byte(contents), 0644, buildReproducibly)
+	controlDir.Entries["md5sums"] = &common.FSRegularFile{
+		Content:  strings.Join(lines, ""),
+		Metadata: common.FSNodeMetadata{Mode: 0644},
+	}
 }
 
 func buildArArchive(entries []arArchiveEntry) ([]byte, error) {

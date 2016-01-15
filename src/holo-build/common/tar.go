@@ -23,6 +23,7 @@ package common
 import (
 	"archive/tar"
 	"bytes"
+	"compress/gzip"
 	"strings"
 	"time"
 )
@@ -97,5 +98,24 @@ func (d *FSDirectory) ToTarArchive(leadingDot, buildReproducibly bool) ([]byte, 
 	}
 
 	err = tw.Close()
+	return buf.Bytes(), err
+}
+
+//ToTarGZArchive is identical to ToTarArchive, but GZip-compresses the result.
+func (d *FSDirectory) ToTarGZArchive(leadingDot, buildReproducibly bool) ([]byte, error) {
+	data, err := d.ToTarArchive(leadingDot, buildReproducibly)
+	if err != nil {
+		return nil, err
+	}
+
+	var buf bytes.Buffer
+	w := gzip.NewWriter(&buf)
+
+	_, err = w.Write(data)
+	if err != nil {
+		return nil, err
+	}
+
+	err = w.Close()
 	return buf.Bytes(), err
 }
