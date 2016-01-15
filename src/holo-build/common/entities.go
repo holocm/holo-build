@@ -88,18 +88,20 @@ func parseUserOrGroupRef(value interface{}, ec *ErrorCollector, entryDesc string
 
 var definitionFileRx = regexp.MustCompile(`^/usr/share/holo/users-groups/[^/]+.toml$`)
 
-func compileEntityDefinitions(pkg PackageSection, groups []GroupSection, users []UserSection, ec *ErrorCollector) *FSEntry {
+func compileEntityDefinitions(pkg PackageSection, groups []GroupSection, users []UserSection, ec *ErrorCollector) (node FSNode, path string) {
 	//only add an entity definition file if it is required
 	if len(groups) == 0 && len(users) == 0 {
-		return nil
+		return nil, ""
 	}
 
 	//needs a valid definition file name
+	path = pkg.DefinitionFile
 	switch {
-	case pkg.DefinitionFile == "":
+	case path == "":
 		ec.Addf("Cannot declare users/groups when package.definitionFile field is missing")
-	case !definitionFileRx.MatchString(pkg.DefinitionFile):
-		ec.Addf("\"%s\" is not an acceptable definition file (should look like \"/usr/share/holo/users-groups/01-foo.toml\")", pkg.DefinitionFile)
+	case !definitionFileRx.MatchString(path):
+		ec.Addf("\"%s\" is not an acceptable definition file (should look like \"/usr/share/holo/users-groups/01-foo.toml\")", path)
+		path = "" //indicate broken path to caller
 	}
 
 	//validate users/groups
@@ -118,20 +120,18 @@ func compileEntityDefinitions(pkg PackageSection, groups []GroupSection, users [
 	var buf bytes.Buffer
 	err := toml.NewEncoder(&buf).Encode(&s)
 	if err != nil {
-		ec.Addf("encoding of \"%s\" failed: %s", pkg.DefinitionFile, err.Error())
-		return nil
+		ec.Addf("encoding of \"%s\" failed: %s", path, err.Error())
+		return nil, ""
 	}
 
 	//toml.Encode does not support the omitempty flag yet, so remove unset fields manually
 	pruneRx := regexp.MustCompile(`(?m:^\s*[a-z]+ = (?:0|""|false)$)\n`)
 	content := pruneRx.ReplaceAllString(string(buf.Bytes()), "")
 
-	return &FSEntry{
-		Type:    FSEntryTypeRegular,
-		Path:    pkg.DefinitionFile,
-		Content: content,
-		Mode:    0644,
-	}
+	return &FSRegularFile{
+		Content:  content,
+		Metadata: FSNodeMetadata{Mode: 0644},
+	}, path
 }
 
 func validateGroup(group GroupSection, ec *ErrorCollector, entryIdx int) {

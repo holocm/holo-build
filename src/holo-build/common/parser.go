@@ -117,7 +117,6 @@ func ParsePackageDefinition(input io.Reader) (*Package, []error) {
 	}
 
 	//restructure the parsed data into a common.Package struct
-	fsEntryCount := len(p.Directory) + len(p.File) + len(p.Symlink)
 	pkg := Package{
 		Name:          strings.TrimSpace(p.Package.Name),
 		Version:       strings.TrimSpace(p.Package.Version),
@@ -127,8 +126,7 @@ func ParsePackageDefinition(input io.Reader) (*Package, []error) {
 		Author:        strings.TrimSpace(p.Package.Author),
 		SetupScript:   strings.TrimSpace(p.Package.SetupScript),
 		CleanupScript: strings.TrimSpace(p.Package.CleanupScript),
-		//"+1" to accommodate the optional entity definition
-		FSEntries: make([]FSEntry, 0, fsEntryCount+1),
+		FSRoot:        NewFSDirectory(),
 	}
 
 	//default value for Release is 1
@@ -169,58 +167,59 @@ func ParsePackageDefinition(input io.Reader) (*Package, []error) {
 	pkg.Conflicts = parseRelatedPackages("conflicts", p.Package.Conflicts, ec)
 	pkg.Replaces = parseRelatedPackages("replaces", p.Package.Replaces, ec)
 
-	//compile entity definition file (we do this before all the other FS
-	//entries, so that this step does not need the wasPathSeen check)
-	wasPathSeen := make(map[string]bool, fsEntryCount+1)
-	entry := compileEntityDefinitions(p.Package, p.Group, p.User, ec)
-	if entry != nil {
-		wasPathSeen[entry.Path] = true
-		pkg.FSEntries = append(pkg.FSEntries, *entry)
+	//compile entity definition file
+	entityNode, entityPath := compileEntityDefinitions(p.Package, p.Group, p.User, ec)
+	if entityNode != nil && entityPath != "" {
+		pkg.InsertFSNode(entityNode, entityPath, ec)
 	}
 
 	//parse and validate FS entries
 	for idx, dirSection := range p.Directory {
 		path := dirSection.Path
-		validatePath(path, &wasPathSeen, ec, "directory", idx)
+		isPathValid := validatePath(path, ec, "directory", idx)
 
 		entryDesc := fmt.Sprintf("directory \"%s\"", path)
-		pkg.FSEntries = append(pkg.FSEntries, FSEntry{
-			Type:  FSEntryTypeDirectory,
-			Path:  path,
+		dirNode := NewFSDirectory()
+		dirNode.Metadata = FSNodeMetadata{
 			Mode:  parseFileMode(dirSection.Mode, 0755, ec, entryDesc),
 			Owner: parseUserOrGroupRef(dirSection.Owner, ec, entryDesc),
 			Group: parseUserOrGroupRef(dirSection.Group, ec, entryDesc),
-		})
+		}
+		if isPathValid {
+			pkg.InsertFSNode(dirNode, path, ec)
+		}
 	}
 
 	for idx, fileSection := range p.File {
 		path := fileSection.Path
-		validatePath(path, &wasPathSeen, ec, "file", idx)
+		isPathValid := validatePath(path, ec, "file", idx)
 
 		entryDesc := fmt.Sprintf("file \"%s\"", path)
-		pkg.FSEntries = append(pkg.FSEntries, FSEntry{
-			Type:    FSEntryTypeRegular,
-			Path:    path,
+		node := &FSRegularFile{
 			Content: parseFileContent(fileSection.Content, fileSection.ContentFrom, fileSection.Raw, ec, entryDesc),
-			Mode:    parseFileMode(fileSection.Mode, 0644, ec, entryDesc),
-			Owner:   parseUserOrGroupRef(fileSection.Owner, ec, entryDesc),
-			Group:   parseUserOrGroupRef(fileSection.Group, ec, entryDesc),
-		})
+			Metadata: FSNodeMetadata{
+				Mode:  parseFileMode(fileSection.Mode, 0644, ec, entryDesc),
+				Owner: parseUserOrGroupRef(fileSection.Owner, ec, entryDesc),
+				Group: parseUserOrGroupRef(fileSection.Group, ec, entryDesc),
+			},
+		}
+		if isPathValid {
+			pkg.InsertFSNode(node, path, ec)
+		}
 	}
 
 	for idx, symlinkSection := range p.Symlink {
 		path := symlinkSection.Path
-		validatePath(path, &wasPathSeen, ec, "symlink", idx)
+		isPathValid := validatePath(path, ec, "symlink", idx)
 
 		if symlinkSection.Target == "" {
 			ec.Addf("symlink \"%s\" is invalid: missing target", path)
 		}
 
-		pkg.FSEntries = append(pkg.FSEntries, FSEntry{
-			Type:    FSEntryTypeSymlink,
-			Path:    path,
-			Content: symlinkSection.Target,
-		})
+		node := &FSSymlink{Target: symlinkSection.Target}
+		if isPathValid {
+			pkg.InsertFSNode(node, path, ec)
+		}
 	}
 
 	return &pkg, ec.Errors
@@ -269,9 +268,8 @@ func parseRelatedPackages(relType string, specs []string, ec *ErrorCollector) []
 }
 
 //path is the path to be validated.
-//wasPathSeen tracks usage of paths to detect duplicate entries.
 //entryType and entryIdx are used for error messages and describe the entry.
-func validatePath(path string, wasPathSeen *map[string]bool, ec *ErrorCollector, entryType string, entryIdx int) bool {
+func validatePath(path string, ec *ErrorCollector, entryType string, entryIdx int) bool {
 	if path == "" {
 		ec.Addf("%s %d is invalid: missing \"path\" attribute", entryType, entryIdx)
 		return false
@@ -284,11 +282,6 @@ func validatePath(path string, wasPathSeen *map[string]bool, ec *ErrorCollector,
 		ec.Addf("%s \"%s\" is invalid: trailing slash(es)", entryType, path)
 		return false
 	}
-	if (*wasPathSeen)[path] {
-		ec.Addf("multiple entries for path \"%s\"", path)
-		return false
-	}
-	(*wasPathSeen)[path] = true
 	return true
 }
 

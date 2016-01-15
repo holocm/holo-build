@@ -22,13 +22,7 @@ package debian
 
 import (
 	"bytes"
-	"crypto/md5"
-	"encoding/hex"
 	"fmt"
-	"os"
-	"os/exec"
-	"path/filepath"
-	"sort"
 	"strings"
 	"time"
 
@@ -59,15 +53,15 @@ type arArchiveEntry struct {
 }
 
 //Build implements the common.Generator interface.
-func (g *Generator) Build(pkg *common.Package, rootPath string, buildReproducibly bool) ([]byte, error) {
+func (g *Generator) Build(pkg *common.Package, buildReproducibly bool) ([]byte, error) {
 	//compress data.tar.xz
-	dataTar, err := buildDataTar(rootPath)
+	dataTar, err := pkg.FSRoot.ToTarXZArchive(true, false, buildReproducibly)
 	if err != nil {
 		return nil, err
 	}
 
 	//prepare a directory into which to assemble the metadata files for control.tar.gz
-	controlTar, err := buildControlTar(pkg, rootPath, buildReproducibly)
+	controlTar, err := buildControlTar(pkg, buildReproducibly)
 	if err != nil {
 		return nil, err
 	}
@@ -80,80 +74,48 @@ func (g *Generator) Build(pkg *common.Package, rootPath string, buildReproducibl
 	})
 }
 
-func buildDataTar(rootPath string) ([]byte, error) {
-	cmd := exec.Command(
-		//using standardized language settings...
-		"env", "LANG=C",
-		//...generate a .tar.xz archive...
-		"tar", "cJf", "-",
-		//...of the working directory (== rootPath)
-		".",
-	)
-	cmd.Dir = rootPath
-	cmd.Stderr = os.Stderr
-	return cmd.Output()
-}
-
-func buildControlTar(pkg *common.Package, rootPath string, buildReproducibly bool) ([]byte, error) {
+func buildControlTar(pkg *common.Package, buildReproducibly bool) ([]byte, error) {
 	//prepare a directory into which to put all these files
-	controlPath := filepath.Join(rootPath, ".control")
-	err := os.MkdirAll(controlPath, 0755)
-	if err != nil {
-		return nil, err
-	}
+	controlDir := common.NewFSDirectory()
 
 	//place all the required files in there (NOTE: using the conffiles file
 	//does not seem to be appropriate for our use-case, although I'll let more
 	//experienced Debian users judge this one)
-	err = writeControlFile(pkg, rootPath, controlPath, buildReproducibly)
+	err := writeControlFile(pkg, controlDir, buildReproducibly)
 	if err != nil {
 		return nil, err
 	}
-	err = writeMD5SumsFile(pkg, controlPath, buildReproducibly)
-	if err != nil {
-		return nil, err
-	}
+	writeMD5SumsFile(pkg, controlDir, buildReproducibly)
 
 	//write postinst script if necessary
 	if strings.TrimSpace(pkg.SetupScript) != "" {
 		script := "#!/bin/bash\n" + strings.TrimSuffix(pkg.SetupScript, "\n") + "\n"
-		err = common.WriteFile(filepath.Join(controlPath, "postinst"), []byte(script), 0755, buildReproducibly)
-		if err != nil {
-			return nil, err
+		controlDir.Entries["postinst"] = &common.FSRegularFile{
+			Content:  script,
+			Metadata: common.FSNodeMetadata{Mode: 0755},
 		}
 	}
 
 	//write postrm script if necessary
 	if strings.TrimSpace(pkg.CleanupScript) != "" {
 		script := "#!/bin/bash\n" + strings.TrimSuffix(pkg.CleanupScript, "\n") + "\n"
-		err = common.WriteFile(filepath.Join(controlPath, "postrm"), []byte(script), 0755, buildReproducibly)
-		if err != nil {
-			return nil, err
+		controlDir.Entries["postrm"] = &common.FSRegularFile{
+			Content:  script,
+			Metadata: common.FSNodeMetadata{Mode: 0755},
 		}
 	}
 
-	//compress directory
-	cmd := exec.Command(
-		//using standardized language settings...
-		"env", "LANG=C",
-		//...generate a .tar.gz archive...
-		"tar", "czf", "-",
-		//...of the working directory (== controlPath)
-		".",
-	)
-	cmd.Dir = controlPath
-	cmd.Stderr = os.Stderr
-	return cmd.Output()
+	return controlDir.ToTarGZArchive(true, false, buildReproducibly)
 }
 
-func writeControlFile(pkg *common.Package, rootPath, controlPath string, buildReproducibly bool) error {
+func writeControlFile(pkg *common.Package, controlDir *common.FSDirectory, buildReproducibly bool) error {
 	//reference for this file:
 	//https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-binarycontrolfiles
 	contents := fmt.Sprintf("Package: %s\n", pkg.Name)
 	contents += fmt.Sprintf("Version: %s\n", fullVersionString(pkg))
 	contents += "Architecture: all\n"
 	contents += fmt.Sprintf("Maintainer: %s\n", pkg.Author)
-	contents += fmt.Sprintf("Installed-Size: %d\n", int(pkg.InstalledSizeInBytes()/1024)) // convert bytes to KiB
+	contents += fmt.Sprintf("Installed-Size: %d\n", int(pkg.FSRoot.InstalledSizeInBytes()/1024)) // convert bytes to KiB
 	contents += "Section: misc\n"
 	contents += "Priority: optional\n"
 
@@ -189,7 +151,11 @@ func writeControlFile(pkg *common.Package, rootPath, controlPath string, buildRe
 	}
 	contents += fmt.Sprintf("Description: %s\n %s\n", desc, desc)
 
-	return common.WriteFile(filepath.Join(controlPath, "control"), []byte(contents), 0644, buildReproducibly)
+	controlDir.Entries["control"] = &common.FSRegularFile{
+		Content:  contents,
+		Metadata: common.FSNodeMetadata{Mode: 0644},
+	}
+	return nil
 }
 
 func compilePackageRelations(relType string, rels []common.PackageRelation) (string, error) {
@@ -226,35 +192,22 @@ func compilePackageRelations(relType string, rels []common.PackageRelation) (str
 	return fmt.Sprintf("%s: %s\n", relType, strings.Join(entries, ", ")), nil
 }
 
-func writeMD5SumsFile(pkg *common.Package, controlPath string, buildReproducibly bool) error {
+func writeMD5SumsFile(pkg *common.Package, controlDir *common.FSDirectory, buildReproducibly bool) {
 	//calculate MD5 sums for all regular files in this package
-	paths := make([]string, 0, len(pkg.FSEntries))
-	md5ForPath := make(map[string]string, len(pkg.FSEntries))
-
-	for _, entry := range pkg.FSEntries {
-		if entry.Type != common.FSEntryTypeRegular {
-			continue
+	var lines []string
+	pkg.WalkFSWithRelativePaths(func(path string, node common.FSNode) error {
+		file, ok := node.(*common.FSRegularFile)
+		if !ok {
+			return nil //look only at regular files
 		}
-		paths = append(paths, entry.Path)
+		lines = append(lines, fmt.Sprintf("%s  %s\n", file.MD5Digest(), path))
+		return nil
+	})
 
-		//the following is equivalent to sum := md5.Sum([]byte(entry.Content)),
-		//but also is backwards-compatible to Go 1.1
-		digest := md5.New()
-		digest.Write([]byte(entry.Content))
-		sum := digest.Sum(nil)
-
-		md5ForPath[entry.Path] = hex.EncodeToString(sum[:])
+	controlDir.Entries["md5sums"] = &common.FSRegularFile{
+		Content:  strings.Join(lines, ""),
+		Metadata: common.FSNodeMetadata{Mode: 0644},
 	}
-
-	//order by path for deterministic behavior
-	sort.Strings(paths)
-	lines := make([]string, len(paths))
-	for _, path := range paths {
-		lines = append(lines, fmt.Sprintf("%s  %s\n", md5ForPath[path], strings.TrimPrefix(path, "/")))
-	}
-	contents := strings.Join(lines, "")
-
-	return common.WriteFile(filepath.Join(controlPath, "md5sums"), []byte(contents), 0644, buildReproducibly)
 }
 
 func buildArArchive(entries []arArchiveEntry) ([]byte, error) {

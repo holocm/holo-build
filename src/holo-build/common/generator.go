@@ -32,28 +32,12 @@ type Generator interface {
 	//If the package is valid, an empty slice is to be returned.
 	Validate(pkg *Package) []error
 	//Build produces the final package (usually a compressed tar file) in the
-	//return argument. When it is called, all files and directories contained
-	//in the package definition have already been materialized in the temporary
-	//directory specified in the second argument.
-	//
-	//For example, if pkg contains the file
-	//
-	//    [[file]]
-	//    name = "/etc/foo.conf"
-	//    content = "xxx"
-	//    mode = "0400"
-	//    owner = "root"
-	//    group = "root"
-	//
-	//Then this file has already been placed at `rootPath+"/etc/foo.conf"` with
-	//the right content, ownership, and permissions. The generator usually just
-	//has to write the package metadata into the temporary directory, tar the
-	//directory and compress it.
+	//return argument.
 	//
 	//If `buildReproducibly` is true, the package must be built such that every
 	//run (even across systems) produces an identical result. For example, no
 	//timestamps or generator version information may be included.
-	Build(pkg *Package, rootPath string, buildReproducibly bool) ([]byte, error)
+	Build(pkg *Package, buildReproducibly bool) ([]byte, error)
 	//Generate the recommended file name for this package. Distributions
 	//usually have guidelines for this sort of thing. The string returned must
 	//be a plain file name, not a path.

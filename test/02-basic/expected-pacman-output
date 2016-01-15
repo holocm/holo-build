@@ -1,8 +1,7 @@
 XZ-compressed POSIX tar archive
     >> .INSTALL is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
         post_install() {
-        chown foouser /etc/files/foo.toml
-        chgrp foogroup /etc/files/foo.toml
+        chown foouser:foogroup /etc/files/foo.toml
         echo setup
         echo setup
         }
@@ -14,7 +13,7 @@ XZ-compressed POSIX tar archive
         echo cleanup
         }
     >> .MTREE is regular file (mode: 644, owner: 0, group: 0), content is GZip-compressed mtree metadata archive
-        >> ./.INSTALL gid=0 md5digest=dede37e36f956199c27abdba15861fd2 mode=644 sha256digest=3474c87b37f73e91a2afab69177e62f798e623671c396c8e56b9037602bb8f20 size=186 time=0.0 type=file uid=0
+        >> ./.INSTALL gid=0 md5digest=500c593a910817ba23d30124a2746347 mode=644 sha256digest=360150b4991bedfd260d2e4e28d501c51dbe7f1b8e8bcc6a81a78a9afe43d67d size=160 time=0.0 type=file uid=0
         >> ./.PKGINFO gid=0 md5digest=e100f0d98a2fe3e9a3a455153ae68080 mode=644 sha256digest=4b7d1c36645a276be54191b9eaebd02e167f6fb43b624454e3b7d93e78fb2d2b size=624 time=0.0 type=file uid=0
         >> ./etc gid=0 mode=755 time=0.0 type=dir uid=0
         >> ./etc/files gid=0 mode=755 time=0.0 type=dir uid=0

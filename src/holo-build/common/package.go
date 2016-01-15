@@ -20,7 +20,10 @@
 
 package common
 
-import "os"
+import (
+	"path/filepath"
+	"strings"
+)
 
 //Package contains all information about a single package. This representation
 //will be passed into the generator backends.
@@ -70,8 +73,9 @@ type Package struct {
 	//CleanupScript contains a shell script that is executed when the package is
 	//installed or upgraded.
 	CleanupScript string
-	//Entries lists the files and directories contained within this package.
-	FSEntries []FSEntry
+	//FSRoot represents the root directory of the package's file system, and
+	//contains all other files and directories recursively.
+	FSRoot *FSDirectory
 }
 
 //PackageRelation declares a relation to another package. For the related
@@ -103,28 +107,29 @@ type VersionConstraint struct {
 	Version string
 }
 
-const (
-	//FSEntryTypeRegular is the FSEntry.Type for regular files.
-	FSEntryTypeRegular = iota
-	//FSEntryTypeSymlink is the FSEntry.Type for symlinks.
-	FSEntryTypeSymlink
-	//FSEntryTypeDirectory is the FSEntry.Type for directories.
-	FSEntryTypeDirectory
-)
-
-//IntOrString is used for FsEntry.Owner and FSEntry.Group that can be either
-//int or string.
-type IntOrString struct {
-	Int uint32
-	Str string
+//InsertFSNode inserts an FSNode into the package's FSRoot at the given
+//absolute path.
+func (p *Package) InsertFSNode(entry FSNode, absolutePath string, ec *ErrorCollector) {
+	relPath, err := filepath.Rel("/", absolutePath)
+	if err != nil {
+		ec.Add(err)
+		return
+	}
+	err = p.FSRoot.Insert(entry, strings.Split(relPath, "/"), "/")
+	if err != nil {
+		ec.Addf("failed to insert \"%s\" into the package file system: %s", absolutePath, err.Error())
+	}
 }
 
-//FSEntry represents a file, directory or symlink in the package.
-type FSEntry struct {
-	Type    int
-	Path    string
-	Content string       //except directories (has content for regular files, target for symlinks)
-	Mode    os.FileMode  //except symlinks
-	Owner   *IntOrString //except symlinks
-	Group   *IntOrString //except symlinks
+//WalkFSWithAbsolutePaths wraps the FSRoot.Wrap function, yielding absolute
+//paths (with a leading slash) to the callback.
+func (p *Package) WalkFSWithAbsolutePaths(callback func(absolutePath string, node FSNode) error) error {
+	return p.FSRoot.Walk("/", callback)
+}
+
+//WalkFSWithRelativePaths wraps the FSRoot.Wrap function, yielding paths
+//relative to the FSRoot (without leading slash) to the callback. The FSRoot
+//itself will be svisited with `relativePath = ""`.
+func (p *Package) WalkFSWithRelativePaths(callback func(relativePath string, node FSNode) error) error {
+	return p.FSRoot.Walk("", callback)
 }
