@@ -22,8 +22,6 @@ package debian
 
 import (
 	"bytes"
-	"crypto/md5"
-	"encoding/hex"
 	"fmt"
 	"strings"
 	"time"
@@ -207,14 +205,7 @@ func writeMD5SumsFile(pkg *common.Package, controlDir *common.FSDirectory, build
 		if !ok {
 			return nil //look only at regular files
 		}
-		//the following is equivalent to sum := md5.Sum([]byte(entry.Content)),
-		//but also is backwards-compatible to Go 1.1
-		digest := md5.New()
-		digest.Write([]byte(file.Content))
-		sum := digest.Sum(nil)
-
-		sumStr := hex.EncodeToString(sum[:])
-		lines = append(lines, fmt.Sprintf("%s  %s\n", sumStr, path))
+		lines = append(lines, fmt.Sprintf("%s  %s\n", file.MD5Digest(), path))
 		return nil
 	})
 

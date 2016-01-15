@@ -23,6 +23,8 @@ package common
 //#include <unistd.h>
 import "C"
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -288,6 +290,17 @@ func (f *FSRegularFile) Materialize(path string) error {
 		return err
 	}
 	return f.Metadata.ApplyTo(path)
+}
+
+//MD5Digest returns the MD5 digest of this file's contents.
+func (f *FSRegularFile) MD5Digest() string {
+	//the following is equivalent to sum := md5.Sum([]byte(f.Content)),
+	//but also is backwards-compatible to Go 1.1
+	digest := md5.New()
+	digest.Write([]byte(f.Content))
+	sum := digest.Sum(nil)
+
+	return hex.EncodeToString(sum[:])
 }
 
 ////////////////////////////////////////////////////////////////////////////////
