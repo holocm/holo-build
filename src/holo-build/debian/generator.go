@@ -60,7 +60,7 @@ type arArchiveEntry struct {
 //BuildInMemory implements the common.Generator interface.
 func (g *Generator) BuildInMemory(pkg *common.Package, buildReproducibly bool) ([]byte, error) {
 	//compress data.tar.xz
-	dataTar, err := pkg.FSRoot.ToTarXZArchive(true, buildReproducibly)
+	dataTar, err := pkg.FSRoot.ToTarXZArchive(true, false, buildReproducibly)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +110,7 @@ func buildControlTar(pkg *common.Package, buildReproducibly bool) ([]byte, error
 		}
 	}
 
-	return controlDir.ToTarGZArchive(true, buildReproducibly)
+	return controlDir.ToTarGZArchive(true, false, buildReproducibly)
 }
 
 func writeControlFile(pkg *common.Package, controlDir *common.FSDirectory, buildReproducibly bool) error {

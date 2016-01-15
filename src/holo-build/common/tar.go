@@ -35,7 +35,10 @@ import (
 //
 //With `leadingDot = true`, generate entry paths like `./foo/bar.conf`.
 //WIth `leadingDot = false`, generate entry paths like `foo/bar.conf`.
-func (d *FSDirectory) ToTarArchive(leadingDot, buildReproducibly bool) ([]byte, error) {
+//
+//With `skipRootDirectory = true`, don't generate an entry for the root
+//directory in the resulting package.
+func (d *FSDirectory) ToTarArchive(leadingDot, skipRootDirectory, buildReproducibly bool) ([]byte, error) {
 	var buf bytes.Buffer
 	tw := tar.NewWriter(&buf)
 
@@ -49,6 +52,9 @@ func (d *FSDirectory) ToTarArchive(leadingDot, buildReproducibly bool) ([]byte, 
 	err := d.Walk(".", func(path string, node FSNode) error {
 		if !leadingDot {
 			path = strings.TrimPrefix(path, "./")
+		}
+		if skipRootDirectory && path == "." {
+			return nil
 		}
 
 		var err error
@@ -104,8 +110,8 @@ func (d *FSDirectory) ToTarArchive(leadingDot, buildReproducibly bool) ([]byte, 
 }
 
 //ToTarGZArchive is identical to ToTarArchive, but GZip-compresses the result.
-func (d *FSDirectory) ToTarGZArchive(leadingDot, buildReproducibly bool) ([]byte, error) {
-	data, err := d.ToTarArchive(leadingDot, buildReproducibly)
+func (d *FSDirectory) ToTarGZArchive(leadingDot, skipRootDirectory, buildReproducibly bool) ([]byte, error) {
+	data, err := d.ToTarArchive(leadingDot, skipRootDirectory, buildReproducibly)
 	if err != nil {
 		return nil, err
 	}
@@ -123,8 +129,8 @@ func (d *FSDirectory) ToTarGZArchive(leadingDot, buildReproducibly bool) ([]byte
 }
 
 //ToTarXZArchive is identical to ToTarArchive, but GZip-compresses the result.
-func (d *FSDirectory) ToTarXZArchive(leadingDot, buildReproducibly bool) ([]byte, error) {
-	data, err := d.ToTarArchive(leadingDot, buildReproducibly)
+func (d *FSDirectory) ToTarXZArchive(leadingDot, skipRootDirectory, buildReproducibly bool) ([]byte, error) {
+	data, err := d.ToTarArchive(leadingDot, skipRootDirectory, buildReproducibly)
 	if err != nil {
 		return nil, err
 	}

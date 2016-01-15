@@ -64,7 +64,7 @@ func (g *Generator) BuildInMemory(pkg *common.Package, buildReproducibly bool) (
 	}
 
 	//compress package
-	return pkg.FSRoot.ToTarXZArchive(false, buildReproducibly)
+	return pkg.FSRoot.ToTarXZArchive(false, true, buildReproducibly)
 }
 
 func fullVersionString(pkg *common.Package) string {
