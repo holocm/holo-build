@@ -72,6 +72,22 @@ type FSNodeMetadata struct {
 	Group *IntOrString
 }
 
+//UID returns Owner.Int if it is set.
+func (m *FSNodeMetadata) UID() uint32 {
+	if m.Owner != nil {
+		return m.Owner.Int
+	}
+	return 0
+}
+
+//GID returns Group.Int if it is set.
+func (m *FSNodeMetadata) GID() uint32 {
+	if m.Group != nil {
+		return m.Group.Int
+	}
+	return 0
+}
+
 //ApplyTo applies the metadata to the filesystem entry at the given path.
 //
 //This function assumes that, if there exist unmaterializable metadata,
