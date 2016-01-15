@@ -42,12 +42,7 @@ func (g *Generator) RecommendedFileName(pkg *common.Package) string {
 }
 
 //Build implements the common.Generator interface.
-func (g *Generator) Build(pkg *common.Package, rootPath string, buildReproducibly bool) ([]byte, error) {
-	return nil, common.UnsupportedBuildMethodError
-}
-
-//BuildInMemory implements the common.Generator interface.
-func (g *Generator) BuildInMemory(pkg *common.Package, buildReproducibly bool) ([]byte, error) {
+func (g *Generator) Build(pkg *common.Package, buildReproducibly bool) ([]byte, error) {
 	//write .PKGINFO
 	err := writePKGINFO(pkg, buildReproducibly)
 	if err != nil {
@@ -99,7 +94,7 @@ func writePKGINFO(pkg *common.Package, buildReproducibly bool) error {
 	} else {
 		contents += fmt.Sprintf("packager = %s\n", pkg.Author)
 	}
-	contents += fmt.Sprintf("size = %d\n", pkg.InstalledSizeInBytes())
+	contents += fmt.Sprintf("size = %d\n", pkg.FSRoot.InstalledSizeInBytes())
 	contents += "arch = any\n"
 	contents += "license = custom:none\n"
 	contents += compilePackageRelations("replaces", pkg.Replaces)

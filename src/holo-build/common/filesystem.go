@@ -20,15 +20,12 @@
 
 package common
 
-//#include <unistd.h>
-import "C"
 import (
 	"crypto/md5"
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"sort"
 )
@@ -47,9 +44,6 @@ type FSNode interface {
 	//directory and everything in it, as calculated by `du -s --apparent-size`,
 	//but in a filesystem-independent way.
 	InstalledSizeInBytes() int
-	//Materialize generates an actual filesystem entry for this node at the
-	//given path.
-	Materialize(path string) error
 	//Walk visits all the nodes below this FSNode (including itself) and calls
 	//the given callback at each node. It is guaranteed that the callback for a
 	//node is called after the callback of its parent node (if any).
@@ -89,31 +83,6 @@ func (m *FSNodeMetadata) GID() uint32 {
 		return m.Group.Int
 	}
 	return 0
-}
-
-//ApplyTo applies the metadata to the filesystem entry at the given path.
-//
-//This function assumes that, if there exist unmaterializable metadata,
-//PostponeUnmaterializable() has already been called.
-func (m *FSNodeMetadata) ApplyTo(path string) error {
-	var uid C.__uid_t
-	var gid C.__gid_t
-	if m.Owner != nil {
-		uid = C.__uid_t(m.Owner.Int)
-	}
-	if m.Group != nil {
-		gid = C.__gid_t(m.Group.Int)
-	}
-	if uid != 0 || gid != 0 {
-		//cannot use os.Chown(); os.Chown calls into syscall.Chown and thus
-		//does a direct syscall which cannot be intercepted by fakeroot; I
-		//need to call chown(2) via cgo
-		result, err := C.chown(C.CString(path), uid, gid)
-		if result != 0 && err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 //PostponeUnmaterializable generates an addition to the package's setup script
@@ -237,25 +206,6 @@ func (d *FSDirectory) Walk(absolutePath string, callback func(string, FSNode) er
 	return nil
 }
 
-//Materialize implements the FSNode interface.
-func (d *FSDirectory) Materialize(path string) error {
-	err := os.Mkdir(path, d.Metadata.Mode)
-	if err != nil {
-		return err
-	}
-	err = d.Metadata.ApplyTo(path)
-	if err != nil {
-		return err
-	}
-	for name, entry := range d.Entries {
-		err = entry.Materialize(path + "/" + name)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // FSRegularFile
 //
@@ -282,15 +232,6 @@ func (f *FSRegularFile) InstalledSizeInBytes() int {
 //Walk implements the FSNode interface.
 func (f *FSRegularFile) Walk(absolutePath string, callback func(string, FSNode) error) error {
 	return callback(absolutePath, f)
-}
-
-//Materialize implements the FSNode interface.
-func (f *FSRegularFile) Materialize(path string) error {
-	err := ioutil.WriteFile(path, []byte(f.Content), f.Metadata.Mode)
-	if err != nil {
-		return err
-	}
-	return f.Metadata.ApplyTo(path)
 }
 
 //MD5Digest returns the MD5 digest of this file's contents.
@@ -340,9 +281,4 @@ func (s *FSSymlink) InstalledSizeInBytes() int {
 //Walk implements the FSNode interface.
 func (s *FSSymlink) Walk(absolutePath string, callback func(string, FSNode) error) error {
 	return callback(absolutePath, s)
-}
-
-//Materialize implements the FSNode interface.
-func (s *FSSymlink) Materialize(path string) error {
-	return os.Symlink(s.Target, path)
 }

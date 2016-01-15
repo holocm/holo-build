@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"strings"
 )
 
@@ -35,41 +34,10 @@ func (pkg *Package) Build(generator Generator, printToStdout bool, buildReproduc
 	//move unmaterializable filesystem metadata into the setupScript
 	pkg.postponeUnmaterializableFSMetadata()
 
-	//try to build package in memory
-	pkgBytes, err := generator.BuildInMemory(pkg, buildReproducibly)
-	if err != nil && err != UnsupportedBuildMethodError {
+	//build package
+	pkgBytes, err := generator.Build(pkg, buildReproducibly)
+	if err != nil {
 		return err
-	}
-
-	//if this is not supported, build package from a materialized filesystem tree
-	if err == UnsupportedBuildMethodError {
-		//choose root directory in such a way that the user can easily find and
-		//inspect it in the case that an error occurs
-		rootPath := fmt.Sprintf("./holo-build-%s-%s", pkg.Name, pkg.Version)
-
-		//if the root directory exists from a previous run, remove it recursively
-		err = os.RemoveAll(rootPath)
-		if err != nil {
-			return err
-		}
-
-		//materialize FS entries in the root directory
-		err = pkg.materializeFSEntries(rootPath, buildReproducibly)
-		if err != nil {
-			return err
-		}
-
-		//build package
-		pkgBytes, err = generator.Build(pkg, rootPath, buildReproducibly)
-		if err != nil {
-			return err
-		}
-
-		//if requested, cleanup the target directory
-		err = os.RemoveAll(rootPath)
-		if err != nil {
-			return err
-		}
 	}
 
 	//write package, either to stdout or to the working directory
@@ -150,28 +118,4 @@ func (pkg *Package) postponeUnmaterializableFSMetadata() {
 
 	//ensure that ownership is correct before running the actual setup script
 	pkg.SetupScript = additionalSetupScript + pkg.SetupScript
-}
-
-func (pkg *Package) materializeFSEntries(rootPath string, buildReproducibly bool) error {
-	err := pkg.FSRoot.Materialize(rootPath)
-	if err != nil {
-		return err
-	}
-
-	//if a reproducible build has been requested, set all timestamps for all FS
-	//entries to 0 (i.e. 1970-01-01T00:00:00Z)
-	if buildReproducibly {
-		err := filepath.Walk(rootPath, func(path string, fileInfo os.FileInfo, err error) error {
-			//skip over unaccessible stuff
-			if err != nil {
-				return err
-			}
-			return ResetTimestamp(path)
-		})
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
 }

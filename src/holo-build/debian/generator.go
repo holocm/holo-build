@@ -39,11 +39,6 @@ func (g *Generator) RecommendedFileName(pkg *common.Package) string {
 	return fmt.Sprintf("%s_%s_any.deb", pkg.Name, fullVersionString(pkg))
 }
 
-//Build implements the common.Generator interface.
-func (g *Generator) Build(pkg *common.Package, rootPath string, buildReproducibly bool) ([]byte, error) {
-	return nil, common.UnsupportedBuildMethodError
-}
-
 func fullVersionString(pkg *common.Package) string {
 	str := fmt.Sprintf("%s-%d", pkg.Version, pkg.Release)
 	if pkg.Epoch > 0 {
@@ -57,8 +52,8 @@ type arArchiveEntry struct {
 	Data []byte
 }
 
-//BuildInMemory implements the common.Generator interface.
-func (g *Generator) BuildInMemory(pkg *common.Package, buildReproducibly bool) ([]byte, error) {
+//Build implements the common.Generator interface.
+func (g *Generator) Build(pkg *common.Package, buildReproducibly bool) ([]byte, error) {
 	//compress data.tar.xz
 	dataTar, err := pkg.FSRoot.ToTarXZArchive(true, false, buildReproducibly)
 	if err != nil {
@@ -120,7 +115,7 @@ func writeControlFile(pkg *common.Package, controlDir *common.FSDirectory, build
 	contents += fmt.Sprintf("Version: %s\n", fullVersionString(pkg))
 	contents += "Architecture: all\n"
 	contents += fmt.Sprintf("Maintainer: %s\n", pkg.Author)
-	contents += fmt.Sprintf("Installed-Size: %d\n", int(pkg.InstalledSizeInBytes()/1024)) // convert bytes to KiB
+	contents += fmt.Sprintf("Installed-Size: %d\n", int(pkg.FSRoot.InstalledSizeInBytes()/1024)) // convert bytes to KiB
 	contents += "Section: misc\n"
 	contents += "Priority: optional\n"
 
