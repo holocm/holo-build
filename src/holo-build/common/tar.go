@@ -24,6 +24,8 @@ import (
 	"archive/tar"
 	"bytes"
 	"compress/gzip"
+	"os"
+	"os/exec"
 	"strings"
 	"time"
 )
@@ -118,4 +120,18 @@ func (d *FSDirectory) ToTarGZArchive(leadingDot, buildReproducibly bool) ([]byte
 
 	err = w.Close()
 	return buf.Bytes(), err
+}
+
+//ToTarXZArchive is identical to ToTarArchive, but GZip-compresses the result.
+func (d *FSDirectory) ToTarXZArchive(leadingDot, buildReproducibly bool) ([]byte, error) {
+	data, err := d.ToTarArchive(leadingDot, buildReproducibly)
+	if err != nil {
+		return nil, err
+	}
+
+	//since we don't have a "compress/xz" package, use the "xz" binary instead
+	cmd := exec.Command("xz", "--compress")
+	cmd.Stdin = bytes.NewReader(data)
+	cmd.Stderr = os.Stderr
+	return cmd.Output()
 }

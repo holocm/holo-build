@@ -25,8 +25,6 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
-	"os"
-	"os/exec"
 	"strings"
 	"time"
 
@@ -64,7 +62,7 @@ type arArchiveEntry struct {
 //Build implements the common.Generator interface.
 func (g *Generator) Build(pkg *common.Package, rootPath string, buildReproducibly bool) ([]byte, error) {
 	//compress data.tar.xz
-	dataTar, err := buildDataTar(rootPath)
+	dataTar, err := pkg.FSRoot.ToTarXZArchive(true, buildReproducibly)
 	if err != nil {
 		return nil, err
 	}
@@ -81,20 +79,6 @@ func (g *Generator) Build(pkg *common.Package, rootPath string, buildReproducibl
 		arArchiveEntry{"control.tar.gz", controlTar},
 		arArchiveEntry{"data.tar.xz", dataTar},
 	})
-}
-
-func buildDataTar(rootPath string) ([]byte, error) {
-	cmd := exec.Command(
-		//using standardized language settings...
-		"env", "LANG=C",
-		//...generate a .tar.xz archive...
-		"tar", "cJf", "-",
-		//...of the working directory (== rootPath)
-		".",
-	)
-	cmd.Dir = rootPath
-	cmd.Stderr = os.Stderr
-	return cmd.Output()
 }
 
 func buildControlTar(pkg *common.Package, buildReproducibly bool) ([]byte, error) {
