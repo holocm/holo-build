@@ -41,8 +41,8 @@ func (g *Generator) RecommendedFileName(pkg *common.Package) string {
 	return fmt.Sprintf("%s_%s_any.deb", pkg.Name, fullVersionString(pkg))
 }
 
-//BuildInMemory implements the common.Generator interface.
-func (g *Generator) BuildInMemory(pkg *common.Package, buildReproducibly bool) ([]byte, error) {
+//Build implements the common.Generator interface.
+func (g *Generator) Build(pkg *common.Package, rootPath string, buildReproducibly bool) ([]byte, error) {
 	return nil, common.UnsupportedBuildMethodError
 }
 
@@ -59,8 +59,8 @@ type arArchiveEntry struct {
 	Data []byte
 }
 
-//Build implements the common.Generator interface.
-func (g *Generator) Build(pkg *common.Package, rootPath string, buildReproducibly bool) ([]byte, error) {
+//BuildInMemory implements the common.Generator interface.
+func (g *Generator) BuildInMemory(pkg *common.Package, buildReproducibly bool) ([]byte, error) {
 	//compress data.tar.xz
 	dataTar, err := pkg.FSRoot.ToTarXZArchive(true, buildReproducibly)
 	if err != nil {
