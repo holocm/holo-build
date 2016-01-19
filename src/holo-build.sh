@@ -21,7 +21,7 @@
 # (can also shortcut if just asked for --help or --version)
 for ARG in "$@"; do
     case $ARG in
-        --debian|--pacman|--help|--version)
+        --debian|--pacman|--rpm|--help|--version)
             exec /usr/lib/holo/holo-build "$@" ;;
         *) ;;
     esac
@@ -34,6 +34,9 @@ DIST_IDS="$(echo "$ID $ID_LIKE" | tr ' ' ',')"
 case ",$DIST_IDS," in
     *,arch,*)   exec /usr/lib/holo/holo-build --pacman "$@" ;;
     *,debian,*) exec /usr/lib/holo/holo-build --debian "$@" ;;
+    *,fedora,*) exec /usr/lib/holo/holo-build --rpm "$@" ;;
+    *,mageia,*) exec /usr/lib/holo/holo-build --rpm "$@" ;;
+    *,suse,*)   exec /usr/lib/holo/holo-build --rpm "$@" ;;
     *)
         echo "!! Running on an unrecognized distribution. Distribution IDs: $DIST_IDS" >&2
         echo ">> Please report this error at <https://github.com/holocm/holo-build/issues/new>" >&2

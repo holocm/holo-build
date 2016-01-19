@@ -28,6 +28,7 @@ import (
 	"./common"
 	"./debian"
 	"./pacman"
+	"./rpm"
 )
 
 type options struct {
@@ -119,6 +120,12 @@ func parseArgs() (result options, exit bool) {
 				hasArgsError = true
 			}
 			opts.generator = &debian.Generator{}
+		case "--rpm":
+			if opts.generator != nil {
+				showError(errors.New("Multiple package formats specified."))
+				hasArgsError = true
+			}
+			opts.generator = &rpm.Generator{}
 		//NOTE: When adding new package formats here, don't forget to update
 		//holo-build.sh accordingly!
 		default:
@@ -144,9 +151,10 @@ func printHelp() {
 	fmt.Println("  --stdout\t\tPrint resulting package on stdout")
 	fmt.Println("  --no-stdout\t\tWrite resulting package to the working directory (default)")
 	fmt.Println("  --reproducible\tBuild a reproducible package with bogus timestamps etc.")
-	fmt.Println("  --no-reproducible\tBuild a non-reproducible package with actual timestamps etc. (default)")
-	fmt.Println("  --debian\t\tBuild a debian package\n")
-	fmt.Println("  --pacman\t\tBuild a pacman package\n")
+	fmt.Println("  --no-reproducible\tBuild a non-reproducible package with actual timestamps etc. (default)\n")
+	fmt.Println("  --debian\t\tBuild a Debian package")
+	fmt.Println("  --pacman\t\tBuild a pacman package")
+	fmt.Println("  --rpm\t\t\tBuild an RPM package\n")
 	fmt.Println("If no options are given, the package format for the current distribution is selected.\n")
 }
 
