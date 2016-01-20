@@ -128,6 +128,7 @@ func ParsePackageDefinition(input io.Reader) (*Package, []error) {
 		CleanupScript: strings.TrimSpace(p.Package.CleanupScript),
 		FSRoot:        NewFSDirectory(),
 	}
+	pkg.FSRoot.Implicit = true
 
 	//default value for Release is 1
 	if pkg.Release == 0 {

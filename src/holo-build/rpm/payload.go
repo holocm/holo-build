@@ -73,6 +73,14 @@ func MakePayload(pkg *common.Package, buildReproducibly bool) (*Payload, error) 
 
 	//assemble the CPIO archive
 	pkg.WalkFSWithAbsolutePaths(func(path string, node common.FSNode) error {
+		//skip implicitly created directories (as rpmbuild-constructed CPIO
+		//archives apparently do)
+		if n, ok := node.(*common.FSDirectory); ok {
+			if n.Implicit {
+				return nil
+			}
+		}
+
 		inodeNumber++                            //make up inode numbers in the same way as rpmbuild does
 		name := append([]byte("."+path), '\000') //must be NUL-terminated!
 

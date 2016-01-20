@@ -124,7 +124,7 @@ func (m *FSNodeMetadata) PostponeUnmaterializable(path string) (additionalSetupS
 type FSDirectory struct {
 	Entries  map[string]FSNode
 	Metadata FSNodeMetadata
-	implicit bool
+	Implicit bool
 }
 
 //NewFSDirectory initializes an empty FSDirectory.
@@ -152,7 +152,7 @@ func (d *FSDirectory) Insert(entry FSNode, relPath []string, location string) er
 			//constructed entry silently; otherwise the entry is a duplicate
 			dirOld, ok1 := subentry.(*FSDirectory)
 			dirNew, ok2 := entry.(*FSDirectory)
-			if !(ok1 && ok2 && dirOld.implicit) {
+			if !(ok1 && ok2 && dirOld.Implicit) {
 				return errors.New("duplicate entry")
 			}
 			//don't lose the entries below the implicitly created directory
@@ -168,7 +168,7 @@ func (d *FSDirectory) Insert(entry FSNode, relPath []string, location string) er
 	//necessary and recurse
 	if subentry == nil {
 		subentry = NewFSDirectory()
-		subentry.(*FSDirectory).implicit = true //this node was implicitly created (see above)
+		subentry.(*FSDirectory).Implicit = true //this node was implicitly created (see above)
 		d.Entries[subname] = subentry
 	}
 	subdir, ok := subentry.(*FSDirectory)
