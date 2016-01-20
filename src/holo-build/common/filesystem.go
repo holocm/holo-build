@@ -44,6 +44,9 @@ type FSNode interface {
 	//directory and everything in it, as calculated by `du -s --apparent-size`,
 	//but in a filesystem-independent way.
 	InstalledSizeInBytes() int
+	//FileModeForArchive returns the file mode of this FSNode as stored in a
+	//tar or CPIO archive.
+	FileModeForArchive() uint32
 	//Walk visits all the nodes below this FSNode (including itself) and calls
 	//the given callback at each node. It is guaranteed that the callback for a
 	//node is called after the callback of its parent node (if any).
@@ -186,6 +189,11 @@ func (d *FSDirectory) InstalledSizeInBytes() int {
 	return sum + 4096
 }
 
+//FileModeForArchive implements the FSNode interface.
+func (d *FSDirectory) FileModeForArchive() uint32 {
+	return 040000 | (uint32(d.Metadata.Mode) & 07777)
+}
+
 //Walk implements the FSNode interface.
 func (d *FSDirectory) Walk(absolutePath string, callback func(string, FSNode) error) error {
 	err := callback(absolutePath, d)
@@ -241,6 +249,11 @@ func (f *FSRegularFile) InstalledSizeInBytes() int {
 	return len(f.Content)
 }
 
+//FileModeForArchive implements the FSNode interface.
+func (f *FSRegularFile) FileModeForArchive() uint32 {
+	return 0100000 | (uint32(f.Metadata.Mode) & 07777)
+}
+
 //Walk implements the FSNode interface.
 func (f *FSRegularFile) Walk(absolutePath string, callback func(string, FSNode) error) error {
 	return callback(absolutePath, f)
@@ -288,6 +301,11 @@ func (s *FSSymlink) Insert(entry FSNode, relPath []string, location string) erro
 //InstalledSizeInBytes implements the FSNode interface.
 func (s *FSSymlink) InstalledSizeInBytes() int {
 	return len(s.Target)
+}
+
+//FileModeForArchive implements the FSNode interface.
+func (s *FSSymlink) FileModeForArchive() uint32 {
+	return 0120777
 }
 
 //Walk implements the FSNode interface.

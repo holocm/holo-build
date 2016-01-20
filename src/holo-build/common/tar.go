@@ -62,7 +62,7 @@ func (d *FSDirectory) ToTarArchive(leadingDot, skipRootDirectory, buildReproduci
 		case *FSDirectory:
 			err = tw.WriteHeader(&tar.Header{
 				Name:       path + "/",
-				Mode:       040000 | int64(uint(n.Metadata.Mode)&07777),
+				Mode:       int64(n.FileModeForArchive()),
 				Uid:        int(n.Metadata.UID()),
 				Gid:        int(n.Metadata.GID()),
 				ModTime:    timestamp,
@@ -73,7 +73,7 @@ func (d *FSDirectory) ToTarArchive(leadingDot, skipRootDirectory, buildReproduci
 			err = tw.WriteHeader(&tar.Header{
 				Name:       path,
 				Size:       int64(len([]byte(n.Content))),
-				Mode:       0100000 | int64(uint(n.Metadata.Mode)&07777),
+				Mode:       int64(n.FileModeForArchive()),
 				Uid:        int(n.Metadata.UID()),
 				Gid:        int(n.Metadata.GID()),
 				ModTime:    timestamp,
@@ -83,7 +83,7 @@ func (d *FSDirectory) ToTarArchive(leadingDot, skipRootDirectory, buildReproduci
 		case *FSSymlink:
 			err = tw.WriteHeader(&tar.Header{
 				Name:       path,
-				Mode:       0120000 | int64(0777),
+				Mode:       int64(n.FileModeForArchive()),
 				Linkname:   n.Target,
 				ModTime:    timestamp,
 				AccessTime: timestamp,

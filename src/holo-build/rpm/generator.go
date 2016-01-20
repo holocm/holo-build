@@ -26,6 +26,15 @@ import (
 	"../common"
 )
 
+////////////////////////////////////////////////////////////////////////////////
+//
+// Documentation for the RPM file format:
+//
+// [LSB] http://refspecs.linux-foundation.org/LSB_3.1.0/LSB-Core-generic/LSB-Core-generic/pkgformat.html
+// [RPM] http://www.rpm.org/max-rpm/s1-rpm-file-format-rpm-file-format.html
+//
+////////////////////////////////////////////////////////////////////////////////
+
 //Generator is the common.Generator for RPM packages.
 type Generator struct{}
 
@@ -52,10 +61,14 @@ func fullVersionString(pkg *common.Package) string {
 
 //Build implements the common.Generator interface.
 func (g *Generator) Build(pkg *common.Package, buildReproducibly bool) ([]byte, error) {
-	lead := writeLead(pkg)
+	payload, err := MakePayload(pkg, buildReproducibly)
+	if err != nil {
+		return nil, err
+	}
+
+	lead := NewLead(pkg).ToBinary()
 	//TODO: signature header (write with alignment!)
 	//TODO: header header (write without alignment!)
-	//TODO: cpio.lzma payload
 	emptyHeaderHeader := []byte{
 		0x8e, 0xad, 0xe8, 0x01,
 		0x00, 0x00, 0x00, 0x00,
@@ -63,43 +76,5 @@ func (g *Generator) Build(pkg *common.Package, buildReproducibly bool) ([]byte, 
 		0x00, 0x00, 0x00, 0x00, //no data
 	}
 	emptySignatureHeader := append(emptyHeaderHeader, []byte{0x00, 0x00, 0x00, 0x00}...)
-	return append(append(lead, emptySignatureHeader...), emptyHeaderHeader...), nil
-}
-
-func writeLead(pkg *common.Package) []byte {
-	//pad "name-version-release" (NVR) field with NUL bytes to 66 bytes length
-	nvrData := []byte(pkg.Name + "-" + fullVersionString(pkg))
-	if len(nvrData) > 65 {
-		nvrData = nvrData[0:65] //leave one byte at the end for trailing NUL
-	}
-	nvrData = append(make([]byte, 0, 66), nvrData...) //extend cap() to 66
-	for len(nvrData) < 66 {
-		nvrData = append(nvrData, '\000')
-	}
-
-	lead := []byte{
-		//char magic[4];
-		0xed, 0xab, 0xee, 0xdb,
-		//unsigned char major, minor;
-		0x03, 0x00,
-		//short type; (0 = binary package)
-		0x00, 0x00,
-		//short arch; (0 = noarch)
-		0x00, 0x00,
-	}
-	//char name[66];
-	lead = append(lead, nvrData...)
-	lead = append(lead, []byte{
-		//short osnum; (1 = Linux)
-		0x00, 0x01,
-		//short signature_type; (5 = signature header)
-		0x00, 0x05,
-		//char reserved[16];
-		0x00, 0x00, 0x00, 0x00,
-		0x00, 0x00, 0x00, 0x00,
-		0x00, 0x00, 0x00, 0x00,
-		0x00, 0x00, 0x00, 0x00,
-	}...)
-
-	return lead
+	return append(append(append(lead, emptySignatureHeader...), emptyHeaderHeader...), payload.Binary...), nil
 }
