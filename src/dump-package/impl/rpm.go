@@ -146,10 +146,13 @@ func dumpRpmHeader(reader io.Reader, sectionIdent string, readAligned bool, tagD
 	bufferedReader := bytes.NewReader(buffer)
 
 	if readAligned {
-		//next structure in reader is aligned to 4-byte boundary -- skip over padding
-		_, err = io.ReadFull(reader, make([]byte, 4-header.DataSize%4))
-		if err != nil {
-			return "", err
+		//next structure in reader is aligned to 8-byte boundary -- skip over padding
+		modulo := header.DataSize % 8
+		if modulo != 0 {
+			_, err = io.ReadFull(reader, make([]byte, 8-modulo))
+			if err != nil {
+				return "", err
+			}
 		}
 	}
 

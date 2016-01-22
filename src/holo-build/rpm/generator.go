@@ -67,14 +67,24 @@ func (g *Generator) Build(pkg *common.Package, buildReproducibly bool) ([]byte, 
 	}
 
 	lead := NewLead(pkg).ToBinary()
+
 	//TODO: signature header (write with alignment!)
 	//TODO: header header (write without alignment!)
-	emptyHeaderHeader := []byte{
-		0x8e, 0xad, 0xe8, 0x01,
-		0x00, 0x00, 0x00, 0x00,
-		0x00, 0x00, 0x00, 0x00, //no entries
-		0x00, 0x00, 0x00, 0x00, //no data
+	emptyHeader := &Header{}
+	emptySignatureHeader := emptyHeader.ToBinary()
+	emptyHeaderHeader := emptyHeader.ToBinary()
+
+	leadAndSig := appendAlignedTo8Byte(lead, emptySignatureHeader)
+	leadSigHdr := appendAlignedTo8Byte(leadAndSig, emptyHeaderHeader)
+	return append(leadSigHdr, payload.Binary...), nil
+}
+
+//According to [LSB, 22.2.2], "A Header structure shall be aligned to an 8 byte
+//boundary."
+func appendAlignedTo8Byte(a []byte, b []byte) []byte {
+	result := a
+	for len(result)%8 != 0 {
+		result = append(result, 0x00)
 	}
-	emptySignatureHeader := append(emptyHeaderHeader, []byte{0x00, 0x00, 0x00, 0x00}...)
-	return append(append(append(lead, emptySignatureHeader...), emptyHeaderHeader...), payload.Binary...), nil
+	return append(result, b...)
 }
