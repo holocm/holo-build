@@ -61,22 +61,26 @@ func fullVersionString(pkg *common.Package) string {
 
 //Build implements the common.Generator interface.
 func (g *Generator) Build(pkg *common.Package, buildReproducibly bool) ([]byte, error) {
+	//assemble CPIO-LZMA payload
 	payload, err := MakePayload(pkg, buildReproducibly)
 	if err != nil {
 		return nil, err
 	}
 
+	//make header section
+	emptyHeader := &Header{}
+	headerSection := emptyHeader.ToBinary() //TODO
+
+	//make signature section
+	signatureSection := MakeSignatureSection(headerSection, payload)
+
+	//make lead
 	lead := NewLead(pkg).ToBinary()
 
-	//TODO: signature header (write with alignment!)
-	//TODO: header header (write without alignment!)
-	emptyHeader := &Header{}
-	emptySignatureHeader := emptyHeader.ToBinary()
-	emptyHeaderHeader := emptyHeader.ToBinary()
-
-	leadAndSig := appendAlignedTo8Byte(lead, emptySignatureHeader)
-	leadSigHdr := appendAlignedTo8Byte(leadAndSig, emptyHeaderHeader)
-	return append(leadSigHdr, payload.Binary...), nil
+	//combine everything with the correct alignment
+	combined1 := appendAlignedTo8Byte(lead, signatureSection)
+	combined2 := appendAlignedTo8Byte(combined1, headerSection)
+	return append(combined2, payload.Binary...), nil
 }
 
 //According to [LSB, 22.2.2], "A Header structure shall be aligned to an 8 byte
