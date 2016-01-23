@@ -69,7 +69,7 @@ func (g *Generator) Build(pkg *common.Package, buildReproducibly bool) ([]byte, 
 
 	//make header section
 	emptyHeader := &Header{}
-	headerSection := emptyHeader.ToBinary() //TODO
+	headerSection := emptyHeader.ToBinary(RpmtagHeaderImmutable) //TODO
 
 	//make signature section
 	signatureSection := MakeSignatureSection(headerSection, payload)

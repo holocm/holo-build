@@ -52,24 +52,64 @@ type headerRecord struct {
 }
 
 //ToBinary serializes the given header.
-func (hdr *Header) ToBinary() []byte {
+func (hdr *Header) ToBinary(regionTag uint32) []byte {
 	var buf bytes.Buffer
 
 	//write header record
+	actualDataSize := uint32(len(hdr.Data))
+	actualRecordCount := uint32(len(hdr.Records))
 	binary.Write(&buf, binary.BigEndian, &headerRecord{
 		Magic:            [4]byte{0x8E, 0xAD, 0xE8, 0x01},
 		Reserved:         [4]byte{0x00, 0x00, 0x00, 0x00},
-		IndexRecordCount: uint32(len(hdr.Records)),
-		DataSize:         uint32(len(hdr.Data)),
+		IndexRecordCount: actualRecordCount + 1, //+1 for the region tag
+		DataSize:         actualDataSize + 16,   //+16 for the region tag
 	})
 
-	//write index records
+	//write index record for region tag
+	//
+	//A "region" is defined nowhere in any kind of spec that I could find for
+	//RPM (i.e. neither in [LSB] nor [RPM]), but it's mentioned in the code of
+	//the rpm-org implementation where they have some validations for it.
+	//
+	//I don't fully grasp the meaning, but it appears that a region tag marks
+	//a set of header tags and data that are to be considered immutable, i.e.
+	//they may be used for validation purposes, such as calculating hash
+	//digests and signatures. I hope that I'm wrong, because this would imply
+	//that RPM has a concept of "metadata that's okay to manipulate even if the
+	//package is GPG-signed", which is insane even for RPM's standards.
+	//However, from what I've seen in the implementation, their regions always
+	//seem to span the whole header structure, therefore marking everything as
+	//immutable.
+	//
+	//We do the same thing. The index record for the region tag is at the
+	//*start* of the index record array, and its data is located at the *end*
+	//of the data area. The data is another index record that (using a negative
+	//offset into the data area) points back at the original index record. (I'm
+	//tempted to use the word "insane", but it feels like I use that word so
+	//often when talking about RPM that it has lost all meaning.)
+	binary.Write(&buf, binary.BigEndian, &HeaderIndexRecord{
+		Tag:    regionTag,
+		Type:   RpmBinType,
+		Offset: actualDataSize,
+		Count:  16,
+	})
+
+	//write the actual index records
 	for _, ir := range hdr.Records {
 		binary.Write(&buf, binary.BigEndian, ir)
 	}
 
 	//write data
 	buf.Write(hdr.Data)
+
+	//write data for the region tag (see the wall of text above)
+	binary.Write(&buf, binary.BigEndian, &HeaderIndexRecord{
+		Tag:    regionTag,
+		Type:   RpmBinType,
+		Offset: -(actualRecordCount + 1) * 16,
+		Count:  16,
+	})
+
 	return buf.Bytes()
 }
 

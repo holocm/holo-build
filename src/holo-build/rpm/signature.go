@@ -55,5 +55,5 @@ func MakeSignatureSection(headerSection []byte, payload *Payload) []byte {
 	md5sum := md5digest.Sum(nil)
 	h.AddBinaryValue(RpmsigtagMD5, md5sum)
 
-	return h.ToBinary()
+	return h.ToBinary(RpmtagHeaderSignatures)
 }
