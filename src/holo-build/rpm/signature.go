@@ -32,7 +32,7 @@ func MakeSignatureSection(headerSection []byte, payload *Payload) []byte {
 
 	//NOTE that some fields validate both header+payload, some only the
 	//payload, and some only the header. This is all according to the
-	//specification, no matter how insane. [LSB, 22.2.3]
+	//specification, no matter how insane. [LSB, 25.2.3]
 
 	//size information
 	h.AddInt32Value(RpmsigtagSize, []int32{

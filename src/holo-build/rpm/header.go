@@ -26,7 +26,7 @@ import (
 )
 
 //Header represents an RPM header structure (as used in the signature section
-//and header section), as defined in [LSB, 22.2.2].
+//and header section), as defined in [LSB, 25.2.2].
 type Header struct {
 	Records      []*HeaderIndexRecord
 	Data         []byte
@@ -35,7 +35,7 @@ type Header struct {
 
 //HeaderIndexRecord represents an index record in a RPM header structure, i.e.
 //a single key-value entry. The actual value is stored in the associated
-//Header.Data field. Defined in [LSB, 22.2.2.2].
+//Header.Data field. Defined in [LSB, 25.2.2.2].
 type HeaderIndexRecord struct {
 	Tag    uint32
 	Type   uint32
@@ -43,7 +43,7 @@ type HeaderIndexRecord struct {
 	Count  uint32
 }
 
-//Binary representation of the header record. [LSB,22.2.2.1]
+//Binary representation of the header record. [LSB,25.2.2.1]
 type headerRecord struct {
 	Magic            [4]byte
 	Reserved         [4]byte
@@ -178,7 +178,7 @@ func (hdr *Header) AddStringArrayValue(tag uint32, data []string) {
 	}
 }
 
-//List of known values for HeaderIndexRecord.Type. [LSB,22.2.2.2.1]
+//List of known values for HeaderIndexRecord.Type. [LSB,25.2.2.2.1]
 //
 //Note that we don't support writing all types; null, char and int{8,16,64}
 //are not needed for the tags that we must support.
@@ -195,7 +195,7 @@ const (
 	RpmI18NStringType  = 9
 )
 
-//List of known values for HeaderIndexRecord.Tag. [LSB, 22.2.2.2.2 ff.]
+//List of known values for HeaderIndexRecord.Tag. [LSB, 25.2.2.2.2 ff.]
 const (
 	RpmtagHeaderSignatures  = 62   //type: BIN
 	RpmtagHeaderImmutable   = 63   //type: BIN
@@ -234,10 +234,10 @@ const (
 	RpmtagPostIn            = 1024 //type: STRING
 	RpmtagPreUn             = 1025 //type: STRING
 	RpmtagPostUn            = 1026 //type: STRING
-	RpmtagPreInScript       = 1085 //type: STRING
-	RpmtagPostInScript      = 1086 //type: STRING
-	RpmtagPreUnScript       = 1087 //type: STRING
-	RpmtagPostUnScript      = 1088 //type: STRING
+	RpmtagPreInProg         = 1085 //type: STRING
+	RpmtagPostInProg        = 1086 //type: STRING
+	RpmtagPreUnProg         = 1087 //type: STRING
+	RpmtagPostUnProg        = 1088 //type: STRING
 	RpmtagOldFileNames      = 1027 //type: STRING_ARRAY
 	RpmtagFileSizes         = 1028 //type: INT32
 	RpmtagFileModes         = 1030 //type: INT16

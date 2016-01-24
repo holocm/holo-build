@@ -30,7 +30,7 @@ import (
 //
 // Documentation for the RPM file format:
 //
-// [LSB] http://refspecs.linux-foundation.org/LSB_3.1.0/LSB-Core-generic/LSB-Core-generic/pkgformat.html
+// [LSB] http://refspecs.linux-foundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/pkgformat.html
 // [RPM] http://www.rpm.org/max-rpm/s1-rpm-file-format-rpm-file-format.html
 //
 ////////////////////////////////////////////////////////////////////////////////
@@ -51,12 +51,15 @@ func (g *Generator) RecommendedFileName(pkg *common.Package) string {
 	return fmt.Sprintf("%s-%s.noarch.rpm", pkg.Name, fullVersionString(pkg))
 }
 
-func fullVersionString(pkg *common.Package) string {
-	str := fmt.Sprintf("%s-%d", pkg.Version, pkg.Release)
+func versionString(pkg *common.Package) string {
 	if pkg.Epoch > 0 {
-		str = fmt.Sprintf("%d:%s", pkg.Epoch, str)
+		return fmt.Sprintf("%d:%s", pkg.Epoch, pkg.Version)
 	}
-	return str
+	return pkg.Version
+}
+
+func fullVersionString(pkg *common.Package) string {
+	return fmt.Sprintf("%s-%d", versionString(pkg), pkg.Release)
 }
 
 //Build implements the common.Generator interface.
@@ -67,14 +70,10 @@ func (g *Generator) Build(pkg *common.Package, buildReproducibly bool) ([]byte, 
 		return nil, err
 	}
 
-	//make header section
-	emptyHeader := &Header{}
-	headerSection := emptyHeader.ToBinary(RpmtagHeaderImmutable) //TODO
-
-	//make signature section
+	//produce header sections in reverse order (since most of them depend on
+	//what comes after them)
+	headerSection := MakeHeaderSection(pkg, payload)
 	signatureSection := MakeSignatureSection(headerSection, payload)
-
-	//make lead
 	lead := NewLead(pkg).ToBinary()
 
 	//combine everything with the correct alignment
@@ -83,7 +82,7 @@ func (g *Generator) Build(pkg *common.Package, buildReproducibly bool) ([]byte, 
 	return append(combined2, payload.Binary...), nil
 }
 
-//According to [LSB, 22.2.2], "A Header structure shall be aligned to an 8 byte
+//According to [LSB, 25.2.2], "A Header structure shall be aligned to an 8 byte
 //boundary."
 func appendAlignedTo8Byte(a []byte, b []byte) []byte {
 	result := a
