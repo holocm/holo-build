@@ -140,7 +140,7 @@ func addFileInformationTags(h *Header, pkg *common.Package) {
 		dirIndexes = append(dirIndexes, int32(dirIdx))
 
 		//actually plausible metadata
-		modes = append(modes, int16(node.FileModeForArchive()))
+		modes = append(modes, int16(node.FileModeForArchive(true)))
 		mtimes = append(mtimes, 0)
 
 		//type-dependent metadata

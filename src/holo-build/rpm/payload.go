@@ -88,7 +88,7 @@ func MakePayload(pkg *common.Package, buildReproducibly bool) (*Payload, error) 
 		header := cpioHeader{
 			Magic:       cpioMagic,
 			InodeNumber: cpioFormatInt(inodeNumber),
-			Mode:        cpioFormatInt(node.FileModeForArchive()),
+			Mode:        cpioFormatInt(node.FileModeForArchive(true)),
 			//UID, GID depend on the node type; see below
 			NumberOfLinks:    cpioOne,
 			ModificationTime: cpioFormatInt(timestamp),
