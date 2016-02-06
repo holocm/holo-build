@@ -124,6 +124,24 @@ func (hdr *Header) AddBinaryValue(tag uint32, data []byte) {
 	hdr.Data = append(hdr.Data, data...)
 }
 
+//AddInt16Value adds a value of type RpmInt32Type to this header.
+func (hdr *Header) AddInt16Value(tag uint32, data []int16) {
+	//align to 2 bytes
+	if len(hdr.Data)%2 != 0 {
+		hdr.Data = append(hdr.Data, 0x00)
+	}
+
+	hdr.Records = append(hdr.Records, &HeaderIndexRecord{
+		Tag:    tag,
+		Type:   RpmInt32Type,
+		Offset: uint32(len(hdr.Data)),
+		Count:  uint32(len(data)),
+	})
+	var buf bytes.Buffer
+	binary.Write(&buf, binary.BigEndian, data)
+	hdr.Data = append(hdr.Data, buf.Bytes()...)
+}
+
 //AddInt32Value adds a value of type RpmInt32Type to this header.
 func (hdr *Header) AddInt32Value(tag uint32, data []int32) {
 	//align to 4 bytes
@@ -266,4 +284,18 @@ const (
 	RpmtagObsoleteName      = 1090 //type: STRING_ARRAY
 	RpmtagObsoleteFlags     = 1114 //type: INT32
 	RpmtagObsoleteVersion   = 1115 //type: STRING_ARRAY
+)
+
+//Values for RpmtagFileFlags, see [LSB,25.2.4.3.1].
+const (
+	RpmfileConfig    = (1 << 0)
+	RpmfileDoc       = (1 << 1)
+	RpmfileDoNotUse  = (1 << 2)
+	RpmfileMissingOK = (1 << 3)
+	RpmfileNoReplace = (1 << 4)
+	RpmfileSpecFile  = (1 << 5)
+	RpmfileGhost     = (1 << 6)
+	RpmfileLicense   = (1 << 7)
+	RpmfileReadme    = (1 << 8)
+	RpmfileExclude   = (1 << 9)
 )

@@ -22,6 +22,7 @@ package rpm
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"../common"
@@ -36,7 +37,8 @@ func MakeHeaderSection(pkg *common.Package, payload *Payload) []byte {
 
 	addInstallationTags(h, pkg)
 
-	//TODO: [LSB, 25.2.4.3] file information tags
+	addFileInformationTags(h, pkg)
+
 	//TODO: [LSB, 25.2.4.4] dependency information tags
 
 	return h.ToBinary(RpmtagHeaderImmutable)
@@ -89,4 +91,121 @@ func addInstallationTags(h *Header, pkg *common.Package) {
 		h.AddStringValue(RpmtagPostUn, pkg.CleanupScript, false)
 		h.AddStringValue(RpmtagPostUnProg, "/bin/sh", false)
 	}
+}
+
+//see [LSB,25.2.4.3]
+func addFileInformationTags(h *Header, pkg *common.Package) {
+	var (
+		sizes       []int32
+		modes       []int16
+		rdevs       []int16
+		mtimes      []int32
+		md5s        []string
+		linktos     []string
+		flags       []int32
+		ownerNames  []string
+		groupNames  []string
+		devices     []int32
+		inodes      []int32
+		langs       []string
+		dirIndexes  []int32
+		basenames   []string
+		dirnames    []string
+		inodeNumber int32
+	)
+
+	//collect attributes for all files in the archive
+	//(NOTE: This traversal works in the same way as the one in MakePayload.)
+	pkg.WalkFSWithAbsolutePaths(func(path string, node common.FSNode) error {
+		//skip implicitly created directories (as rpmbuild-constructed CPIO
+		//archives apparently do)
+		if n, ok := node.(*common.FSDirectory); ok {
+			if n.Implicit {
+				return nil
+			}
+		}
+
+		//stupid stuff (which is an understatement because this whole section
+		//is completely redundant)
+		inodeNumber++ //make up inode numbers in the same way as rpmbuild does
+		inodes = append(inodes, inodeNumber)
+		langs = append(langs, "")
+		devices = append(devices, 1)
+		rdevs = append(rdevs, 0)
+
+		//split path into dirname and basename
+		basenames = append(basenames, filepath.Base(path))
+		var dirIdx int
+		dirnames, dirIdx = findOrAppend(dirnames, filepath.Dir(path))
+		dirIndexes = append(dirIndexes, int32(dirIdx))
+
+		//actually plausible metadata
+		modes = append(modes, int16(node.FileModeForArchive()))
+		mtimes = append(mtimes, 0)
+
+		//type-dependent metadata
+		switch n := node.(type) {
+		case *common.FSDirectory:
+			sizes = append(sizes, 4096)
+			md5s = append(md5s, "")
+			linktos = append(linktos, "")
+			flags = append(flags, 0)
+			ownerNames = append(ownerNames, makeUpUserOrGroupName(n.Metadata.UID(), "uid"))
+			groupNames = append(groupNames, makeUpUserOrGroupName(n.Metadata.GID(), "gid"))
+		case *common.FSRegularFile:
+			sizes = append(sizes, int32(len(n.Content)))
+			md5s = append(md5s, n.MD5Digest())
+			linktos = append(linktos, "")
+			flags = append(flags, RpmfileNoReplace)
+			ownerNames = append(ownerNames, makeUpUserOrGroupName(n.Metadata.UID(), "uid"))
+			groupNames = append(groupNames, makeUpUserOrGroupName(n.Metadata.GID(), "gid"))
+		case *common.FSSymlink:
+			sizes = append(sizes, int32(len(n.Target)))
+			md5s = append(md5s, "")
+			linktos = append(linktos, n.Target)
+			flags = append(flags, 0)
+			ownerNames = append(ownerNames, "root")
+			groupNames = append(groupNames, "root")
+		}
+
+		return nil
+	})
+
+	h.AddInt32Value(RpmtagFileSizes, sizes)
+	h.AddInt16Value(RpmtagFileModes, modes)
+	h.AddInt16Value(RpmtagFileRdevs, rdevs)
+	h.AddInt32Value(RpmtagFileMtimes, mtimes)
+	h.AddStringArrayValue(RpmtagFileMD5s, md5s)
+	h.AddStringArrayValue(RpmtagFileLinktos, linktos)
+	h.AddInt32Value(RpmtagFileFlags, flags)
+	h.AddStringArrayValue(RpmtagFileUserName, ownerNames)
+	h.AddStringArrayValue(RpmtagFileGroupName, groupNames)
+	h.AddInt32Value(RpmtagFileDevices, devices)
+	h.AddInt32Value(RpmtagFileInodes, inodes)
+	h.AddStringArrayValue(RpmtagFileLangs, langs)
+	h.AddInt32Value(RpmtagDirIndexes, dirIndexes)
+	h.AddStringArrayValue(RpmtagBasenames, basenames)
+	h.AddStringArrayValue(RpmtagDirNames, dirnames)
+}
+
+//If `list` contains `value`, otherwise append `value` to `list`.
+//Return the new list and the index of `value` in `list`.
+func findOrAppend(list []string, value string) (newList []string, position int) {
+	for idx, elem := range list {
+		if elem == value {
+			return list, idx
+		}
+	}
+	length := len(list)
+	return append(list, value), length
+}
+
+//Return "root" for uid/gid 0. Otherwise, just make up a name. They don't
+//matter anyway since we apply name-based users/groups in the post-install
+//script.
+func makeUpUserOrGroupName(id uint32, prefix string) string {
+	if id == 0 {
+		return "root"
+	}
+	return prefix + fmt.Sprintf("%d", id)
 }

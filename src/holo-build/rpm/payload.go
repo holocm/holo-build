@@ -72,6 +72,7 @@ func MakePayload(pkg *common.Package, buildReproducibly bool) (*Payload, error) 
 	cpioMagic := [6]byte{'0', '7', '0', '7', '0', '1'}
 
 	//assemble the CPIO archive
+	//(NOTE: This traversal works in the same way as the one in addFileInformationTags.)
 	pkg.WalkFSWithAbsolutePaths(func(path string, node common.FSNode) error {
 		//skip implicitly created directories (as rpmbuild-constructed CPIO
 		//archives apparently do)
