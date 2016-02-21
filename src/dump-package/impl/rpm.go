@@ -194,8 +194,12 @@ func dumpRpmHeader(reader io.Reader, sectionIdent string, readAligned bool, tagD
 			tagName = fmt.Sprintf("tag %d", entry.Tag)
 		}
 
-		line := fmt.Sprintf("%s: length %d\n", tagName, entry.Count)
-		lines = append(lines, line+strings.TrimSuffix(Indent(strings.Join(sublines, "\n")), "\n"))
+		line := fmt.Sprintf("%s: length %d", tagName, entry.Count)
+		if len(sublines) == 0 {
+			lines = append(lines, line)
+		} else {
+			lines = append(lines, line+"\n"+strings.TrimSuffix(Indent(strings.Join(sublines, "\n")), "\n"))
+		}
 	}
 
 	return identifier + Indent(strings.Join(lines, "\n")), nil
