@@ -27,6 +27,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"sort"
 	"strings"
 )
 
@@ -157,7 +158,8 @@ func dumpRpmHeader(reader io.Reader, sectionIdent string, readAligned bool, tagD
 	}
 
 	//decode and dump entries
-	lines := make([]string, 0, len(indexEntries)) //lower estimate only
+	dumpForTag := make(map[uint32]string)
+	tags := make([]uint32, 0, len(indexEntries))
 	for _, entry := range indexEntries {
 		//seek to start of entry
 		_, err := bufferedReader.Seek(int64(entry.Offset), 0)
@@ -194,16 +196,36 @@ func dumpRpmHeader(reader io.Reader, sectionIdent string, readAligned bool, tagD
 			tagName = fmt.Sprintf("tag %d", entry.Tag)
 		}
 
-		line := fmt.Sprintf("%s: length %d", tagName, entry.Count)
-		if len(sublines) == 0 {
-			lines = append(lines, line)
-		} else {
-			lines = append(lines, line+"\n"+strings.TrimSuffix(Indent(strings.Join(sublines, "\n")), "\n"))
+		dump := fmt.Sprintf("%s: length %d", tagName, entry.Count)
+		if len(sublines) > 0 {
+			dump += "\n" + strings.TrimSuffix(Indent(strings.Join(sublines, "\n")), "\n")
 		}
+
+		//the same tag should not appear multiple times; but if it does, report
+		//both instead of overwriting the first occurrence with the second one
+		if _, duplicateTag := dumpForTag[entry.Tag]; duplicateTag {
+			dumpForTag[entry.Tag] += "\n" + dump
+		} else {
+			dumpForTag[entry.Tag] = dump
+			tags = append(tags, entry.Tag)
+		}
+	}
+
+	//sort entry dumps by tag value, because order should not matter
+	sort.Sort(byUint32(tags))
+	lines := make([]string, 0, len(tags))
+	for _, tag := range tags {
+		lines = append(lines, dumpForTag[tag])
 	}
 
 	return identifier + Indent(strings.Join(lines, "\n")), nil
 }
+
+type byUint32 []uint32
+
+func (b byUint32) Len() int           { return len(b) }
+func (b byUint32) Less(i, j int) bool { return b[i] < b[j] }
+func (b byUint32) Swap(i, j int)      { b[i], b[j] = b[j], b[i] }
 
 func decodeIndexEntry(dataType uint32, reader io.Reader) (string, error) {
 	//check data type
