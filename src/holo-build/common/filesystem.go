@@ -59,6 +59,9 @@ type FSNode interface {
 
 //IntOrString is used for FSNodeMetadata.Owner and FSNodeMetadata.Group that
 //can be either int or string.
+//
+//Note that, from within a generator, you will always see `Str` to be empty.
+//See PostponeUnmaterializable() for details.
 type IntOrString struct {
 	Int uint32
 	Str string
