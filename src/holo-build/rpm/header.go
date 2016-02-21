@@ -133,7 +133,7 @@ func (hdr *Header) AddInt16Value(tag uint32, data []int16) {
 
 	hdr.Records = append(hdr.Records, &HeaderIndexRecord{
 		Tag:    tag,
-		Type:   RpmInt32Type,
+		Type:   RpmInt16Type,
 		Offset: uint32(len(hdr.Data)),
 		Count:  uint32(len(data)),
 	})
