@@ -40,7 +40,8 @@ type Generator struct{}
 
 //Validate implements the common.Generator interface.
 func (g *Generator) Validate(pkg *common.Package) []error {
-	//TODO
+	//TODO, (cannot find a reliable cross-distro source of truth for the
+	//acceptable format of package names and versions)
 	return nil
 }
 

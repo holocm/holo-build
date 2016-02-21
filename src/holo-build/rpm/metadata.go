@@ -39,7 +39,7 @@ func MakeHeaderSection(pkg *common.Package, payload *Payload) []byte {
 
 	addFileInformationTags(h, pkg)
 
-	//TODO: [LSB, 25.2.4.4] dependency information tags
+	addDependencyInformationTags(h, pkg)
 
 	return h.ToBinary(RpmtagHeaderImmutable)
 }
@@ -208,4 +208,90 @@ func makeUpUserOrGroupName(id uint32, prefix string) string {
 		return "root"
 	}
 	return prefix + fmt.Sprintf("%d", id)
+}
+
+//see [LSB,25.2.4.4]
+func addDependencyInformationTags(h *Header, pkg *common.Package) {
+	serializeRelations(h, pkg.Requires,
+		RpmtagRequireName, RpmtagRequireFlags, RpmtagRequireVersion)
+	serializeRelations(h, pkg.Provides,
+		RpmtagProvideName, RpmtagProvideFlags, RpmtagProvideVersion)
+	serializeRelations(h, pkg.Conflicts,
+		RpmtagConflictName, RpmtagConflictFlags, RpmtagConflictVersion)
+	serializeRelations(h, pkg.Replaces,
+		RpmtagObsoleteName, RpmtagObsoleteFlags, RpmtagObsoleteVersion)
+}
+
+type rpmlibPseudoDependency struct {
+	Name    string
+	Version string
+}
+
+var rpmlibPseudoDependencies = []rpmlibPseudoDependency{
+	//indicate that RPMTAG_PROVIDENAME and RPMTAG_OBSOLETENAME may have a
+	//version associated with them (as if the presence of
+	//RPMTAG_PROVIDEVERSION and RPMTAG_OBSOLETEVERSION is not enough)
+	rpmlibPseudoDependency{"VersionedDependencies", "3.0.3-1"},
+	//indicate that filenames in the payload are represented in the
+	//RPMTAG_DIRINDEXES, RPMTAG_DIRNAME and RPMTAG_BASENAMES indexes
+	//(again, as if the presence of these tags wasn't evidence enough)
+	rpmlibPseudoDependency{"CompressedFileNames", "3.0.4-1"},
+	//title says it all; apparently RPM devs haven't got the memo that you can
+	//easily identify compression formats by the first few bytes
+	rpmlibPseudoDependency{"PayloadIsLzma", "4.4.6-1"},
+	//path names in the CPIO payload start with "./" because apparently you
+	//cannot read that from the payload itself
+	rpmlibPseudoDependency{"PayloadFilesHavePrefix", "4.0-1"},
+}
+
+var flagsForConstraintRelation = map[string]int32{
+	"<":      RpmsenseLess,
+	"<=":     RpmsenseLess | RpmsenseEqual,
+	"=":      RpmsenseEqual,
+	">=":     RpmsenseGreater | RpmsenseEqual,
+	">":      RpmsenseGreater,
+	"rpmlib": RpmsenseRpmlib | RpmsenseLess | RpmsenseEqual,
+}
+
+func serializeRelations(h *Header, rels []common.PackageRelation, namesTag, flagsTag, versionsTag uint32) {
+	//for the Requires list, we need to add pseudo-dependencies to describe the
+	//structure of our package (because apparently a custom key-value database
+	//wasn't enough, so they built a second key-value database inside the
+	//requirements array -- BRILLIANT!)
+	if namesTag == RpmtagRequireName {
+		for _, dep := range rpmlibPseudoDependencies {
+			rels = append(rels, common.PackageRelation{
+				RelatedPackage: "rpmlib(" + dep.Name + ")",
+				Constraints: []common.VersionConstraint{
+					common.VersionConstraint{Relation: "rpmlib", Version: dep.Version},
+				},
+			})
+		}
+	}
+
+	//serialize relations into RPM's bizarre multi-array format
+	var (
+		names    []string
+		flags    []int32
+		versions []string
+	)
+	for _, rel := range rels {
+		if len(rel.Constraints) == 0 {
+			//case 1: no version constraints -> generate one relation for the RelatedPackage
+			names = append(names, rel.RelatedPackage)
+			flags = append(flags, RpmsenseAny)
+			versions = append(versions, "")
+		} else {
+			//case 2: no version constraints -> generate one relation per constraint
+			for _, cons := range rel.Constraints {
+				names = append(names, rel.RelatedPackage)
+				flags = append(flags, flagsForConstraintRelation[cons.Relation])
+				versions = append(versions, cons.Version)
+			}
+		}
+	}
+
+	h.AddStringArrayValue(namesTag, names)
+	h.AddInt32Value(flagsTag, flags)
+	h.AddStringArrayValue(versionsTag, versions)
 }

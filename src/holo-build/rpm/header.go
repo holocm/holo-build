@@ -299,3 +299,21 @@ const (
 	RpmfileReadme    = (1 << 8)
 	RpmfileExclude   = (1 << 9)
 )
+
+//Values for RpmtagRequireFlags, RpmtagConflictFlags, RpmtagProvideFlags, RpmtagObsoleteFlags. See [LSB,25.2.4.4.2].
+//
+//Note that "RPMSENSE" is copied from the spec, but is clearly a euphemism.
+//There is nothing in RPM that makes sense.
+const (
+	RpmsenseAny          = 0
+	RpmsenseLess         = 0x02
+	RpmsenseGreater      = 0x04
+	RpmsenseEqual        = 0x08
+	RpmsensePrereq       = 0x40
+	RpmsenseInterp       = 0x100
+	RpmsenseScriptPre    = 0x200
+	RpmsenseScriptPost   = 0x400
+	RpmsenseScriptPreUn  = 0x800
+	RpmsenseScriptPostUn = 0x1000
+	RpmsenseRpmlib       = 0x1000000
+)
