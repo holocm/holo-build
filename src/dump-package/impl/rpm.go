@@ -235,23 +235,23 @@ func decodeIndexEntry(dataType uint32, reader io.Reader) (string, error) {
 	case 1: //CHAR
 		var value uint8
 		err := binary.Read(reader, binary.BigEndian, &value)
-		return fmt.Sprintf("char: %c = 0x%X", rune(value), value), err
+		return fmt.Sprintf("char: %c = 0x%X = 0o%o", rune(value), value, value), err
 	case 2: //INT8
 		var value int8
 		err := binary.Read(reader, binary.BigEndian, &value)
-		return fmt.Sprintf("int8: %d = 0x%X", value, uint8(value)), err
+		return fmt.Sprintf("int8: %d = 0x%X = 0o%o", value, uint8(value), uint8(value)), err
 	case 3: //INT16
 		var value int16
 		err := binary.Read(reader, binary.BigEndian, &value)
-		return fmt.Sprintf("int16: %d = 0x%X", value, uint16(value)), err
+		return fmt.Sprintf("int16: %d = 0x%X = 0o%o", value, uint16(value), uint16(value)), err
 	case 4: //INT32
 		var value int32
 		err := binary.Read(reader, binary.BigEndian, &value)
-		return fmt.Sprintf("int32: %d = 0x%X", value, uint32(value)), err
+		return fmt.Sprintf("int32: %d = 0x%X = 0o%o", value, uint32(value), uint32(value)), err
 	case 5: //INT64
 		var value int64
 		err := binary.Read(reader, binary.BigEndian, &value)
-		return fmt.Sprintf("int64: %d = 0x%X", value, uint64(value)), err
+		return fmt.Sprintf("int64: %d = 0x%X = 0o%o", value, uint64(value), uint64(value)), err
 	case 7: //BIN
 		panic("Cannot be reached")
 	case 6, 8: //STRING or STRING_ARRAY or I18NSTRING (not different at this point)
