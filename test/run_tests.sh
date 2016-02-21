@@ -22,7 +22,7 @@ run_testcase() {
     # run test for all available generators
     local FILES_TO_DIFF="suggested-filenames"
     rm -f -- suggested-filenames
-    for GENERATOR in debian pacman; do
+    for GENERATOR in debian pacman rpm; do
         # check suggested filename
         (
             FILENAME="$(../../build/holo-build --suggest-filename --$GENERATOR < input.toml 2>/dev/null)"

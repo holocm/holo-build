@@ -6,3 +6,5 @@ debian-output
 debian-error-output
 pacman-output
 pacman-error-output
+rpm-output
+rpm-error-output

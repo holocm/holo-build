@@ -1,2 +1,3 @@
 debian: foo_1.0.2.3-1_any.deb
 pacman: foo-1.0.2.3-1-any.pkg.tar.xz
+rpm: foo-1.0.2.3-1.noarch.rpm
