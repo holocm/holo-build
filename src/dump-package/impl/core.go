@@ -126,7 +126,7 @@ func dumpXZ(data []byte) (string, error) {
 }
 
 func dumpLZMA(data []byte) (string, error) {
-	return dumpUsingProgram(data, "LZMA", "lzmadec")
+	return dumpUsingProgram(data, "LZMA", "xz", "--format=lzma", "--decompress", "--stdout")
 }
 
 func dumpUsingProgram(data []byte, format string, command string, args ...string) (string, error) {
