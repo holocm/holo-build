@@ -126,6 +126,11 @@ func (hdr *Header) AddBinaryValue(tag uint32, data []byte) {
 
 //AddInt16Value adds a value of type RpmInt32Type to this header.
 func (hdr *Header) AddInt16Value(tag uint32, data []int16) {
+	//see near start of AddStringArrayValue() for rationale
+	if len(data) == 0 {
+		return
+	}
+
 	//align to 2 bytes
 	if len(hdr.Data)%2 != 0 {
 		hdr.Data = append(hdr.Data, 0x00)
@@ -144,6 +149,11 @@ func (hdr *Header) AddInt16Value(tag uint32, data []int16) {
 
 //AddInt32Value adds a value of type RpmInt32Type to this header.
 func (hdr *Header) AddInt32Value(tag uint32, data []int32) {
+	//see near start of AddStringArrayValue() for rationale
+	if len(data) == 0 {
+		return
+	}
+
 	//align to 4 bytes
 	for len(hdr.Data)%4 != 0 {
 		hdr.Data = append(hdr.Data, 0x00)
@@ -185,6 +195,15 @@ func (hdr *Header) AddStringValue(tag uint32, data string, i18n bool) {
 
 //AddStringArrayValue adds a value of type RpmStringArrayType to this header.
 func (hdr *Header) AddStringArrayValue(tag uint32, data []string) {
+	//skip the tag entirely if it does not contain any data (even if the tag
+	//may be listed as "required"); e.g. in metapackages without filesystem
+	//entries, none of the filesystem metadata tags may be written (this is
+	//because RPM's dataLength() function returns failure if 0 strings were
+	//read, even if there were legitimately 0 strings)
+	if len(data) == 0 {
+		return
+	}
+
 	hdr.Records = append(hdr.Records, &HeaderIndexRecord{
 		Tag:    tag,
 		Type:   RpmStringArrayType,

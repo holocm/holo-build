@@ -10,16 +10,16 @@ RPM package
         tag 62 (HEADERSIGNATURES): length 16
             00000000  00 00 00 3e 00 00 00 07  ff ff ff b0 00 00 00 10  |...>............|
         tag 269 (SHA1): length 1
-            string: 1056087ed62e5c9995c7b847350916a66afc61d1
+            string: 7d1c0ca5aefac7d158fae1b8baa1028e11ace863
         tag 1000 (SIZE): length 1
-            int32: 1542 = 0x606 = 0o3006
+            int32: 1397 = 0x575 = 0o2565
         tag 1004 (MD5): length 16
-            00000000  ab 73 e5 6d 97 81 92 a8  5b e8 e6 f5 4e 10 55 f5  |.s.m....[...N.U.|
+            00000000  2b 87 77 59 e5 b6 7e 6e  5f dd 29 38 3e a3 ca f8  |+.wY..~n_.)8>...|
         tag 1007 (PAYLOADSIZE): length 1
             int32: 656 = 0x290 = 0o1220
-    >> header section: format version 1, 48 entries, 484 bytes of data
+    >> header section: format version 1, 39 entries, 483 bytes of data
         tag 63 (HEADERIMMUTABLE): length 16
-            00000000  00 00 00 3f 00 00 00 07  ff ff fd 00 00 00 00 10  |...?............|
+            00000000  00 00 00 3f 00 00 00 07  ff ff fd 90 00 00 00 10  |...?............|
         tag 100 (HEADERI18NTABLE): length 1
             string: C
         tag 1000 (NAME): length 1
@@ -68,7 +68,6 @@ RPM package
             string: root
         tag 1046 (ARCHIVESIZE): length 1
             int32: 656 = 0x290 = 0o1220
-        tag 1047 (PROVIDENAME): length 0
         tag 1048 (REQUIREFLAGS): length 5
             int32: 0 = 0x0 = 0o0
             int32: 16777226 = 0x100000A = 0o100000012
@@ -87,24 +86,16 @@ RPM package
             string: 3.0.4-1
             string: 4.4.6-1
             string: 4.0-1
-        tag 1053 (CONFLICTFLAGS): length 0
-        tag 1054 (CONFLICTNAME): length 0
-        tag 1055 (CONFLICTVERSION): length 0
         tag 1086 (POSTINPROG): length 1
             string: /bin/sh
         tag 1088 (POSTUNPROG): length 1
             string: /bin/sh
-        tag 1090 (OBSOLETENAME): length 0
         tag 1095 (FILEDEVICES): length 1
             int32: 1 = 0x1 = 0o1
         tag 1096 (FILEINODES): length 1
             int32: 1 = 0x1 = 0o1
         tag 1097 (FILELANGS): length 1
             string: 
-        tag 1112 (PROVIDEFLAGS): length 0
-        tag 1113 (PROVIDEVERSION): length 0
-        tag 1114 (OBSOLETEFLAGS): length 0
-        tag 1115 (OBSOLETEVERSION): length 0
         tag 1116 (DIRINDEXES): length 1
             int32: 0 = 0x0 = 0o0
         tag 1117 (BASENAMES): length 1
