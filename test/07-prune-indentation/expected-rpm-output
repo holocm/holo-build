@@ -1,0 +1,204 @@
+RPM package
+    >> lead section:
+        RPM format version 3.0
+        Type: 0 (0 = binary, 1 = source)
+        Architecture: 0 (0 = noarch, 1 = x86, ...)
+        Name: prune-indentation-1.0.0-1
+        Built for OS: 1 (1 = Linux, ...)
+        Signature type: 5
+    >> signature section: format version 1, 5 entries, 81 bytes of data
+        tag 62 (HEADERSIGNATURES): length 16
+            00000000  00 00 00 3e 00 00 00 07  ff ff ff b0 00 00 00 10  |...>............|
+        tag 269 (SHA1): length 1
+            string: f5f8553d878d03cabdf104073ec010b0ef9a99ba
+        tag 1000 (SIZE): length 1
+            int32: 1873 = 0x751 = 0o3521
+        tag 1004 (MD5): length 16
+            00000000  27 72 eb 20 c0 84 87 3a  24 4b e4 6e 5d db 00 99  |'r. ...:$K.n]...|
+        tag 1007 (PAYLOADSIZE): length 1
+            int32: 1160 = 0x488 = 0o2210
+    >> header section: format version 1, 44 entries, 900 bytes of data
+        tag 63 (HEADERIMMUTABLE): length 16
+            00000000  00 00 00 3f 00 00 00 07  ff ff fd 40 00 00 00 10  |...?.......@....|
+        tag 100 (HEADERI18NTABLE): length 1
+            string: C
+        tag 1000 (NAME): length 1
+            string: prune-indentation
+        tag 1001 (VERSION): length 1
+            string: 1.0.0
+        tag 1002 (RELEASE): length 1
+            string: 1
+        tag 1004 (SUMMARY): length 1
+            translatable string: 
+        tag 1005 (DESCRIPTION): length 1
+            translatable string: 
+        tag 1009 (SIZE): length 1
+            int32: 8367 = 0x20AF = 0o20257
+        tag 1014 (LICENSE): length 1
+            string: None
+        tag 1015 (PACKAGER): length 1
+            string: Holo Build <holo.build@example.org>
+        tag 1016 (GROUP): length 1
+            translatable string: System/Management
+        tag 1021 (OS): length 1
+            string: linux
+        tag 1022 (ARCH): length 1
+            string: noarch
+        tag 1028 (FILESIZES): length 6
+            int32: 28 = 0x1C = 0o34
+            int32: 40 = 0x28 = 0o50
+            int32: 31 = 0x1F = 0o37
+            int32: 28 = 0x1C = 0o34
+            int32: 25 = 0x19 = 0o31
+            int32: 23 = 0x17 = 0o27
+        tag 1030 (FILEMODES): length 6
+            int16: -32348 = 0x81A4 = 0o100644
+            int16: -32348 = 0x81A4 = 0o100644
+            int16: -32348 = 0x81A4 = 0o100644
+            int16: -32348 = 0x81A4 = 0o100644
+            int16: -32348 = 0x81A4 = 0o100644
+            int16: -32348 = 0x81A4 = 0o100644
+        tag 1033 (FILERDEVS): length 6
+            int16: 0 = 0x0 = 0o0
+            int16: 0 = 0x0 = 0o0
+            int16: 0 = 0x0 = 0o0
+            int16: 0 = 0x0 = 0o0
+            int16: 0 = 0x0 = 0o0
+            int16: 0 = 0x0 = 0o0
+        tag 1034 (FILEMTIMES): length 6
+            int32: 0 = 0x0 = 0o0
+            int32: 0 = 0x0 = 0o0
+            int32: 0 = 0x0 = 0o0
+            int32: 0 = 0x0 = 0o0
+            int32: 0 = 0x0 = 0o0
+            int32: 0 = 0x0 = 0o0
+        tag 1035 (FILEMD5S): length 6
+            string: 19336acc49f29b8dedbcf7321f19f726
+            string: f46695565a30f8ccadafde741d7d8309
+            string: 88a7007e9dca45b095e46fb3ff81f6ca
+            string: 19336acc49f29b8dedbcf7321f19f726
+            string: 651828373f84935a002f1305ef961835
+            string: be44856380472dc06370ce47f741bf89
+        tag 1036 (FILELINKTOS): length 6
+            string: 
+            string: 
+            string: 
+            string: 
+            string: 
+            string: 
+        tag 1037 (FILEFLAGS): length 6
+            int32: 16 = 0x10 = 0o20
+            int32: 16 = 0x10 = 0o20
+            int32: 16 = 0x10 = 0o20
+            int32: 16 = 0x10 = 0o20
+            int32: 16 = 0x10 = 0o20
+            int32: 16 = 0x10 = 0o20
+        tag 1039 (FILEUSERNAME): length 6
+            string: root
+            string: root
+            string: root
+            string: root
+            string: root
+            string: root
+        tag 1040 (FILEGROUPNAME): length 6
+            string: root
+            string: root
+            string: root
+            string: root
+            string: root
+            string: root
+        tag 1046 (ARCHIVESIZE): length 1
+            int32: 1160 = 0x488 = 0o2210
+        tag 1047 (PROVIDENAME): length 0
+        tag 1048 (REQUIREFLAGS): length 4
+            int32: 16777226 = 0x100000A = 0o100000012
+            int32: 16777226 = 0x100000A = 0o100000012
+            int32: 16777226 = 0x100000A = 0o100000012
+            int32: 16777226 = 0x100000A = 0o100000012
+        tag 1049 (REQUIRENAME): length 4
+            string: rpmlib(VersionedDependencies)
+            string: rpmlib(CompressedFileNames)
+            string: rpmlib(PayloadIsLzma)
+            string: rpmlib(PayloadFilesHavePrefix)
+        tag 1050 (REQUIREVERSION): length 4
+            string: 3.0.3-1
+            string: 3.0.4-1
+            string: 4.4.6-1
+            string: 4.0-1
+        tag 1053 (CONFLICTFLAGS): length 0
+        tag 1054 (CONFLICTNAME): length 0
+        tag 1055 (CONFLICTVERSION): length 0
+        tag 1090 (OBSOLETENAME): length 0
+        tag 1095 (FILEDEVICES): length 6
+            int32: 1 = 0x1 = 0o1
+            int32: 1 = 0x1 = 0o1
+            int32: 1 = 0x1 = 0o1
+            int32: 1 = 0x1 = 0o1
+            int32: 1 = 0x1 = 0o1
+            int32: 1 = 0x1 = 0o1
+        tag 1096 (FILEINODES): length 6
+            int32: 1 = 0x1 = 0o1
+            int32: 2 = 0x2 = 0o2
+            int32: 3 = 0x3 = 0o3
+            int32: 4 = 0x4 = 0o4
+            int32: 5 = 0x5 = 0o5
+            int32: 6 = 0x6 = 0o6
+        tag 1097 (FILELANGS): length 6
+            string: 
+            string: 
+            string: 
+            string: 
+            string: 
+            string: 
+        tag 1112 (PROVIDEFLAGS): length 0
+        tag 1113 (PROVIDEVERSION): length 0
+        tag 1114 (OBSOLETEFLAGS): length 0
+        tag 1115 (OBSOLETEVERSION): length 0
+        tag 1116 (DIRINDEXES): length 6
+            int32: 0 = 0x0 = 0o0
+            int32: 0 = 0x0 = 0o0
+            int32: 0 = 0x0 = 0o0
+            int32: 0 = 0x0 = 0o0
+            int32: 0 = 0x0 = 0o0
+            int32: 0 = 0x0 = 0o0
+        tag 1117 (BASENAMES): length 6
+            string: no-indent.conf
+            string: noprune-explicitly.conf
+            string: noprune-inconsistent-indent.conf
+            string: prune-indent-with-spaces.conf
+            string: prune-indent-with-tabs.conf
+            string: prune-mixed-indent.conf
+        tag 1118 (DIRNAMES): length 1
+            string: /etc
+        tag 1124 (PAYLOADFORMAT): length 1
+            string: cpio
+        tag 1125 (PAYLOADCOMPRESSOR): length 1
+            string: lzma
+        tag 1126 (PAYLOADFLAGS): length 1
+            string: 5
+    >> payload: LZMA-compressed cpio archive
+        >> ./etc/no-indent.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+            foo foo
+                qux qux
+            bar bar
+        >> ./etc/noprune-explicitly.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+                foo foo
+                    qux qux
+                bar bar
+        >> ./etc/noprune-inconsistent-indent.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+            	foo foo
+            		qux qux
+                bar bar
+        >> ./etc/prune-indent-with-spaces.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+            foo foo
+                qux qux
+            bar bar
+        >> ./etc/prune-indent-with-tabs.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+            foo foo
+            	qux qux
+            bar bar
+        >> ./etc/prune-mixed-indent.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+            foo foo
+              	qux
+            bar bar
+
