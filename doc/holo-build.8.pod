@@ -245,15 +245,12 @@ can be specified with the same syntax as for C<requires>.
 For C<--debian>, the provided version syntax is not allowed. C<provides> may
 only contain plain package names.
 
-For C<--pacman>, the same special syntax is allowed as for C<provides>; see
-there for details.
-
 =item B<conflicts> (array of strings)
 
 A list of other packages that may not be installed when this package is
 installed. Version tests can be added using the same syntax as for C<requires>.
 
-For C<--pacman>, the same special syntax is allowed as for C<provides>; see
+For C<--pacman>, the same special syntax is allowed as for C<requires>; see
 there for details.
 
 =item B<replaces> (array of strings)
@@ -267,7 +264,7 @@ If this package can replace the obsolete package, but it shall not be replaced
 automatically, don't use this; reference the obsolete package in both
 C<provides> and C<conflicts> instead.
 
-For C<--pacman>, the same special syntax is allowed as for C<provides>; see
+For C<--pacman>, the same special syntax is allowed as for C<requires>; see
 there for details.
 
 =item B<setupScript> (string)

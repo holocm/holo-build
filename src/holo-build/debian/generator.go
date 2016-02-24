@@ -54,10 +54,17 @@ func (g *Generator) Validate(pkg *common.Package) []error {
 	})
 
 	if pkg.Author == "" {
-		errs = append(errs,
-			errors.New("The \"package.author\" field is required for Debian packages"),
-		)
+		err := errors.New("The \"package.author\" field is required for Debian packages")
+		errs = append(errs, err)
 	}
+
+	for _, rel := range pkg.Provides {
+		if len(rel.Constraints) > 0 {
+			err := fmt.Errorf("version constraints on \"Provides: %s\" are not allowed for Debian packages", rel.RelatedPackage)
+			errs = append(errs, err)
+		}
+	}
+
 	return errs
 }
 
@@ -192,10 +199,6 @@ func compilePackageRelations(relType string, rels []common.PackageRelation) (str
 
 		//...compile constraints into a list like ">= 2.4, << 3.0" (operators "<" and ">" become "<<" and ">>" here)
 		if len(rel.Constraints) > 0 {
-			if relType == "Provides" {
-				//TODO: this should be checked during Validate
-				return "", fmt.Errorf("version constraints on \"Provides: %s\" are not allowed for Debian packages", rel.RelatedPackage)
-			}
 			for _, c := range rel.Constraints {
 				operator := c.Relation
 				if operator == "<" {
