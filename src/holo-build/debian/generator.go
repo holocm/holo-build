@@ -22,6 +22,7 @@ package debian
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -37,6 +38,27 @@ func (g *Generator) RecommendedFileName(pkg *common.Package) string {
 	//this is called after Build(), so we can assume that package name,
 	//version, etc. were already validated
 	return fmt.Sprintf("%s_%s_any.deb", pkg.Name, fullVersionString(pkg))
+}
+
+//Validate implements the common.Generator interface.
+func (g *Generator) Validate(pkg *common.Package) []error {
+	//reference: https://www.debian.org/doc/debian-policy/ch-controlfields.html
+	var nameRx = `[a-z0-9][a-z0-9+-.]+`
+	var versionRx = `[0-9][A-Za-z0-9.+:~-]*`
+	errs := pkg.ValidateWith(common.RegexSet{
+		PackageName:    nameRx,
+		PackageVersion: versionRx,
+		RelatedName:    nameRx,
+		RelatedVersion: "(?:[0-9]+:)?" + versionRx + "(?:-[1-9][0-9]*)?", //incl. release/epoch
+		FormatName:     "Debian",
+	})
+
+	if pkg.Author == "" {
+		errs = append(errs,
+			errors.New("The \"package.author\" field is required for Debian packages"),
+		)
+	}
+	return errs
 }
 
 func fullVersionString(pkg *common.Package) string {

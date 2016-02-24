@@ -53,7 +53,7 @@ func compilePackageRelations(relType string, rels []common.PackageRelation) stri
 
 //Like compilePackageRelations, but resolve special syntax for requirements
 //(references to groups, exclusion of packages and groups).
-func compilePackageRequirements(rels []common.PackageRelation) (string, error) {
+func compilePackageRequirements(relType string, rels []common.PackageRelation) (string, error) {
 	//acceptRel marks which packages will be included in the result
 	//(e.g. "not:foo" sets acceptPkg["foo"] = false)
 	acceptPkg := make(map[string]bool, len(rels))
@@ -107,7 +107,7 @@ func compilePackageRequirements(rels []common.PackageRelation) (string, error) {
 	sort.Sort(byRelatedPackage(additionalRels))
 	prunedRels = append(prunedRels, additionalRels...)
 
-	return compilePackageRelations("depend", prunedRels), nil
+	return compilePackageRelations(relType, prunedRels), nil
 }
 
 func resolvePackageGroup(groupName string) ([]string, error) {

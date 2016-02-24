@@ -41,6 +41,19 @@ func (g *Generator) RecommendedFileName(pkg *common.Package) string {
 	return fmt.Sprintf("%s-%s-any.pkg.tar.xz", pkg.Name, fullVersionString(pkg))
 }
 
+//Validate implements the common.Generator interface.
+func (g *Generator) Validate(pkg *common.Package) []error {
+	var nameRx = `[a-z0-9@._+][a-z0-9@._+-]*`
+	var versionRx = `[a-zA-Z0-9._]+`
+	return pkg.ValidateWith(common.RegexSet{
+		PackageName:    nameRx,
+		PackageVersion: versionRx,
+		RelatedName:    "(?:except:)?(?:group:)?" + nameRx,
+		RelatedVersion: "(?:[0-9]+:)?" + versionRx + "(?:-[1-9][0-9]*)?", //incl. release/epoch
+		FormatName:     "pacman",
+	})
+}
+
 //Build implements the common.Generator interface.
 func (g *Generator) Build(pkg *common.Package, buildReproducibly bool) ([]byte, error) {
 	//write .PKGINFO
@@ -63,8 +76,7 @@ func (g *Generator) Build(pkg *common.Package, buildReproducibly bool) ([]byte, 
 }
 
 func fullVersionString(pkg *common.Package) string {
-	//pkg.Version may not contain dashes in pacman packages, so replace "-" with "_"
-	str := fmt.Sprintf("%s-%d", strings.Replace(pkg.Version, "-", "_", -1), pkg.Release)
+	str := fmt.Sprintf("%s-%d", pkg.Version, pkg.Release)
 	if pkg.Epoch > 0 {
 		str = fmt.Sprintf("%d:%s", pkg.Epoch, str)
 	}
@@ -97,11 +109,21 @@ func writePKGINFO(pkg *common.Package, buildReproducibly bool) error {
 	contents += fmt.Sprintf("size = %d\n", pkg.FSRoot.InstalledSizeInBytes())
 	contents += "arch = any\n"
 	contents += "license = custom:none\n"
-	contents += compilePackageRelations("replaces", pkg.Replaces)
-	contents += compilePackageRelations("conflict", pkg.Conflicts)
-	contents += compilePackageRelations("provides", pkg.Provides)
+	replaces, err := compilePackageRequirements("replaces", pkg.Replaces)
+	if err != nil {
+		return err
+	}
+	conflicts, err := compilePackageRequirements("conflict", pkg.Conflicts)
+	if err != nil {
+		return err
+	}
+	provides, err := compilePackageRequirements("provides", pkg.Provides)
+	if err != nil {
+		return err
+	}
+	contents += replaces + conflicts + provides
 	contents += compileBackupMarkers(pkg)
-	requires, err := compilePackageRequirements(pkg.Requires)
+	requires, err := compilePackageRequirements("depend", pkg.Requires)
 	if err != nil {
 		return err
 	}
