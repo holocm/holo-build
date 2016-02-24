@@ -10,14 +10,14 @@ RPM package
         tag 62 (HEADERSIGNATURES): length 16
             00000000  00 00 00 3e 00 00 00 07  ff ff ff b0 00 00 00 10  |...>............|
         tag 269 (SHA1): length 1
-            string: 7d1c0ca5aefac7d158fae1b8baa1028e11ace863
+            string: 335d0a5f11da38c6c63735404d2a1ae09f112a6d
         tag 1000 (SIZE): length 1
-            int32: 1397 = 0x575 = 0o2565
+            int32: 1401 = 0x579 = 0o2571
         tag 1004 (MD5): length 16
-            00000000  2b 87 77 59 e5 b6 7e 6e  5f dd 29 38 3e a3 ca f8  |+.wY..~n_.)8>...|
+            00000000  51 43 49 e8 30 40 23 85  ca c9 32 a6 71 af d5 9c  |QCI.0@#...2.q...|
         tag 1007 (PAYLOADSIZE): length 1
             int32: 656 = 0x290 = 0o1220
-    >> header section: format version 1, 39 entries, 483 bytes of data
+    >> header section: format version 1, 39 entries, 487 bytes of data
         tag 63 (HEADERIMMUTABLE): length 16
             00000000  00 00 00 3f 00 00 00 07  ff ff fd 90 00 00 00 10  |...?............|
         tag 100 (HEADERI18NTABLE): length 1
@@ -101,7 +101,7 @@ RPM package
         tag 1117 (BASENAMES): length 1
             string: 08-holo-entities.toml
         tag 1118 (DIRNAMES): length 1
-            string: /usr/share/holo/users-groups
+            string: /usr/share/holo/users-groups/
         tag 1124 (PAYLOADFORMAT): length 1
             string: cpio
         tag 1125 (PAYLOADCOMPRESSOR): length 1

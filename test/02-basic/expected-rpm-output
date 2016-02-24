@@ -10,14 +10,14 @@ RPM package
         tag 62 (HEADERSIGNATURES): length 16
             00000000  00 00 00 3e 00 00 00 07  ff ff ff b0 00 00 00 10  |...>............|
         tag 269 (SHA1): length 1
-            string: e6d6e294655d14ec5fa1c101efe5ea04bd3f7835
+            string: 65c71d1d19f7d8ce9b5d26943be0d6b77c5a64b5
         tag 1000 (SIZE): length 1
-            int32: 2342 = 0x926 = 0o4446
+            int32: 2338 = 0x922 = 0o4442
         tag 1004 (MD5): length 16
-            00000000  dc 97 9a 4d ea f7 cb 5c  c5 45 e4 8c 9b bf ad 12  |...M...\.E......|
+            00000000  4a 1c fe 06 f9 f5 dd d9  b7 b7 52 46 a2 7b 26 da  |J.........RF.{&.|
         tag 1007 (PAYLOADSIZE): length 1
             int32: 1816 = 0x718 = 0o3430
-    >> header section: format version 1, 48 entries, 968 bytes of data
+    >> header section: format version 1, 48 entries, 964 bytes of data
         tag 63 (HEADERIMMUTABLE): length 16
             00000000  00 00 00 3f 00 00 00 07  ff ff fd 00 00 00 00 10  |...?............|
         tag 100 (HEADERI18NTABLE): length 1
@@ -105,14 +105,14 @@ RPM package
             string: root
             string: root
             string: root
-            string: uid4242
+            string: 4242
             string: root
         tag 1040 (FILEGROUPNAME): length 6
             string: root
             string: root
             string: root
             string: root
-            string: gid2323
+            string: 2323
             string: root
         tag 1046 (ARCHIVESIZE): length 1
             int32: 1816 = 0x718 = 0o3430
@@ -204,9 +204,9 @@ RPM package
             string: bar
             string: baz
         tag 1118 (DIRNAMES): length 3
-            string: /etc/files
-            string: /etc/links
-            string: /var/lib/foo
+            string: /etc/files/
+            string: /etc/links/
+            string: /var/lib/foo/
         tag 1124 (PAYLOADFORMAT): length 1
             string: cpio
         tag 1125 (PAYLOADCOMPRESSOR): length 1

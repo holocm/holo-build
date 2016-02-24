@@ -135,8 +135,13 @@ func addFileInformationTags(h *Header, pkg *common.Package) {
 
 		//split path into dirname and basename
 		basenames = append(basenames, filepath.Base(path))
+		//dirname needs a "/" suffix
+		dirname := filepath.Dir(path)
+		if !strings.HasSuffix(dirname, "/") {
+			dirname = dirname + "/"
+		}
 		var dirIdx int
-		dirnames, dirIdx = findOrAppend(dirnames, filepath.Dir(path))
+		dirnames, dirIdx = findOrAppend(dirnames, dirname)
 		dirIndexes = append(dirIndexes, int32(dirIdx))
 
 		//actually plausible metadata
@@ -150,15 +155,15 @@ func addFileInformationTags(h *Header, pkg *common.Package) {
 			md5s = append(md5s, "")
 			linktos = append(linktos, "")
 			flags = append(flags, 0)
-			ownerNames = append(ownerNames, makeUpUserOrGroupName(n.Metadata.UID(), "uid"))
-			groupNames = append(groupNames, makeUpUserOrGroupName(n.Metadata.GID(), "gid"))
+			ownerNames = append(ownerNames, idToString(n.Metadata.UID()))
+			groupNames = append(groupNames, idToString(n.Metadata.GID()))
 		case *common.FSRegularFile:
 			sizes = append(sizes, int32(len(n.Content)))
 			md5s = append(md5s, n.MD5Digest())
 			linktos = append(linktos, "")
 			flags = append(flags, RpmfileNoReplace)
-			ownerNames = append(ownerNames, makeUpUserOrGroupName(n.Metadata.UID(), "uid"))
-			groupNames = append(groupNames, makeUpUserOrGroupName(n.Metadata.GID(), "gid"))
+			ownerNames = append(ownerNames, idToString(n.Metadata.UID()))
+			groupNames = append(groupNames, idToString(n.Metadata.GID()))
 		case *common.FSSymlink:
 			sizes = append(sizes, int32(len(n.Target)))
 			md5s = append(md5s, "")
@@ -200,14 +205,13 @@ func findOrAppend(list []string, value string) (newList []string, position int) 
 	return append(list, value), length
 }
 
-//Return "root" for uid/gid 0. Otherwise, just make up a name. They don't
-//matter anyway since we apply name-based users/groups in the post-install
-//script.
-func makeUpUserOrGroupName(id uint32, prefix string) string {
+//Convert the given UID/GID into something that's maybe suitable for a
+//username/groupname field.
+func idToString(id uint32) string {
 	if id == 0 {
 		return "root"
 	}
-	return prefix + fmt.Sprintf("%d", id)
+	return fmt.Sprintf("%d", id)
 }
 
 //see [LSB,25.2.4.4]
