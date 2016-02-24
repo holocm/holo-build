@@ -2,6 +2,7 @@ default: prepare-build
 default: build/holo-build build/man/holo-build.8
 
 VERSION := $(shell git describe --tags --dirty)
+GOPATH := # unset (to force people to use golangvend)
 
 prepare-build:
 	@mkdir -p build/man

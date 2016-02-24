@@ -30,8 +30,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/blakesmith/ar"
-	cpio "github.com/surma/gocpio"
+	"../../../localdeps/github.com/blakesmith/ar"
+	cpio "../../../localdeps/github.com/surma/gocpio"
 )
 
 //DumpTar dumps tar archives.
