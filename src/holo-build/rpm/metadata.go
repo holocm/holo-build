@@ -57,9 +57,6 @@ func addPackageInformationTags(h *Header, pkg *common.Package) {
 	sizeInBytes := int32(pkg.FSRoot.InstalledSizeInBytes())
 	h.AddInt32Value(RpmtagSize, []int32{sizeInBytes})
 
-	//TODO validate that RPM implementations actually like this; there seems to
-	//be no reference for how to spell "no license" in RPM (to compare, the
-	//License attribute is optional in dpkg, and pacman accepts "custom:none")
 	h.AddStringValue(RpmtagLicense, "None", false)
 
 	if pkg.Author != "" {
