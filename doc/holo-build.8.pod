@@ -70,6 +70,14 @@ the default under suitable distributions.
 Generate a Debian package (suitable for Debian and derivatives). This is
 the default under suitable distributions.
 
+=item B<--rpm> (experimental)
+
+Generate an LSB-compliant RPM package (suitable for Redhat, Fedora, Suse,
+Mageia and derivatives). This is the default under suitable distributions.
+
+B<WARNING:> The RPM generator is considered experimental because RPM is
+underdocumented and a bizarrely baroque format to begin with.
+
 =item B<--suggest-filename>
 
 Do not generate a package. After reading and validating the package definition,
@@ -367,6 +375,15 @@ Since user/group names cannot be mapped to IDs at package build time, specifying
 a name will result in the file being packaged as belonging to user/group
 C<root>, and the actual user/group will be applied at install time using
 L<chown(1)> or L<chgrp(1)>.
+
+B<BUG:> For C<--rpm>, specification of numeric IDs is broken. When encountering
+a numeric user/group ID in a holo-build package, RPM will say things like
+
+    user 42 does not exist - using root
+    group 42 does not exist - using root
+
+and fall back to UID/GID 0. As a workaround, call L<chown(1)> or L<chgrp(1)>
+from the package's setup script to fix the file ownership.
 
 =back
 
