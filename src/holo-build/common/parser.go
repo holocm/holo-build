@@ -30,7 +30,7 @@ import (
 	"strconv"
 	"strings"
 
-	"../../internal/toml"
+	"github.com/BurntSushi/toml"
 )
 
 //PackageDefinition only needs a nice exported name for the TOML parser to

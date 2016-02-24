@@ -25,7 +25,7 @@ import (
 	"regexp"
 	"strings"
 
-	"../../internal/toml"
+	"github.com/BurntSushi/toml"
 )
 
 //This file contains the parts of parser.go relating to the support for entity
