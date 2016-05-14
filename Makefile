@@ -7,9 +7,9 @@ GOPATH := # unset (to force people to use golangvend)
 prepare-build:
 	@mkdir -p build/man
 build/holo-build: src/holo-build/main.go src/holo-build/*/*.go
-	go build --ldflags "-X _$(CURDIR)/src/holo-build/common.version=$(VERSION)" -o $@ $<
+	go build --ldflags "-s -w -X _$(CURDIR)/src/holo-build/common.version=$(VERSION)" -o $@ $<
 build/dump-package: src/dump-package/main.go src/dump-package/*/*.go
-	go build -o $@ $<
+	go build --ldflags "-s -w" -o $@ $<
 
 # manpages are generated using pod2man (which comes with Perl and therefore
 # should be readily available on almost every Unix system)
