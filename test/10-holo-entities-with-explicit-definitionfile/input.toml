@@ -1,10 +1,10 @@
-# This testcase checks the generation of an entity definition file with users
-# and groups from the corresponding sections in a package definition file.
+# Like test/08-holo-entities/, but with an explicit package.definitionFile.
 
 [package]
 name    = "holo-entities"
 version = "1.0"
 author  = "Holo Build <holo.build@example.org>"
+definitionFile = "/usr/share/holo/users-groups/08-holo-entities.toml"
 
 [[group]]
 name = "foogroup"
