@@ -31,7 +31,7 @@ func ShowWarning(msg string) {
 }
 
 //WarnDeprecatedKey prints a warning message to inform the user that she has
-//used a deprecated key in her package declaration.
+//used a deprecated key in her package definition.
 func WarnDeprecatedKey(key string) {
 	ShowWarning("The '" + key + "' key is deprecated. See `man 1 holo-build` for details.")
 }

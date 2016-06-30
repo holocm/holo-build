@@ -16,8 +16,9 @@ ar archive
             Description: my foo bar package
              my foo bar package
         >> ./md5sums is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+            d41d8cd98f00b204e9800998ecf8427e  etc/empty.toml
             5fb7ba7e8447a836e774b66155f5776a  etc/files/foo.conf
-            16c84007fcd1dd1bd2a5fb5800a8c4a6  etc/files/foo.toml
+            15dfaf6e4d94d2bf189ea1bed8ea3cd0  etc/files/foo.toml
         >> ./postinst is regular file (mode: 755, owner: 0, group: 0), content is data as shown below
             #!/bin/bash
             chown foouser:foogroup /etc/files/foo.toml
@@ -36,6 +37,7 @@ ar archive
     >> data.tar.xz is regular file (mode: 644, owner: 0, group: 0), content is XZ-compressed POSIX tar archive
         >> ./ is directory (mode: 755, owner: 0, group: 0)
         >> ./etc/ is directory (mode: 755, owner: 0, group: 0)
+        >> ./etc/empty.toml is regular file (mode: 644, owner: 0, group: 0), content is empty file
         >> ./etc/files/ is directory (mode: 755, owner: 0, group: 0)
         >> ./etc/files/foo.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
             foo
@@ -87,9 +89,13 @@ ar archive
             
             [[file]]
             path = "/etc/files/foo.toml"
-            contentFrom = "input.toml"
+            contentFrom = "input.toml" # check handling of relative paths
             owner = "foouser"
             group = "foogroup"
+            
+            [[file]]
+            path = "/etc/empty.toml"
+            contentFrom = "/dev/null" # check handling of absolute paths
             
             [[action]]
             on = "setup"

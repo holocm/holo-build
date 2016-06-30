@@ -44,9 +44,13 @@ foo
 
 [[file]]
 path = "/etc/files/foo.toml"
-contentFrom = "input.toml"
+contentFrom = "input.toml" # check handling of relative paths
 owner = "foouser"
 group = "foogroup"
+
+[[file]]
+path = "/etc/empty.toml"
+contentFrom = "/dev/null" # check handling of absolute paths
 
 [[action]]
 on = "setup"

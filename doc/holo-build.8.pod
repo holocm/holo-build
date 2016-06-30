@@ -6,7 +6,7 @@ holo-build - cross-distribution system package compiler
 
 =head1 SYNOPSIS
 
-holo-build [I<option>...] < I<file>
+holo-build [I<option>...] I<file>
 
 holo-build B<--help|--version>
 
@@ -56,6 +56,10 @@ installs and configures C<systemd-timesyncd> with a custom NTP server:
 The package description format is described below.
 
 =head1 OPTIONS
+
+The only positional argument I<file> is the file name from where the package
+definition will be read. If no such argument is given, the package definition
+is read from standard input instead.
 
 =over 4
 
@@ -353,8 +357,9 @@ slash.
 If the C<content> field is given, it contains the content of this file.
 Alternatively, C<contentFrom> may reference a file whose contents will be used.
 This file must be present at package-build time; relative paths will be
-interpreted relative to the current working directory of the C<holo-build>
-process.
+interpreted relative to the directory of the input file (or, if the package
+definition is presented on standard input, to the current working directory of
+the C<holo-build> process).
 
 If C<content> is given, it may not be empty. To create an empty file, you can
 use C</dev/null> as a source:

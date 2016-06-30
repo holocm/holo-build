@@ -23,7 +23,10 @@ package main
 import (
 	"errors"
 	"fmt"
+	"io"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"./common"
 	"./debian"
@@ -33,6 +36,7 @@ import (
 
 type options struct {
 	generator     common.Generator
+	inputFileName string
 	printToStdout bool
 	reproducible  bool
 	filenameOnly  bool
@@ -46,7 +50,18 @@ func main() {
 	generator := opts.generator
 
 	//read package definition from stdin
-	pkg, errs := common.ParsePackageDefinition(os.Stdin)
+	input := io.Reader(os.Stdin)
+	baseDirectory := "."
+	if opts.inputFileName != "" {
+		var err error
+		input, err = os.Open(opts.inputFileName)
+		if err != nil {
+			showError(err)
+			os.Exit(1)
+		}
+		baseDirectory = filepath.Dir(opts.inputFileName)
+	}
+	pkg, errs := common.ParsePackageDefinition(input, baseDirectory)
 
 	//try to validate package
 	var validateErrs []error
@@ -81,11 +96,7 @@ func main() {
 
 func parseArgs() (result options, exit bool) {
 	//default settings
-	opts := options{
-		generator:     nil,
-		printToStdout: false,
-		reproducible:  false,
-	}
+	var opts options
 
 	//parse arguments
 	args := os.Args[1:]
@@ -129,8 +140,13 @@ func parseArgs() (result options, exit bool) {
 		//NOTE: When adding new package formats here, don't forget to update
 		//holo-build.sh accordingly!
 		default:
-			showError(fmt.Errorf("Unrecognized argument: '%s'", arg))
-			hasArgsError = true
+			//the first positional argument is used as input file name
+			if opts.inputFileName == "" && !strings.HasPrefix(arg, "-") {
+				opts.inputFileName = arg
+			} else {
+				showError(fmt.Errorf("Unrecognized argument: '%s'", arg))
+				hasArgsError = true
+			}
 		}
 	}
 	if hasArgsError {
@@ -147,7 +163,7 @@ func parseArgs() (result options, exit bool) {
 
 func printHelp() {
 	program := os.Args[0]
-	fmt.Printf("Usage: %s <options> < definitionfile > packagefile\n\nOptions:\n", program)
+	fmt.Printf("Usage: %s <options> <definitionfile> > packagefile\n\nOptions:\n", program)
 	fmt.Println("  --stdout\t\tPrint resulting package on stdout")
 	fmt.Println("  --no-stdout\t\tWrite resulting package to the working directory (default)")
 	fmt.Println("  --reproducible\tBuild a reproducible package with bogus timestamps etc.")
@@ -156,6 +172,7 @@ func printHelp() {
 	fmt.Println("  --pacman\t\tBuild a pacman package")
 	fmt.Println("  --rpm\t\t\tBuild an RPM package\n")
 	fmt.Println("If no options are given, the package format for the current distribution is selected.\n")
+	fmt.Println("If the definition file is not given as an argument, it will be read from standard input.\n")
 }
 
 func showError(err error) {

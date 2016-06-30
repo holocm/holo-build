@@ -45,7 +45,7 @@ func Indent(dump string) string {
 //recognize the data format).
 func RecognizeAndDump(data []byte) (string, error) {
 	if len(data) == 0 {
-		return "empty file", nil
+		return "empty file\n", nil
 	}
 
 	//Thanks to https://stackoverflow.com/a/19127748/334761 for

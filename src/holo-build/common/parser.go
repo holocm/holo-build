@@ -26,6 +26,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -111,8 +112,8 @@ var versionRx = regexp.MustCompile(`^(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*))*$`
 var authorRx = regexp.MustCompile(`^[^<>]+\s+<[^<>\s]+>$`)
 
 //ParsePackageDefinition parses a package definition from the given input.
-//The operation is successful if the returned []error is nil or empty.
-func ParsePackageDefinition(input io.Reader) (*Package, []error) {
+//The operation is successful if the returned []error is empty.
+func ParsePackageDefinition(input io.Reader, baseDirectory string) (*Package, []error) {
 	//read from input
 	blob, err := ioutil.ReadAll(input)
 	if err != nil {
@@ -221,7 +222,7 @@ func ParsePackageDefinition(input io.Reader) (*Package, []error) {
 
 		entryDesc := fmt.Sprintf("file \"%s\"", path)
 		node := &FSRegularFile{
-			Content: parseFileContent(fileSection.Content, fileSection.ContentFrom, fileSection.Raw, ec, entryDesc),
+			Content: parseFileContent(fileSection.Content, fileSection.ContentFrom, fileSection.Raw, baseDirectory, ec, entryDesc),
 			Metadata: FSNodeMetadata{
 				Mode:  parseFileMode(fileSection.Mode, 0644, ec, entryDesc),
 				Owner: parseUserOrGroupRef(fileSection.Owner, ec, entryDesc),
@@ -348,7 +349,7 @@ func parseFileMode(modeStr string, defaultMode os.FileMode, ec *ErrorCollector, 
 	return os.FileMode(value)
 }
 
-func parseFileContent(content string, contentFrom string, dontPruneIndent bool, ec *ErrorCollector, entryDesc string) string {
+func parseFileContent(content string, contentFrom string, dontPruneIndent bool, baseDirectory string, ec *ErrorCollector, entryDesc string) string {
 	//option 1: content given verbatim in "content" field
 	if content != "" {
 		if contentFrom != "" {
@@ -364,6 +365,10 @@ func parseFileContent(content string, contentFrom string, dontPruneIndent bool, 
 	if contentFrom == "" {
 		ec.Addf("%s is invalid: missing content", entryDesc)
 		return ""
+	}
+	if !strings.HasPrefix(contentFrom, "/") {
+		//resolve relative paths
+		contentFrom = filepath.Join(baseDirectory, contentFrom)
 	}
 	bytes, err := ioutil.ReadFile(contentFrom)
 	ec.Add(err)

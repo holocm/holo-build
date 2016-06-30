@@ -20,11 +20,12 @@ XZ-compressed POSIX tar archive
         }
     >> .MTREE is regular file (mode: 644, owner: 0, group: 0), content is GZip-compressed mtree metadata archive
         >> ./.INSTALL gid=0 md5digest=a8ddad15e5d73940123c70b29f01e39c mode=644 sha256digest=6f3d87defc7678acf46c90dc8853a68bc59e11c40153c03d029ef1c499a48b92 size=244 time=0.0 type=file uid=0
-        >> ./.PKGINFO gid=0 md5digest=d659f9371134a3c023dacca8ac28bb08 mode=644 sha256digest=13204013f572d1dfff7a53b7fd45ee75d71c3a9d3856bf3f68f6ee15745a400f size=624 time=0.0 type=file uid=0
+        >> ./.PKGINFO gid=0 md5digest=0d2a229ded19ae95b0f72394e3326a16 mode=644 sha256digest=214ee4b7078f9819e6334f2914997ee9ce01844b174108f7f273a40f81a49463 size=648 time=0.0 type=file uid=0
         >> ./etc gid=0 mode=755 time=0.0 type=dir uid=0
+        >> ./etc/empty.toml gid=0 md5digest=d41d8cd98f00b204e9800998ecf8427e mode=644 sha256digest=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 size=0 time=0.0 type=file uid=0
         >> ./etc/files gid=0 mode=755 time=0.0 type=dir uid=0
         >> ./etc/files/foo.conf gid=0 md5digest=5fb7ba7e8447a836e774b66155f5776a mode=644 sha256digest=f13a55b71d31ec3df35f99d6b6332b23a4967312314456941aff922a7d354818 size=8 time=0.0 type=file uid=0
-        >> ./etc/files/foo.toml gid=0 md5digest=16c84007fcd1dd1bd2a5fb5800a8c4a6 mode=644 sha256digest=6d82fb6d43ddf664e7e0f4feb94c3aaea288aa5063091c53cadc5cd48d6889e7 size=1109 time=0.0 type=file uid=0
+        >> ./etc/files/foo.toml gid=0 md5digest=15dfaf6e4d94d2bf189ea1bed8ea3cd0 mode=644 sha256digest=e2feaebbf4dc2af197ef61f4fc49198be96bea13113b78c26ab57e93d7332011 size=1240 time=0.0 type=file uid=0
         >> ./etc/links gid=0 mode=755 time=0.0 type=dir uid=0
         >> ./etc/links/bar.conf gid=0 link=bar.target mode=777 time=0.0 type=link uid=0
         >> ./etc/links/foo.conf gid=0 link=/etc/files/foo.conf mode=777 time=0.0 type=link uid=0
@@ -40,7 +41,7 @@ XZ-compressed POSIX tar archive
         pkgdesc = my foo bar package
         url = 
         packager = Holo Build <holo.build@example.org>
-        size = 38010
+        size = 38141
         arch = any
         license = custom:none
         replaces = foo-bar<2.1
@@ -48,6 +49,7 @@ XZ-compressed POSIX tar archive
         conflict = qux<=1.2.0
         provides = foo-bar
         provides = foo-baz
+        backup = etc/empty.toml
         backup = etc/files/foo.conf
         backup = etc/files/foo.toml
         depend = bar>=2.1
@@ -64,6 +66,7 @@ XZ-compressed POSIX tar archive
         makepkgopt = !upx
         makepkgopt = !debug
     >> etc/ is directory (mode: 755, owner: 0, group: 0)
+    >> etc/empty.toml is regular file (mode: 644, owner: 0, group: 0), content is empty file
     >> etc/files/ is directory (mode: 755, owner: 0, group: 0)
     >> etc/files/foo.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
         foo
@@ -115,9 +118,13 @@ XZ-compressed POSIX tar archive
         
         [[file]]
         path = "/etc/files/foo.toml"
-        contentFrom = "input.toml"
+        contentFrom = "input.toml" # check handling of relative paths
         owner = "foouser"
         group = "foogroup"
+        
+        [[file]]
+        path = "/etc/empty.toml"
+        contentFrom = "/dev/null" # check handling of absolute paths
         
         [[action]]
         on = "setup"
