@@ -6,7 +6,6 @@
 # name =
 # version =
 description = "not enough"
-definitionFile = "/usr/share/holo/users-groups/03-missing-fields.toml"
 
 [[file]]
 path = "/etc/this-is-ok.conf"

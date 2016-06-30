@@ -98,7 +98,7 @@ func compileEntityDefinitions(pkg PackageSection, groups []GroupSection, users [
 	path = pkg.DefinitionFile
 	switch {
 	case path == "":
-		ec.Addf("Cannot declare users/groups when package.definitionFile field is missing")
+		path = "/usr/share/holo/users-groups/" + pkg.Name + ".toml"
 	case !definitionFileRx.MatchString(path):
 		ec.Addf("\"%s\" is not an acceptable definition file (should look like \"/usr/share/holo/users-groups/01-foo.toml\")", path)
 		path = "" //indicate broken path to caller

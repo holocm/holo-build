@@ -284,10 +284,15 @@ uninstalled, after the package files have been removed from the file system.
 If the package contains any files below F</usr/share/holo>, then C<holo apply>
 will automatically run before this cleanup script is executed.
 
-=item B<definitionFile> (string)
+=item B<definitionFile> (string, deprecated)
 
 A path where C<[[user]]> and C<[[group]]> sections will be placed inside the
 package. See the description of C<[[user]]> and C<[[group]]> sections below.
+When omitted, the default value is
+F</usr/share/holo/users-groups/${package_name}.toml>.
+
+B<DEPRECATED:> This key can be specified for compatibility reasons, but its use
+is discouraged, and it will be removed in the next major release.
 
 =back
 
@@ -448,9 +453,8 @@ These can be used to provision user accounts and groups when the package is
 installed. For example:
 
     [package]
-    name           = "foobar"
-    version        = "1.0"
-    definitionFile = "/usr/share/holo/users-groups/01-example.toml"
+    name    = "foobar"
+    version = "1.0"
 
     [[group]]
     name   = "foobargroup"
@@ -462,10 +466,10 @@ installed. For example:
     group  = "foobargroup"
 
 The user and group definitions are validated at package compilation time, and
-written into the file named in the C<[package]> section. Since this file must
-be in F</usr/share/holo/users-groups>, a dependency on C<holo-users-groups> is
-implied and C<holo apply> is executed in the setup and cleanup scripts. So the
-previous example is functionally equivalent to:
+written into F</usr/share/holo/users-groups/${package_name}.toml>. Because of
+this file, a dependency on C<holo-users-groups> is implied and C<holo apply> is
+executed in the setup and cleanup scripts. So the previous example is
+functionally equivalent to:
 
     [package]
     name          = "foobar"
@@ -475,7 +479,7 @@ previous example is functionally equivalent to:
     cleanupScript = "holo apply"
 
     [[file]]
-    path    = "/usr/share/holo/users-groups/01-example.toml"
+    path    = "/usr/share/holo/users-groups/foobar.toml"
     content = """
         [[group]]
         name   = "foobargroup"

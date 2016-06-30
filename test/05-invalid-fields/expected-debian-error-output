@@ -4,7 +4,6 @@
 !! Invalid package reference in requires: "holo += 2.0"
 !! Invalid package reference in provides: "=1.1"
 !! Invalid package reference in conflicts: "bar< =2.0"
-!! Cannot declare users/groups when package.definitionFile field is missing
 !! group "$users" is invalid: name is not an acceptable group name
 !! group "$users" is invalid: if "gid" is given, then "system" is useless
 !! user "john+doe" is invalid: name is not an acceptable user name
