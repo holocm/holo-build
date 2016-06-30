@@ -102,6 +102,8 @@ func compileEntityDefinitions(pkg PackageSection, groups []GroupSection, users [
 	case !definitionFileRx.MatchString(path):
 		ec.Addf("\"%s\" is not an acceptable definition file (should look like \"/usr/share/holo/users-groups/01-foo.toml\")", path)
 		path = "" //indicate broken path to caller
+	default:
+		WarnDeprecatedKey("package.definitionFile")
 	}
 
 	//validate users/groups
