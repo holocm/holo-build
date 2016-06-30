@@ -133,19 +133,26 @@ func ParsePackageDefinition(input io.Reader, baseDirectory string) (*Package, []
 		Epoch:       p.Package.Epoch,
 		Description: strings.TrimSpace(p.Package.Description),
 		Author:      strings.TrimSpace(p.Package.Author),
-		Actions: []PackageAction{
-			PackageAction{
-				Type:    SetupAction,
-				Content: strings.TrimSpace(p.Package.SetupScript),
-			},
-			PackageAction{
-				Type:    CleanupAction,
-				Content: strings.TrimSpace(p.Package.CleanupScript),
-			},
-		},
-		FSRoot: NewFSDirectory(),
+		Actions:     []PackageAction{},
+		FSRoot:      NewFSDirectory(),
 	}
 	pkg.FSRoot.Implicit = true
+
+	if script := strings.TrimSpace(p.Package.SetupScript); script != "" {
+		WarnDeprecatedKey("package.setupScript")
+		pkg.AppendActions(PackageAction{
+			Type:    SetupAction,
+			Content: script,
+		})
+	}
+
+	if script := strings.TrimSpace(p.Package.CleanupScript); script != "" {
+		WarnDeprecatedKey("package.cleanupScript")
+		pkg.AppendActions(PackageAction{
+			Type:    CleanupAction,
+			Content: script,
+		})
+	}
 
 	//default value for Release is 1
 	if pkg.Release == 0 {

@@ -1,0 +1,2 @@
+>> The 'package.setupScript' key is deprecated. See `man 1 holo-build` for details.
+>> The 'package.cleanupScript' key is deprecated. See `man 1 holo-build` for details.
