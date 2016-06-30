@@ -108,12 +108,12 @@ func (m *FSNodeMetadata) PostponeUnmaterializable(path string) (additionalSetupS
 
 	if ownerStr != "" {
 		if groupStr != "" {
-			return fmt.Sprintf("chown %s:%s %s\n", ownerStr, groupStr, path)
+			return fmt.Sprintf("chown %s:%s %s", ownerStr, groupStr, path)
 		}
-		return fmt.Sprintf("chown %s %s\n", ownerStr, path)
+		return fmt.Sprintf("chown %s %s", ownerStr, path)
 	}
 	if groupStr != "" {
-		return fmt.Sprintf("chgrp %s %s\n", groupStr, path)
+		return fmt.Sprintf("chgrp %s %s", groupStr, path)
 	}
 	return ""
 }

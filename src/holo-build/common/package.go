@@ -67,12 +67,9 @@ type Package struct {
 	//package. Upon performing a system upgrade, the obsolete packages will be
 	//automatically replaced by this package.
 	Replaces []PackageRelation
-	//SetupScript contains a shell script that is executed when the package is
-	//installed or upgraded.
-	SetupScript string
-	//CleanupScript contains a shell script that is executed when the package is
-	//installed or upgraded.
-	CleanupScript string
+	//Actions contains a list of actions that can be executed while the package
+	//manager runs.
+	Actions []PackageAction
 	//FSRoot represents the root directory of the package's file system, and
 	//contains all other files and directories recursively.
 	FSRoot *FSDirectory
@@ -107,6 +104,48 @@ type VersionConstraint struct {
 	Version string
 }
 
+//PackageAction describes an action that can be executed by the package manager
+//at various points during its execution.
+type PackageAction struct {
+	//Type determines when this action will be run. Acceptable values include
+	//`SetupAction` and `CleanupAction`.
+	Type uint
+	//Content is a shell script that will be executed when the action is run.
+	Content string
+}
+
+const (
+	//SetupAction is an acceptable value for `PackageAction.Type`. Setup
+	//actions run immediately after the package has been installed or upgraded
+	//on a system.
+	SetupAction = iota
+	//CleanupAction is an acceptable value for `PackageAction.Type`. Cleanup
+	//actions run immediately after the package has been removed from a system.
+	CleanupAction
+)
+
+//PrependActions prepends elements to p.Actions.
+func (p *Package) PrependActions(actions ...PackageAction) {
+	p.Actions = append(actions, p.Actions...)
+}
+
+//AppendActions appends elements to p.Actions.
+func (p *Package) AppendActions(actions ...PackageAction) {
+	p.Actions = append(p.Actions, actions...)
+}
+
+//Script returns the concatenation of the scripts for all actions of the given
+//type.
+func (p *Package) Script(actionType uint) string {
+	var scripts []string
+	for _, action := range p.Actions {
+		if action.Type == actionType {
+			scripts = append(scripts, action.Content)
+		}
+	}
+	return strings.TrimSpace(strings.Join(scripts, "\n"))
+}
+
 //InsertFSNode inserts an FSNode into the package's FSRoot at the given
 //absolute path.
 func (p *Package) InsertFSNode(entry FSNode, absolutePath string, ec *ErrorCollector) {
@@ -129,7 +168,7 @@ func (p *Package) WalkFSWithAbsolutePaths(callback func(absolutePath string, nod
 
 //WalkFSWithRelativePaths wraps the FSRoot.Wrap function, yielding paths
 //relative to the FSRoot (without leading slash) to the callback. The FSRoot
-//itself will be svisited with `relativePath = ""`.
+//itself will be visited with `relativePath = ""`.
 func (p *Package) WalkFSWithRelativePaths(callback func(relativePath string, node FSNode) error) error {
 	return p.FSRoot.Walk("", callback)
 }

@@ -117,8 +117,9 @@ func buildControlTar(pkg *common.Package, buildReproducibly bool) ([]byte, error
 	writeMD5SumsFile(pkg, controlDir, buildReproducibly)
 
 	//write postinst script if necessary
-	if strings.TrimSpace(pkg.SetupScript) != "" {
-		script := "#!/bin/bash\n" + strings.TrimSuffix(pkg.SetupScript, "\n") + "\n"
+	script := pkg.Script(common.SetupAction)
+	if script != "" {
+		script := "#!/bin/bash\n" + script + "\n"
 		controlDir.Entries["postinst"] = &common.FSRegularFile{
 			Content:  script,
 			Metadata: common.FSNodeMetadata{Mode: 0755},
@@ -126,8 +127,9 @@ func buildControlTar(pkg *common.Package, buildReproducibly bool) ([]byte, error
 	}
 
 	//write postrm script if necessary
-	if strings.TrimSpace(pkg.CleanupScript) != "" {
-		script := "#!/bin/bash\n" + strings.TrimSuffix(pkg.CleanupScript, "\n") + "\n"
+	script = pkg.Script(common.CleanupAction)
+	if script != "" {
+		script := "#!/bin/bash\n" + script + "\n"
 		controlDir.Entries["postrm"] = &common.FSRegularFile{
 			Content:  script,
 			Metadata: common.FSNodeMetadata{Mode: 0755},

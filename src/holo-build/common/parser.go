@@ -118,15 +118,23 @@ func ParsePackageDefinition(input io.Reader) (*Package, []error) {
 
 	//restructure the parsed data into a common.Package struct
 	pkg := Package{
-		Name:          strings.TrimSpace(p.Package.Name),
-		Version:       strings.TrimSpace(p.Package.Version),
-		Release:       p.Package.Release,
-		Epoch:         p.Package.Epoch,
-		Description:   strings.TrimSpace(p.Package.Description),
-		Author:        strings.TrimSpace(p.Package.Author),
-		SetupScript:   strings.TrimSpace(p.Package.SetupScript),
-		CleanupScript: strings.TrimSpace(p.Package.CleanupScript),
-		FSRoot:        NewFSDirectory(),
+		Name:        strings.TrimSpace(p.Package.Name),
+		Version:     strings.TrimSpace(p.Package.Version),
+		Release:     p.Package.Release,
+		Epoch:       p.Package.Epoch,
+		Description: strings.TrimSpace(p.Package.Description),
+		Author:      strings.TrimSpace(p.Package.Author),
+		Actions: []PackageAction{
+			PackageAction{
+				Type:    SetupAction,
+				Content: strings.TrimSpace(p.Package.SetupScript),
+			},
+			PackageAction{
+				Type:    CleanupAction,
+				Content: strings.TrimSpace(p.Package.CleanupScript),
+			},
+		},
+		FSRoot: NewFSDirectory(),
 	}
 	pkg.FSRoot.Implicit = true
 

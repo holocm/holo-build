@@ -93,29 +93,33 @@ func (pkg *Package) doMagicalHoloIntegration() {
 	}
 
 	//...and run `holo apply` during setup/cleanup
-	pkg.SetupScript = "holo apply\n" + pkg.SetupScript
-	pkg.CleanupScript = "holo apply\n" + pkg.CleanupScript
+	pkg.PrependActions(
+		PackageAction{Type: SetupAction, Content: "holo apply"},
+		PackageAction{Type: CleanupAction, Content: "holo apply"},
+	)
 }
 
 func (pkg *Package) postponeUnmaterializableFSMetadata() {
 	//When an FSEntry identifies its Owner/Group by name, we cannot materialize
-	//that at build time since we don't know the UID/GID to write into the archive.
-	//Therefore, remove the Owner/Group from the FS entry and add a chown(1) call
-	//to the setupScript to apply ownership at install time.
-	var additionalSetupScript string
-
+	//that at build time since we don't know the UID/GID to write into the
+	//archive. Therefore, remove the Owner/Group from the FS entry and add a
+	//chown(1)/chgrp(1) call to the setupScript to apply ownership at install
+	//time.
 	pkg.WalkFSWithAbsolutePaths(func(path string, node FSNode) error {
+		var script string
 		switch n := node.(type) {
 		case *FSDirectory:
-			additionalSetupScript += n.Metadata.PostponeUnmaterializable(path)
+			script = n.Metadata.PostponeUnmaterializable(path)
 		case *FSRegularFile:
-			additionalSetupScript += n.Metadata.PostponeUnmaterializable(path)
+			script = n.Metadata.PostponeUnmaterializable(path)
 		default:
 			//don't do anything for FSNodes that don't have metadata
+		}
+		//ensure that ownership is correct before running the actual setup script
+		if script != "" {
+			pkg.PrependActions(PackageAction{Type: SetupAction, Content: script})
 		}
 		return nil
 	})
 
-	//ensure that ownership is correct before running the actual setup script
-	pkg.SetupScript = additionalSetupScript + pkg.SetupScript
 }

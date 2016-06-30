@@ -80,12 +80,12 @@ func addPackageInformationTags(h *Header, pkg *common.Package) {
 
 //see [LSB,25.2.4.2]
 func addInstallationTags(h *Header, pkg *common.Package) {
-	if pkg.SetupScript != "" {
-		h.AddStringValue(RpmtagPostIn, pkg.SetupScript, false)
+	if script := pkg.Script(common.SetupAction); script != "" {
+		h.AddStringValue(RpmtagPostIn, script, false)
 		h.AddStringValue(RpmtagPostInProg, "/bin/sh", false)
 	}
-	if pkg.CleanupScript != "" {
-		h.AddStringValue(RpmtagPostUn, pkg.CleanupScript, false)
+	if script := pkg.Script(common.CleanupAction); script != "" {
+		h.AddStringValue(RpmtagPostUn, script, false)
 		h.AddStringValue(RpmtagPostUnProg, "/bin/sh", false)
 	}
 }
