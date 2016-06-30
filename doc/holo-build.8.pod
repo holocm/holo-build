@@ -32,8 +32,6 @@ installs and configures C<systemd-timesyncd> with a custom NTP server:
     version  = "1.0"
     author   = "Jane Doe <jane.doe@example.org>"
     requires = ["systemd"]
-    setupScript   = "systemctl daemon-reload && systemctl start systemd-timesyncd"
-    cleanupScript = "systemctl stop systemd-timesyncd"
 
     [[file]]
     path     = "/etc/systemd/timesyncd.conf.d/server.conf"
@@ -46,6 +44,14 @@ installs and configures C<systemd-timesyncd> with a custom NTP server:
     # as created by `systemctl enable systemd-timesyncd`
     path     = "/etc/systemd/system/sysinit.target.wants/systemd-timesyncd.service"
     target   = "/usr/lib/systemd/system/systemd-timesyncd.service"
+
+    [[action]]
+    on     = "setup"
+    script = "systemctl daemon-reload && systemctl start systemd-timesyncd"
+
+    [[action]]
+    on     = "cleanup"
+    script = "systemctl stop systemd-timesyncd"
 
 The package description format is described below.
 
@@ -116,7 +122,7 @@ Print out usage information.
 
 =item B<--version>
 
-Print out Holo's version string including the release name.
+Print out holo-build's version string.
 
 =back
 
@@ -144,8 +150,6 @@ This section is required and contains global properties for the package.
     provides    = [ "example-package-api = 1.2" ]
     conflicts   = [ "bloatware-package" ]
     replaces    = [ "sample-package" ]
-    setupScript   = "touch /etc/example.conf && systemctl reload cron"
-    cleanupScript = "rm -r /var/lib/example"
 
 =over 4
 
@@ -267,7 +271,7 @@ C<provides> and C<conflicts> instead.
 For C<--pacman>, the same special syntax is allowed as for C<requires>; see
 there for details.
 
-=item B<setupScript> (string)
+=item B<setupScript> (string, deprecated)
 
 A shell script that will be executed (as root) when the package is installed or
 updated, after the package files have been extracted to the file system.
@@ -276,13 +280,37 @@ If the package contains any files below F</usr/share/holo>, then C<holo apply>
 will automatically run before this setup script is executed, so you can rely on
 provisioned files, user accounts and groups to be available already.
 
-=item B<cleanupScript> (string)
+B<DEPRECATED:> This key will be removed in the next major release. Use
+C<[[action]]> sections instead.
+
+    # deprecated
+    [package]
+    setupScript = "echo Hello World"
+
+    # write instead
+    [[action]]
+    on     = "setup"
+    script = "echo Hello World"
+
+=item B<cleanupScript> (string, deprecated)
 
 A shell script that will be executed (as root) when the package is being
 uninstalled, after the package files have been removed from the file system.
 
 If the package contains any files below F</usr/share/holo>, then C<holo apply>
 will automatically run before this cleanup script is executed.
+
+B<DEPRECATED:> This key will be removed in the next major release. Use
+C<[[action]]> sections instead.
+
+    # deprecated
+    [package]
+    cleanupScript = "echo Hello World"
+
+    # write instead
+    [[action]]
+    on     = "cleanup"
+    script = "echo Hello World"
 
 =item B<definitionFile> (string, deprecated)
 
@@ -447,6 +475,35 @@ The symlink target. Both relative and absolute targets are acceptable.
 
 =back
 
+=head2 C<[[action]]> section
+
+Each one of these sections define an action that can be executed by the
+package manager. For example:
+
+    [[action]]
+    on      = "setup"
+    content = "echo Just Installed"
+
+=over 4
+
+=item B<on> (string, required)
+
+This field defines when this action will be executed. The following values are
+valid:
+
+    on = "setup"   # run right after package is installed or upgraded
+    on = "cleanup" # run right after package is removed
+
+If there are multiple actions with the same C<on> value, they will be executed
+in the order in which they are given in the package description.
+
+=item B<content> (string, required)
+
+This field contains a shell script that will be run (as root) when the action
+is executed.
+
+=back
+
 =head2 C<[[user]]> and C<[[group]]> sections
 
 These can be used to provision user accounts and groups when the package is
@@ -475,8 +532,6 @@ functionally equivalent to:
     name          = "foobar"
     version       = "1.0"
     depends       = ["holo-users-groups"]
-    setupScript   = "holo apply"
-    cleanupScript = "holo apply"
 
     [[file]]
     path    = "/usr/share/holo/users-groups/foobar.toml"
@@ -490,6 +545,14 @@ functionally equivalent to:
         uid    = 285
         group  = "foobargroup"
     """
+
+    [[action]]
+    on     = "setup"
+    script = "holo apply"
+
+    [[action]]
+    on     = "cleanup"
+    script = "holo apply"
 
 The actual syntax and semantics of C<[[user]]> and C<[[group]]> sections is
 described in L<holo-users-groups(8)>.

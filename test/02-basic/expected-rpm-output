@@ -10,14 +10,14 @@ RPM package
         tag 62 (HEADERSIGNATURES): length 16
             00000000  00 00 00 3e 00 00 00 07  ff ff ff b0 00 00 00 10  |...>............|
         tag 269 (SHA1): length 1
-            string: 65c71d1d19f7d8ce9b5d26943be0d6b77c5a64b5
+            string: 3010eaef6f71e97126ec7ff86f9cd3f92631480e
         tag 1000 (SIZE): length 1
-            int32: 2338 = 0x922 = 0o4442
+            int32: 2471 = 0x9A7 = 0o4647
         tag 1004 (MD5): length 16
-            00000000  4a 1c fe 06 f9 f5 dd d9  b7 b7 52 46 a2 7b 26 da  |J.........RF.{&.|
+            00000000  2e e4 5b a6 aa 53 cf 28  ad bc 4c 9e b8 43 cb d0  |..[..S.(..L..C..|
         tag 1007 (PAYLOADSIZE): length 1
-            int32: 1816 = 0x718 = 0o3430
-    >> header section: format version 1, 48 entries, 964 bytes of data
+            int32: 2060 = 0x80C = 0o4014
+    >> header section: format version 1, 48 entries, 1048 bytes of data
         tag 63 (HEADERIMMUTABLE): length 16
             00000000  00 00 00 3f 00 00 00 07  ff ff fd 00 00 00 00 10  |...?............|
         tag 100 (HEADERI18NTABLE): length 1
@@ -33,7 +33,7 @@ RPM package
         tag 1005 (DESCRIPTION): length 1
             translatable string: my foo bar package
         tag 1009 (SIZE): length 1
-            int32: 37768 = 0x9388 = 0o111610
+            int32: 38010 = 0x947A = 0o112172
         tag 1014 (LICENSE): length 1
             string: None
         tag 1015 (PACKAGER): length 1
@@ -48,12 +48,18 @@ RPM package
             string: chown foouser:foogroup /etc/files/foo.toml
             echo setup
             echo setup
+            echo setup 1
+            echo setup 2
+            echo setup 2
         tag 1026 (POSTUN): length 1
             string: echo cleanup
             echo cleanup
+            echo cleanup 1
+            echo cleanup 1
+            echo cleanup 2
         tag 1028 (FILESIZES): length 6
             int32: 8 = 0x8 = 0o10
-            int32: 867 = 0x363 = 0o1543
+            int32: 1109 = 0x455 = 0o2125
             int32: 10 = 0xA = 0o12
             int32: 19 = 0x13 = 0o23
             int32: 4096 = 0x1000 = 0o10000
@@ -81,7 +87,7 @@ RPM package
             int32: 0 = 0x0 = 0o0
         tag 1035 (FILEMD5S): length 6
             string: 5fb7ba7e8447a836e774b66155f5776a
-            string: f972aeea05bf32a5ae7e0322a0e6ca01
+            string: 16c84007fcd1dd1bd2a5fb5800a8c4a6
             string: 
             string: 
             string: 
@@ -115,7 +121,7 @@ RPM package
             string: 2323
             string: root
         tag 1046 (ARCHIVESIZE): length 1
-            int32: 1816 = 0x718 = 0o3430
+            int32: 2060 = 0x80C = 0o4014
         tag 1047 (PROVIDENAME): length 2
             string: foo-bar
             string: foo-baz
@@ -268,7 +274,27 @@ RPM package
             owner = "foouser"
             group = "foogroup"
             
+            [[action]]
+            on = "setup"
+            script = "echo setup 1"
             
+            [[action]]
+            on = "cleanup"
+            script = """
+            echo cleanup 1
+            echo cleanup 1
+            """
+            
+            [[action]]
+            on = "setup"
+            script = """
+            echo setup 2
+            echo setup 2
+            """
+            
+            [[action]]
+            on = "cleanup"
+            script = "echo cleanup 2"
         >> ./etc/links/bar.conf is symlink to bar.target
         >> ./etc/links/foo.conf is symlink to /etc/files/foo.conf
         >> ./var/lib/foo/bar is directory (mode: 700, owner: 4242, group: 2323)

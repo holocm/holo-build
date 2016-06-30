@@ -9,7 +9,6 @@ requires = [ "holo += 2.0" ] # unknown operator
 provides = [ "=1.1" ]        # missing package name
 conflicts = [ "bar< =2.0"]   # space inside operator
 author = "John Doe"          # missing mail address
-definitionFile = ""          # missing definition file, even though users/groups are declared
 
 [[file]]
 path = "foo/bar.conf"        # relative path is not allowed
@@ -45,3 +44,7 @@ system = true                # redundant when fixed UID is given
 group = "$users"             # unacceptable group name (cf. regexp in groupadd(8))
 groups = ["abc", "$(/$" ]    # unacceptable group name (the second one)
 home = "etc/foo/"            # relative path is not allowed; trailing slash is not allowed
+
+[[action]]
+on = "error"                 # unknown action type
+script = "echo hallo"

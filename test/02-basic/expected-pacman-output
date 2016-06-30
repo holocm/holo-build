@@ -4,6 +4,9 @@ XZ-compressed POSIX tar archive
         chown foouser:foogroup /etc/files/foo.toml
         echo setup
         echo setup
+        echo setup 1
+        echo setup 2
+        echo setup 2
         }
         post_upgrade() {
         post_install
@@ -11,14 +14,17 @@ XZ-compressed POSIX tar archive
         post_remove() {
         echo cleanup
         echo cleanup
+        echo cleanup 1
+        echo cleanup 1
+        echo cleanup 2
         }
     >> .MTREE is regular file (mode: 644, owner: 0, group: 0), content is GZip-compressed mtree metadata archive
-        >> ./.INSTALL gid=0 md5digest=500c593a910817ba23d30124a2746347 mode=644 sha256digest=360150b4991bedfd260d2e4e28d501c51dbe7f1b8e8bcc6a81a78a9afe43d67d size=160 time=0.0 type=file uid=0
-        >> ./.PKGINFO gid=0 md5digest=e100f0d98a2fe3e9a3a455153ae68080 mode=644 sha256digest=4b7d1c36645a276be54191b9eaebd02e167f6fb43b624454e3b7d93e78fb2d2b size=624 time=0.0 type=file uid=0
+        >> ./.INSTALL gid=0 md5digest=a8ddad15e5d73940123c70b29f01e39c mode=644 sha256digest=6f3d87defc7678acf46c90dc8853a68bc59e11c40153c03d029ef1c499a48b92 size=244 time=0.0 type=file uid=0
+        >> ./.PKGINFO gid=0 md5digest=d659f9371134a3c023dacca8ac28bb08 mode=644 sha256digest=13204013f572d1dfff7a53b7fd45ee75d71c3a9d3856bf3f68f6ee15745a400f size=624 time=0.0 type=file uid=0
         >> ./etc gid=0 mode=755 time=0.0 type=dir uid=0
         >> ./etc/files gid=0 mode=755 time=0.0 type=dir uid=0
         >> ./etc/files/foo.conf gid=0 md5digest=5fb7ba7e8447a836e774b66155f5776a mode=644 sha256digest=f13a55b71d31ec3df35f99d6b6332b23a4967312314456941aff922a7d354818 size=8 time=0.0 type=file uid=0
-        >> ./etc/files/foo.toml gid=0 md5digest=f972aeea05bf32a5ae7e0322a0e6ca01 mode=644 sha256digest=e6798f01210a0b68f61cbde5223fc2f557ffa8884c1b2971360c11d65e363cbc size=867 time=0.0 type=file uid=0
+        >> ./etc/files/foo.toml gid=0 md5digest=16c84007fcd1dd1bd2a5fb5800a8c4a6 mode=644 sha256digest=6d82fb6d43ddf664e7e0f4feb94c3aaea288aa5063091c53cadc5cd48d6889e7 size=1109 time=0.0 type=file uid=0
         >> ./etc/links gid=0 mode=755 time=0.0 type=dir uid=0
         >> ./etc/links/bar.conf gid=0 link=bar.target mode=777 time=0.0 type=link uid=0
         >> ./etc/links/foo.conf gid=0 link=/etc/files/foo.conf mode=777 time=0.0 type=link uid=0
@@ -34,7 +40,7 @@ XZ-compressed POSIX tar archive
         pkgdesc = my foo bar package
         url = 
         packager = Holo Build <holo.build@example.org>
-        size = 37768
+        size = 38010
         arch = any
         license = custom:none
         replaces = foo-bar<2.1
@@ -113,7 +119,27 @@ XZ-compressed POSIX tar archive
         owner = "foouser"
         group = "foogroup"
         
+        [[action]]
+        on = "setup"
+        script = "echo setup 1"
         
+        [[action]]
+        on = "cleanup"
+        script = """
+        echo cleanup 1
+        echo cleanup 1
+        """
+        
+        [[action]]
+        on = "setup"
+        script = """
+        echo setup 2
+        echo setup 2
+        """
+        
+        [[action]]
+        on = "cleanup"
+        script = "echo cleanup 2"
     >> etc/links/ is directory (mode: 755, owner: 0, group: 0)
     >> etc/links/bar.conf is symlink to bar.target
     >> etc/links/foo.conf is symlink to /etc/files/foo.conf

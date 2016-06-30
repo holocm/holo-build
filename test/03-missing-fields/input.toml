@@ -42,3 +42,11 @@ uid = 1000
 [[group]]
 # name =
 gid = 1000
+
+[[action]]
+# on =
+script = "echo test"
+
+[[action]]
+on = "setup"
+# script =

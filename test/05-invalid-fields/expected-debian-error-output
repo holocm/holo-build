@@ -12,6 +12,7 @@
 !! user "john+doe" is invalid: "$(/$" is not an acceptable group name
 !! user "john+doe" is invalid: home directory "etc/foo/" must be an absolute path
 !! user "john+doe" is invalid: home directory "etc/foo/" has trailing slash(es)
+!! action 0 is invalid: unacceptable value "error" for "on" attribute
 !! directory "/var/lib/foo/bar/" is invalid: trailing slash(es)
 !! directory "/var/lib/foo/bar/" is invalid: cannot parse mode "read/write" (strconv.ParseUint: parsing "read/write": invalid syntax)
 !! directory "/var/lib/foo/bar/" is invalid: user or group ID "-23" may not be negative

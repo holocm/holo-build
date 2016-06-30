@@ -48,4 +48,24 @@ contentFrom = "input.toml"
 owner = "foouser"
 group = "foogroup"
 
+[[action]]
+on = "setup"
+script = "echo setup 1"
 
+[[action]]
+on = "cleanup"
+script = """
+echo cleanup 1
+echo cleanup 1
+"""
+
+[[action]]
+on = "setup"
+script = """
+echo setup 2
+echo setup 2
+"""
+
+[[action]]
+on = "cleanup"
+script = "echo cleanup 2"

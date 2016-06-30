@@ -6,7 +6,7 @@ ar archive
             Version: 1.0.2.3-1
             Architecture: all
             Maintainer: Holo Build <holo.build@example.org>
-            Installed-Size: 36
+            Installed-Size: 37
             Section: misc
             Priority: optional
             Depends: bar (>= 2.1), bar (<< 3.0), baz
@@ -17,16 +17,22 @@ ar archive
              my foo bar package
         >> ./md5sums is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
             5fb7ba7e8447a836e774b66155f5776a  etc/files/foo.conf
-            f972aeea05bf32a5ae7e0322a0e6ca01  etc/files/foo.toml
+            16c84007fcd1dd1bd2a5fb5800a8c4a6  etc/files/foo.toml
         >> ./postinst is regular file (mode: 755, owner: 0, group: 0), content is data as shown below
             #!/bin/bash
             chown foouser:foogroup /etc/files/foo.toml
             echo setup
             echo setup
+            echo setup 1
+            echo setup 2
+            echo setup 2
         >> ./postrm is regular file (mode: 755, owner: 0, group: 0), content is data as shown below
             #!/bin/bash
             echo cleanup
             echo cleanup
+            echo cleanup 1
+            echo cleanup 1
+            echo cleanup 2
     >> data.tar.xz is regular file (mode: 644, owner: 0, group: 0), content is XZ-compressed POSIX tar archive
         >> ./ is directory (mode: 755, owner: 0, group: 0)
         >> ./etc/ is directory (mode: 755, owner: 0, group: 0)
@@ -85,7 +91,27 @@ ar archive
             owner = "foouser"
             group = "foogroup"
             
+            [[action]]
+            on = "setup"
+            script = "echo setup 1"
             
+            [[action]]
+            on = "cleanup"
+            script = """
+            echo cleanup 1
+            echo cleanup 1
+            """
+            
+            [[action]]
+            on = "setup"
+            script = """
+            echo setup 2
+            echo setup 2
+            """
+            
+            [[action]]
+            on = "cleanup"
+            script = "echo cleanup 2"
         >> ./etc/links/ is directory (mode: 755, owner: 0, group: 0)
         >> ./etc/links/bar.conf is symlink to bar.target
         >> ./etc/links/foo.conf is symlink to /etc/files/foo.conf

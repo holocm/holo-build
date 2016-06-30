@@ -40,6 +40,7 @@ type PackageDefinition struct {
 	File      []FileSection
 	Directory []DirectorySection
 	Symlink   []SymlinkSection
+	Action    []ActionSection
 	User      []UserSection  //see common/entities.go
 	Group     []GroupSection //see common/entities.go
 }
@@ -93,6 +94,13 @@ type DirectorySection struct {
 type SymlinkSection struct {
 	Path   string
 	Target string
+}
+
+//ActionSection only needs a nice exported name for the TOML parser to produce
+//more meaningful error messages on malformed input data.
+type ActionSection struct {
+	On     string
+	Script string
 }
 
 //versions are dot-separated numbers like (0|[1-9][0-9]*) (this enforces no
@@ -180,6 +188,14 @@ func ParsePackageDefinition(input io.Reader) (*Package, []error) {
 	entityNode, entityPath := compileEntityDefinitions(p.Package, p.Group, p.User, ec)
 	if entityNode != nil && entityPath != "" {
 		pkg.InsertFSNode(entityNode, entityPath, ec)
+	}
+
+	//parse and validate actions
+	for idx, actSection := range p.Action {
+		action, isValid := parseAction(actSection, ec, idx)
+		if isValid {
+			pkg.AppendActions(action)
+		}
 	}
 
 	//parse and validate FS entries
@@ -274,6 +290,30 @@ func parseRelatedPackages(relType string, specs []string, ec *ErrorCollector) []
 	}
 
 	return rels
+}
+
+//maps string values of "action.on" to internal enum values
+var actionTypeMap = map[string]uint{
+	"setup":   SetupAction,
+	"cleanup": CleanupAction,
+}
+
+func parseAction(data ActionSection, ec *ErrorCollector, entryIdx int) (action PackageAction, isValid bool) {
+	action.Type, isValid = actionTypeMap[data.On]
+	if !isValid {
+		if data.On == "" {
+			ec.Addf("action %d is invalid: missing or empty \"on\" attribute", entryIdx)
+		} else {
+			ec.Addf("action %d is invalid: unacceptable value \"%s\" for \"on\" attribute", entryIdx, data.On)
+		}
+	}
+
+	action.Content = strings.TrimSpace(data.Script)
+	if action.Content == "" {
+		ec.Addf("action %d is invalid: missing or empty \"content\" attribute", entryIdx)
+		isValid = false
+	}
+	return
 }
 
 //path is the path to be validated.
