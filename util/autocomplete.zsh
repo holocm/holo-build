@@ -11,7 +11,8 @@
         '(--reproducible --no-reproducible)--no-reproducible[Build a non-reproducible package with actual timestamps etc.]' \
         '(--pacman --debian --rpm)--debian[Build a Debian package]' \
         '(--pacman --debian --rpm)--pacman[Build a pacman package]' \
-        '(--pacman --debian --rpm)--rpm[Build an LSB-compliant RPM package (experimental!)]'
+        '(--pacman --debian --rpm)--rpm[Build an LSB-compliant RPM package (experimental!)]' \
+        '::input file:_files'
     return 0
 }
 

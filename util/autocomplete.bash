@@ -1,6 +1,8 @@
 #!/bin/bash
 _holo_build() {
-    COMPREPLY=( $(compgen -W "--help --version --stdout --no-stdout --reproducible --no-reproducible --pacman --debian --rpm" -- "${COMP_WORDS[COMP_CWORD]}") )
-    return 0
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+    if [[ $cur = -* ]]; then
+        COMPREPLY=( $(compgen -W "--help --version --stdout --no-stdout --reproducible --no-reproducible --pacman --debian --rpm" -- "$cur") )
+    fi
 }
-complete -F _holo_build holo-build
+complete -o default -F _holo_build holo-build
