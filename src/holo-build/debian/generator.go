@@ -25,7 +25,6 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-	"time"
 
 	"../common"
 )
@@ -243,14 +242,13 @@ func buildArArchive(entries []arArchiveEntry) ([]byte, error) {
 	buf := bytes.NewBuffer([]byte("!<arch>\n"))
 
 	//most fields are static
-	now := time.Now().Unix()
 	headerFormat := "%-16s"
-	headerFormat += fmt.Sprintf("%-12d", now) //modification time = now
-	headerFormat += "0     "                  //owner ID = root
-	headerFormat += "0     "                  //group ID = root
-	headerFormat += "100644  "                //file mode = regular file, rw-r--r--
-	headerFormat += "%-10d"                   //file size in bytes
-	headerFormat += "\x60\n"                  //magic header separator
+	headerFormat += "0           " //modification time = UNIX timestamp 0 (for reproducability)
+	headerFormat += "0     "       //owner ID = root
+	headerFormat += "0     "       //group ID = root
+	headerFormat += "100644  "     //file mode = regular file, rw-r--r--
+	headerFormat += "%-10d"        //file size in bytes
+	headerFormat += "\x60\n"       //magic header separator
 
 	for _, entry := range entries {
 		fmt.Fprintf(buf, headerFormat, entry.Name, len(entry.Data))
