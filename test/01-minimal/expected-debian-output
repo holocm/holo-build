@@ -1,7 +1,7 @@
-ar archive
-    >> control.tar.gz is regular file (mode: 644, owner: 0, group: 0), content is GZip-compressed POSIX tar archive
+(sha256:478dd3f2b1f4b8dd311bd6812113d28f32d7a6599f10fb24e84c0dd0e8a19180) ar archive
+    >> control.tar.gz is regular file (mode: 644, owner: 0, group: 0), content is (sha256:f2f2e0d7b031a07435bd62f7bf167b157f9e4580cd2b3101673d3af6708ee1f3) GZip-compressed (sha256:5d49e33975187ea8bf7dffab939efb3fb17d3bb5f9bd9c6c2f12e621127a2e1f) POSIX tar archive
         >> ./ is directory (mode: 755, owner: 0, group: 0)
-        >> ./control is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+        >> ./control is regular file (mode: 644, owner: 0, group: 0), content is (sha256:c99d45fbd37ef97d637333ca98fd6976821a905a84b33422325a42e3e89455db) data as shown below
             Package: the-package
             Version: 1.0-1
             Architecture: all
@@ -12,8 +12,8 @@ ar archive
             Description: the-package
              the-package
         >> ./md5sums is regular file (mode: 644, owner: 0, group: 0), content is empty file
-    >> data.tar.xz is regular file (mode: 644, owner: 0, group: 0), content is XZ-compressed POSIX tar archive
+    >> data.tar.xz is regular file (mode: 644, owner: 0, group: 0), content is (sha256:2b8624c681db6883363c5b3ef3ad6ca44e04bd7b587a350d17078eb5d0b21e9a) XZ-compressed (sha256:d68f1aa92ae64e55c176a9e7a87d520385783cd2b7cffd3573e1daf8e287aca4) POSIX tar archive
         >> ./ is directory (mode: 755, owner: 0, group: 0)
-    >> debian-binary is regular file (mode: 644, owner: 0, group: 0) at archive position 0, content is data as shown below
+    >> debian-binary is regular file (mode: 644, owner: 0, group: 0) at archive position 0, content is (sha256:d526eb4e878a23ef26ae190031b4efd2d58ed66789ac049ea3dbaf74c9df7402) data as shown below
         2.0
 

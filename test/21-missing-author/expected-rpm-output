@@ -1,4 +1,4 @@
-RPM package
+(sha256:76ed9291e63fd5267927d7452707c50b822a738d60e6cc8cfcffe3cf68227586) RPM package
     >> lead section:
         RPM format version 3.0
         Type: 0 (0 = binary, 1 = source)
@@ -65,6 +65,6 @@ RPM package
             string: lzma
         tag 1126 (PAYLOADFLAGS): length 1
             string: 5
-    >> payload: LZMA-compressed cpio archive
+    >> payload: (sha256:de0852eefe6007df35c3d19451ce417649429d479bc70a37a63ed7e2f53ec7cb) LZMA-compressed (sha256:5096c083e1a504be55b70a56a6e5585adaafd9382547b916d5f081e2cf6e110d) cpio archive
         
 

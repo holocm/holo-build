@@ -1,4 +1,4 @@
-RPM package
+(sha256:a6ede2cf1d2fdd517c3386ca416d1fa9b29f1accfdd082aceecb5234dbdc547f) RPM package
     >> lead section:
         RPM format version 3.0
         Type: 0 (0 = binary, 1 = source)
@@ -108,8 +108,8 @@ RPM package
             string: lzma
         tag 1126 (PAYLOADFLAGS): length 1
             string: 5
-    >> payload: LZMA-compressed cpio archive
-        >> ./usr/share/holo/users-groups/08-holo-entities.toml is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+    >> payload: (sha256:b6d8f0769fef3539f2c5221b37bbb72d8806ed621830dff35ac29f8bc01c1d27) LZMA-compressed (sha256:3cfbeb201639925b5120557f2b3fd1ff3bc40eb4d1f33a718c7cefebfa38716e) cpio archive
+        >> ./usr/share/holo/users-groups/08-holo-entities.toml is regular file (mode: 644, owner: 0, group: 0), content is (sha256:a92e6c9de506a8b3fea0acd4c705ac9a6a20861f65c9696175a456ffbd9687b1) data as shown below
             [[group]]
               name = "foogroup"
               gid = 101

@@ -1,4 +1,4 @@
-RPM package
+(sha256:b42b50c73d91ce540fd3d87c6c54d8035471c24f455b96292d3d09e5c269cd4b) RPM package
     >> lead section:
         RPM format version 3.0
         Type: 0 (0 = binary, 1 = source)
@@ -234,12 +234,12 @@ RPM package
             string: lzma
         tag 1126 (PAYLOADFLAGS): length 1
             string: 5
-    >> payload: LZMA-compressed cpio archive
+    >> payload: (sha256:5995e5fdd2cc0a80be6db0ca1c12d1ece1ea136429caed655adcc6059ae38580) LZMA-compressed (sha256:12a2cc93da770337085ebcb64b3deec8e73e9ebac17a3f33678c14d655e70718) cpio archive
         >> ./etc/empty.toml is regular file (mode: 644, owner: 0, group: 0), content is empty file
-        >> ./etc/files/foo.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+        >> ./etc/files/foo.conf is regular file (mode: 644, owner: 0, group: 0), content is (sha256:f13a55b71d31ec3df35f99d6b6332b23a4967312314456941aff922a7d354818) data as shown below
             foo
             foo
-        >> ./etc/files/foo.toml is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+        >> ./etc/files/foo.toml is regular file (mode: 644, owner: 0, group: 0), content is (sha256:e2feaebbf4dc2af197ef61f4fc49198be96bea13113b78c26ab57e93d7332011) data as shown below
             # This testcase covers all the basic syntax elements of package definitions.
             
             [package]

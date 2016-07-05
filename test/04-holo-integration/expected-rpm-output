@@ -1,4 +1,4 @@
-RPM package
+(sha256:5852512ea185febc3a2e184d6353581336e0dc9ff3c5ca71ca20b65ee2d4007d) RPM package
     >> lead section:
         RPM format version 3.0
         Type: 0 (0 = binary, 1 = source)
@@ -108,7 +108,7 @@ RPM package
             string: lzma
         tag 1126 (PAYLOADFLAGS): length 1
             string: 5
-    >> payload: LZMA-compressed cpio archive
-        >> ./usr/share/holo/files/01-first/etc/foo.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+    >> payload: (sha256:ceca56f1e126b25b32e1aa7c54154d39af5a215a870532d9abcf64b2feb0dc7d) LZMA-compressed (sha256:56bad9ba836389a631ff652d66da8ec2c87735b0354ea7a0f49c39c41c73ceea) cpio archive
+        >> ./usr/share/holo/files/01-first/etc/foo.conf is regular file (mode: 644, owner: 0, group: 0), content is (sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08) data as shown below
             test
 

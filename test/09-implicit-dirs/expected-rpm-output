@@ -1,4 +1,4 @@
-RPM package
+(sha256:a2b805eeded6ed4ec782a5009ea25af9396d7f5103d251d13b3de2f93544ab30) RPM package
     >> lead section:
         RPM format version 3.0
         Type: 0 (0 = binary, 1 = source)
@@ -127,7 +127,7 @@ RPM package
             string: lzma
         tag 1126 (PAYLOADFLAGS): length 1
             string: 5
-    >> payload: LZMA-compressed cpio archive
+    >> payload: (sha256:117fbc9dc904cc68753c4ac2f7fed46260c1ab6041bbf04871ab2137eeea29ca) LZMA-compressed (sha256:e3538b91d9a7209301eb94b729d4ae1832f20989821cd66d11de4e16891d4349) cpio archive
         >> ./etc is directory (mode: 700, owner: 0, group: 0)
         >> ./etc/foo is directory (mode: 700, owner: 0, group: 0)
         >> ./etc/foo/bar is directory (mode: 700, owner: 0, group: 0)

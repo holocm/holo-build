@@ -1,7 +1,7 @@
-ar archive
-    >> control.tar.gz is regular file (mode: 644, owner: 0, group: 0), content is GZip-compressed POSIX tar archive
+(sha256:eff57614add027204043096c1440e596f8a794ab57afa27c1fd8d86dc7d3dd0a) ar archive
+    >> control.tar.gz is regular file (mode: 644, owner: 0, group: 0), content is (sha256:ebb7f1960c7894ab139131b81eafd8e0af723add54870afd5710d34e04073bc9) GZip-compressed (sha256:f151dc606e2bac6a4d243f5cb22f4da5c269ef886ce7e3aadd9cd5d31c83d893) POSIX tar archive
         >> ./ is directory (mode: 755, owner: 0, group: 0)
-        >> ./control is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+        >> ./control is regular file (mode: 644, owner: 0, group: 0), content is (sha256:df7f140045359f5a180c63cfa16193c429a2dbe3b98ad99464dddec9d2bab0da) data as shown below
             Package: implicit-dirs
             Version: 1.0-1
             Architecture: all
@@ -12,11 +12,11 @@ ar archive
             Description: implicit directories
              implicit directories
         >> ./md5sums is regular file (mode: 644, owner: 0, group: 0), content is empty file
-    >> data.tar.xz is regular file (mode: 644, owner: 0, group: 0), content is XZ-compressed POSIX tar archive
+    >> data.tar.xz is regular file (mode: 644, owner: 0, group: 0), content is (sha256:0c18d7944a6697406cec9ef7644e9be02a5bf675338fd955bad14849449c46d5) XZ-compressed (sha256:c99a340b48c7f1b17447dadbb5b65192745f81399301acd26f95b5a7374f0abf) POSIX tar archive
         >> ./ is directory (mode: 755, owner: 0, group: 0)
         >> ./etc/ is directory (mode: 700, owner: 0, group: 0)
         >> ./etc/foo/ is directory (mode: 700, owner: 0, group: 0)
         >> ./etc/foo/bar/ is directory (mode: 700, owner: 0, group: 0)
-    >> debian-binary is regular file (mode: 644, owner: 0, group: 0) at archive position 0, content is data as shown below
+    >> debian-binary is regular file (mode: 644, owner: 0, group: 0) at archive position 0, content is (sha256:d526eb4e878a23ef26ae190031b4efd2d58ed66789ac049ea3dbaf74c9df7402) data as shown below
         2.0
 

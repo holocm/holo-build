@@ -24,6 +24,8 @@ import (
 	"bytes"
 	"compress/bzip2"
 	"compress/gzip"
+	"crypto/sha256"
+	"encoding/hex"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -51,44 +53,37 @@ func RecognizeAndDump(data []byte) (string, error) {
 	//Thanks to https://stackoverflow.com/a/19127748/334761 for
 	//listing all the magic numbers of the usual compression formats.
 
-	//is it GZip-compressed?
-	if bytes.HasPrefix(data, []byte{0x1f, 0x8b, 0x08}) {
-		return dumpGZ(data)
-	}
-	//is it BZip2-compressed?
-	if bytes.HasPrefix(data, []byte{0x42, 0x5a, 0x68}) {
-		return dumpBZ2(data)
-	}
-	//is it XZ-compressed?
-	if bytes.HasPrefix(data, []byte{0xfd, 0x37, 0x7a, 0x58, 0x5a, 0x00}) {
-		return dumpXZ(data)
-	}
-	//is it LZMA-compressed?
-	if bytes.HasPrefix(data, []byte{0x5d, 0x00, 0x00}) {
-		return dumpLZMA(data)
-	}
-	//is it a POSIX tar archive?
-	if len(data) >= 512 && bytes.Equal(data[257:262], []byte("ustar")) {
-		return DumpTar(data)
-	}
-	//is it an mtree archive?
-	if bytes.HasPrefix(data, []byte("#mtree")) {
-		return DumpMtree(data)
-	}
-	//is it an ar archive?
-	if bytes.HasPrefix(data, []byte("!<arch>\n")) {
-		return DumpAr(data)
-	}
-	//is it a cpio archive?
-	if bytes.HasPrefix(data, []byte("070701")) {
-		return DumpCpio(data)
-	}
-	//is it an RPM package?
-	if bytes.HasPrefix(data, []byte{0xed, 0xab, 0xee, 0xdb}) {
-		return DumpRpm(data)
+	var (
+		result string
+		err    error
+	)
+	switch {
+	case bytes.HasPrefix(data, []byte{0x1f, 0x8b, 0x08}):
+		result, err = dumpGZ(data)
+	case bytes.HasPrefix(data, []byte{0x42, 0x5a, 0x68}):
+		result, err = dumpBZ2(data)
+	case bytes.HasPrefix(data, []byte{0xfd, 0x37, 0x7a, 0x58, 0x5a, 0x00}):
+		result, err = dumpXZ(data)
+	case bytes.HasPrefix(data, []byte{0x5d, 0x00, 0x00}):
+		result, err = dumpLZMA(data)
+	case len(data) >= 512 && bytes.Equal(data[257:262], []byte("ustar")):
+		result, err = DumpTar(data)
+	case bytes.HasPrefix(data, []byte("#mtree")):
+		result, err = DumpMtree(data)
+	case bytes.HasPrefix(data, []byte("!<arch>\n")):
+		result, err = DumpAr(data)
+	case bytes.HasPrefix(data, []byte("070701")):
+		result, err = DumpCpio(data)
+	case bytes.HasPrefix(data, []byte{0xed, 0xab, 0xee, 0xdb}):
+		result, err = DumpRpm(data)
+	default:
+		result = "data as shown below\n" + Indent(string(data))
 	}
 
-	return "data as shown below\n" + Indent(string(data)), nil
+	//include checksum (to check reproducability of output in holo-build testcases)
+	checksumBytes := sha256.Sum256(data)
+	checksumStr := hex.EncodeToString(checksumBytes[:])
+	return "(sha256:" + checksumStr + ") " + result, err
 }
 
 func dumpGZ(data []byte) (string, error) {

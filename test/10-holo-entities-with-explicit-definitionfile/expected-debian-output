@@ -1,7 +1,7 @@
-ar archive
-    >> control.tar.gz is regular file (mode: 644, owner: 0, group: 0), content is GZip-compressed POSIX tar archive
+(sha256:c5fafbd87e09c6c53e8ff7a87eca003d7fa614e5d16e30cdb2e58c79a0fe3876) ar archive
+    >> control.tar.gz is regular file (mode: 644, owner: 0, group: 0), content is (sha256:c00375a2716b5332caa20ffed6b37eec70dd4ffdf43d9784a7bebc801da4c7e7) GZip-compressed (sha256:50010fa610e4caa7a4d6608afad16631b5a476b03c65c4f5fd2007f1ea9197a3) POSIX tar archive
         >> ./ is directory (mode: 755, owner: 0, group: 0)
-        >> ./control is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+        >> ./control is regular file (mode: 644, owner: 0, group: 0), content is (sha256:81c1d667373a1752eb4edd0e4ecfd674c5f47498525655bd41c43f827f162475) data as shown below
             Package: holo-entities
             Version: 1.0-1
             Architecture: all
@@ -12,21 +12,21 @@ ar archive
             Depends: holo-users-groups
             Description: holo-entities
              holo-entities
-        >> ./md5sums is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+        >> ./md5sums is regular file (mode: 644, owner: 0, group: 0), content is (sha256:2686e9a261ff4b89efec0a4a8d1272273f74f44efc91908f03199ce080a70280) data as shown below
             89164e38542babd6b83461b130f1c432  usr/share/holo/users-groups/08-holo-entities.toml
-        >> ./postinst is regular file (mode: 755, owner: 0, group: 0), content is data as shown below
+        >> ./postinst is regular file (mode: 755, owner: 0, group: 0), content is (sha256:deb85655808d2b15683a7ead50156e85c7c0b3af13dc77cabc19e7c4b2bfd345) data as shown below
             #!/bin/bash
             holo apply
-        >> ./postrm is regular file (mode: 755, owner: 0, group: 0), content is data as shown below
+        >> ./postrm is regular file (mode: 755, owner: 0, group: 0), content is (sha256:deb85655808d2b15683a7ead50156e85c7c0b3af13dc77cabc19e7c4b2bfd345) data as shown below
             #!/bin/bash
             holo apply
-    >> data.tar.xz is regular file (mode: 644, owner: 0, group: 0), content is XZ-compressed POSIX tar archive
+    >> data.tar.xz is regular file (mode: 644, owner: 0, group: 0), content is (sha256:8f32a1a39a10ba18a89d6e4c6cefba0ca623b507569d3998a09db84819e0f44c) XZ-compressed (sha256:49170850a7f889739f406de35c644d4be94cebf4681ffc75131994e884627910) POSIX tar archive
         >> ./ is directory (mode: 755, owner: 0, group: 0)
         >> ./usr/ is directory (mode: 755, owner: 0, group: 0)
         >> ./usr/share/ is directory (mode: 755, owner: 0, group: 0)
         >> ./usr/share/holo/ is directory (mode: 755, owner: 0, group: 0)
         >> ./usr/share/holo/users-groups/ is directory (mode: 755, owner: 0, group: 0)
-        >> ./usr/share/holo/users-groups/08-holo-entities.toml is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+        >> ./usr/share/holo/users-groups/08-holo-entities.toml is regular file (mode: 644, owner: 0, group: 0), content is (sha256:a92e6c9de506a8b3fea0acd4c705ac9a6a20861f65c9696175a456ffbd9687b1) data as shown below
             [[group]]
               name = "foogroup"
               gid = 101
@@ -53,6 +53,6 @@ ar archive
             
             [[user]]
               name = "minimaluser"
-    >> debian-binary is regular file (mode: 644, owner: 0, group: 0) at archive position 0, content is data as shown below
+    >> debian-binary is regular file (mode: 644, owner: 0, group: 0) at archive position 0, content is (sha256:d526eb4e878a23ef26ae190031b4efd2d58ed66789ac049ea3dbaf74c9df7402) data as shown below
         2.0
 

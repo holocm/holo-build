@@ -1,7 +1,7 @@
-ar archive
-    >> control.tar.gz is regular file (mode: 644, owner: 0, group: 0), content is GZip-compressed POSIX tar archive
+(sha256:5bd0acee73af8b78b4ffff43797009761899793394638f071ce66dee4291edb2) ar archive
+    >> control.tar.gz is regular file (mode: 644, owner: 0, group: 0), content is (sha256:c851a0e2791e8137f9ee5a45e75809daf591cead07d8f82598a32a373589f9d8) GZip-compressed (sha256:3947b52a3331a368073dd95f09445d6dfa156e77d01aa34ee5940f4e2c6f6d82) POSIX tar archive
         >> ./ is directory (mode: 755, owner: 0, group: 0)
-        >> ./control is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+        >> ./control is regular file (mode: 644, owner: 0, group: 0), content is (sha256:9ea0743a122e9593fa997e3c415c64b221e8d478340c7381bfc87194534beaa5) data as shown below
             Package: holo-integration
             Version: 1.0-1
             Architecture: all
@@ -12,15 +12,15 @@ ar archive
             Depends: holo-files
             Description: holo-integration
              holo-integration
-        >> ./md5sums is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+        >> ./md5sums is regular file (mode: 644, owner: 0, group: 0), content is (sha256:2e92b8a717cc0bbbd77864df51fb50d5471d4272680c85732dff081fd7a0bee8) data as shown below
             098f6bcd4621d373cade4e832627b4f6  usr/share/holo/files/01-first/etc/foo.conf
-        >> ./postinst is regular file (mode: 755, owner: 0, group: 0), content is data as shown below
+        >> ./postinst is regular file (mode: 755, owner: 0, group: 0), content is (sha256:deb85655808d2b15683a7ead50156e85c7c0b3af13dc77cabc19e7c4b2bfd345) data as shown below
             #!/bin/bash
             holo apply
-        >> ./postrm is regular file (mode: 755, owner: 0, group: 0), content is data as shown below
+        >> ./postrm is regular file (mode: 755, owner: 0, group: 0), content is (sha256:deb85655808d2b15683a7ead50156e85c7c0b3af13dc77cabc19e7c4b2bfd345) data as shown below
             #!/bin/bash
             holo apply
-    >> data.tar.xz is regular file (mode: 644, owner: 0, group: 0), content is XZ-compressed POSIX tar archive
+    >> data.tar.xz is regular file (mode: 644, owner: 0, group: 0), content is (sha256:e5a41fd5fcc4af68bceef1f75722939225773f27d17c17c0d3df9d98c1e83ccb) XZ-compressed (sha256:0703a6ec53a7625dc8e5cd5ad950d71cf9dcf7e099190d623141a92f8319a64c) POSIX tar archive
         >> ./ is directory (mode: 755, owner: 0, group: 0)
         >> ./usr/ is directory (mode: 755, owner: 0, group: 0)
         >> ./usr/share/ is directory (mode: 755, owner: 0, group: 0)
@@ -28,8 +28,8 @@ ar archive
         >> ./usr/share/holo/files/ is directory (mode: 755, owner: 0, group: 0)
         >> ./usr/share/holo/files/01-first/ is directory (mode: 755, owner: 0, group: 0)
         >> ./usr/share/holo/files/01-first/etc/ is directory (mode: 755, owner: 0, group: 0)
-        >> ./usr/share/holo/files/01-first/etc/foo.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+        >> ./usr/share/holo/files/01-first/etc/foo.conf is regular file (mode: 644, owner: 0, group: 0), content is (sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08) data as shown below
             test
-    >> debian-binary is regular file (mode: 644, owner: 0, group: 0) at archive position 0, content is data as shown below
+    >> debian-binary is regular file (mode: 644, owner: 0, group: 0) at archive position 0, content is (sha256:d526eb4e878a23ef26ae190031b4efd2d58ed66789ac049ea3dbaf74c9df7402) data as shown below
         2.0
 
