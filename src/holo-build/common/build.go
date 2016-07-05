@@ -28,14 +28,14 @@ import (
 )
 
 //Build builds the package using the given Generator.
-func (pkg *Package) Build(generator Generator, printToStdout bool, buildReproducibly bool) error {
+func (pkg *Package) Build(generator Generator, printToStdout bool) error {
 	//do magical Holo integration tasks
 	pkg.doMagicalHoloIntegration()
 	//move unmaterializable filesystem metadata into the setupScript
 	pkg.postponeUnmaterializableFSMetadata()
 
 	//build package
-	pkgBytes, err := generator.Build(pkg, buildReproducibly)
+	pkgBytes, err := generator.Build(pkg)
 	if err != nil {
 		return err
 	}

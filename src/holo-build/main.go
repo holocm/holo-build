@@ -38,7 +38,6 @@ type options struct {
 	generator     common.Generator
 	inputFileName string
 	printToStdout bool
-	reproducible  bool
 	filenameOnly  bool
 }
 
@@ -85,7 +84,7 @@ func main() {
 	}
 
 	//build package
-	err := pkg.Build(generator, opts.printToStdout, opts.reproducible)
+	err := pkg.Build(generator, opts.printToStdout)
 	if err != nil {
 		showError(fmt.Errorf("cannot build %s: %s",
 			generator.RecommendedFileName(pkg), err.Error(),
@@ -115,10 +114,8 @@ func parseArgs() (result options, exit bool) {
 			opts.printToStdout = false
 		case "--suggest-filename":
 			opts.filenameOnly = true
-		case "--reproducible":
-			opts.reproducible = true
-		case "--no-reproducible":
-			opts.reproducible = false
+		case "--reproducible", "--no-reproducible":
+			//no effect anymore - TODO: remove in 2.0
 		case "--pacman":
 			if opts.generator != nil {
 				showError(errors.New("Multiple package formats specified."))
@@ -166,8 +163,6 @@ func printHelp() {
 	fmt.Printf("Usage: %s <options> <definitionfile> > packagefile\n\nOptions:\n", program)
 	fmt.Println("  --stdout\t\tPrint resulting package on stdout")
 	fmt.Println("  --no-stdout\t\tWrite resulting package to the working directory (default)")
-	fmt.Println("  --reproducible\tBuild a reproducible package with bogus timestamps etc.")
-	fmt.Println("  --no-reproducible\tBuild a non-reproducible package with actual timestamps etc. (default)\n")
 	fmt.Println("  --debian\t\tBuild a Debian package")
 	fmt.Println("  --pacman\t\tBuild a pacman package")
 	fmt.Println("  --rpm\t\t\tBuild an RPM package\n")

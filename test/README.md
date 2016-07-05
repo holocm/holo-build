@@ -5,12 +5,12 @@ The `holo-build` binary is tested using test package definitions, which are
 built into packages with all available generators. The resulting packages are
 then compared to the expectations recorded for each test case.
 
-`holo-build` runs in `--reproducible` mode during testing, so technically the
-test should pass if the same exact archive is generated (down to the last byte)
-that was generated when the test first passed. However, when the test fails,
-comparing differences between binary package files is unnecessarily tedious, so
-we use the helper program [dump-package.go](../src/dump-package) to convert
-packages into a readable form, that looks something like this:
+`holo-build` always operates reproducibly, so technically the test should pass
+if the same exact archive is generated (down to the last byte) that was
+generated when the test first passed. However, when the test fails, comparing
+differences between binary package files is unnecessarily tedious, so we use
+the helper program [dump-package.go](../src/dump-package) to convert packages
+into a readable form, that looks something like this:
 
     $ tar cJf foo.tar.xz foo/
     $ ./build/dump-package < foo.tar.xz
@@ -39,7 +39,7 @@ test case looks like this:
 The generator name `$g` is the one in the CLI option that selects this
 generator. `holo-build` is called as
 
-    holo-build --$g --reproducible --stdout < input.toml 2> $g-stderr-output | dump-package > $g-output
+    holo-build --$g --stdout < input.toml 2> $g-stderr-output | dump-package > $g-output
 
 Running the tests
 -----------------

@@ -64,9 +64,9 @@ func fullVersionString(pkg *common.Package) string {
 }
 
 //Build implements the common.Generator interface.
-func (g *Generator) Build(pkg *common.Package, buildReproducibly bool) ([]byte, error) {
+func (g *Generator) Build(pkg *common.Package) ([]byte, error) {
 	//assemble CPIO-LZMA payload
-	payload, err := MakePayload(pkg, buildReproducibly)
+	payload, err := MakePayload(pkg)
 	if err != nil {
 		return nil, err
 	}

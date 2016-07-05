@@ -32,12 +32,10 @@ type Generator interface {
 	//If the package is valid, an empty slice is to be returned.
 	Validate(pkg *Package) []error
 	//Build produces the final package (usually a compressed tar file) in the
-	//return argument.
-	//
-	//If `buildReproducibly` is true, the package must be built such that every
+	//return argument. The package must be built reproducibly; such that every
 	//run (even across systems) produces an identical result. For example, no
 	//timestamps or generator version information may be included.
-	Build(pkg *Package, buildReproducibly bool) ([]byte, error)
+	Build(pkg *Package) ([]byte, error)
 	//Generate the recommended file name for this package. Distributions
 	//usually have guidelines for this sort of thing. The string returned must
 	//be a plain file name, not a path.

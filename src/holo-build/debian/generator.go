@@ -82,15 +82,15 @@ type arArchiveEntry struct {
 }
 
 //Build implements the common.Generator interface.
-func (g *Generator) Build(pkg *common.Package, buildReproducibly bool) ([]byte, error) {
+func (g *Generator) Build(pkg *common.Package) ([]byte, error) {
 	//compress data.tar.xz
-	dataTar, err := pkg.FSRoot.ToTarXZArchive(true, false, buildReproducibly)
+	dataTar, err := pkg.FSRoot.ToTarXZArchive(true, false)
 	if err != nil {
 		return nil, err
 	}
 
 	//prepare a directory into which to assemble the metadata files for control.tar.gz
-	controlTar, err := buildControlTar(pkg, buildReproducibly)
+	controlTar, err := buildControlTar(pkg)
 	if err != nil {
 		return nil, err
 	}
@@ -103,18 +103,18 @@ func (g *Generator) Build(pkg *common.Package, buildReproducibly bool) ([]byte, 
 	})
 }
 
-func buildControlTar(pkg *common.Package, buildReproducibly bool) ([]byte, error) {
+func buildControlTar(pkg *common.Package) ([]byte, error) {
 	//prepare a directory into which to put all these files
 	controlDir := common.NewFSDirectory()
 
 	//place all the required files in there (NOTE: using the conffiles file
 	//does not seem to be appropriate for our use-case, although I'll let more
 	//experienced Debian users judge this one)
-	err := writeControlFile(pkg, controlDir, buildReproducibly)
+	err := writeControlFile(pkg, controlDir)
 	if err != nil {
 		return nil, err
 	}
-	writeMD5SumsFile(pkg, controlDir, buildReproducibly)
+	writeMD5SumsFile(pkg, controlDir)
 
 	//write postinst script if necessary
 	script := pkg.Script(common.SetupAction)
@@ -136,10 +136,10 @@ func buildControlTar(pkg *common.Package, buildReproducibly bool) ([]byte, error
 		}
 	}
 
-	return controlDir.ToTarGZArchive(true, false, buildReproducibly)
+	return controlDir.ToTarGZArchive(true, false)
 }
 
-func writeControlFile(pkg *common.Package, controlDir *common.FSDirectory, buildReproducibly bool) error {
+func writeControlFile(pkg *common.Package, controlDir *common.FSDirectory) error {
 	//reference for this file:
 	//https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-binarycontrolfiles
 	contents := fmt.Sprintf("Package: %s\n", pkg.Name)
@@ -219,7 +219,7 @@ func compilePackageRelations(relType string, rels []common.PackageRelation) (str
 	return fmt.Sprintf("%s: %s\n", relType, strings.Join(entries, ", ")), nil
 }
 
-func writeMD5SumsFile(pkg *common.Package, controlDir *common.FSDirectory, buildReproducibly bool) {
+func writeMD5SumsFile(pkg *common.Package, controlDir *common.FSDirectory) {
 	//calculate MD5 sums for all regular files in this package
 	var lines []string
 	pkg.WalkFSWithRelativePaths(func(path string, node common.FSNode) error {

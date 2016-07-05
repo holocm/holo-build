@@ -38,16 +38,11 @@ import (
 //
 //With `skipRootDirectory = true`, don't generate an entry for the root
 //directory in the resulting package.
-func (d *FSDirectory) ToTarArchive(leadingDot, skipRootDirectory, buildReproducibly bool) ([]byte, error) {
+func (d *FSDirectory) ToTarArchive(leadingDot, skipRootDirectory bool) ([]byte, error) {
 	var buf bytes.Buffer
 	tw := tar.NewWriter(&buf)
 
-	var timestamp time.Time
-	if buildReproducibly {
-		timestamp = time.Unix(0, 0)
-	} else {
-		timestamp = time.Now()
-	}
+	timestamp := time.Unix(0, 0)
 
 	err := d.Walk(".", func(path string, node FSNode) error {
 		if !leadingDot {
@@ -113,8 +108,8 @@ func (d *FSDirectory) ToTarArchive(leadingDot, skipRootDirectory, buildReproduci
 }
 
 //ToTarGZArchive is identical to ToTarArchive, but GZip-compresses the result.
-func (d *FSDirectory) ToTarGZArchive(leadingDot, skipRootDirectory, buildReproducibly bool) ([]byte, error) {
-	data, err := d.ToTarArchive(leadingDot, skipRootDirectory, buildReproducibly)
+func (d *FSDirectory) ToTarGZArchive(leadingDot, skipRootDirectory bool) ([]byte, error) {
+	data, err := d.ToTarArchive(leadingDot, skipRootDirectory)
 	if err != nil {
 		return nil, err
 	}
@@ -132,8 +127,8 @@ func (d *FSDirectory) ToTarGZArchive(leadingDot, skipRootDirectory, buildReprodu
 }
 
 //ToTarXZArchive is identical to ToTarArchive, but GZip-compresses the result.
-func (d *FSDirectory) ToTarXZArchive(leadingDot, skipRootDirectory, buildReproducibly bool) ([]byte, error) {
-	data, err := d.ToTarArchive(leadingDot, skipRootDirectory, buildReproducibly)
+func (d *FSDirectory) ToTarXZArchive(leadingDot, skipRootDirectory bool) ([]byte, error) {
+	data, err := d.ToTarArchive(leadingDot, skipRootDirectory)
 	if err != nil {
 		return nil, err
 	}

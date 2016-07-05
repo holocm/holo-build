@@ -111,14 +111,10 @@ This option can be used when auto-generating Makefiles, where the output
 filename needs to be known before C<holo-build> runs (for purposes of dependency
 resolution).
 
-=item B<--reproducible>
+=item B<--reproducible> (deprecated)
 
-Try to generate a package that is more reproducible, that is: does not contain
-any timestamps and such. This switch does not actually guarantee a 100%
-reproducible package.
-
-This switch should be considered internal, and only be used for testing
-purposes.
+This switch does not have any effect anymore and will be removed in the next
+major version. Packages are now always generated reproducibly.
 
 =item B<--help>
 

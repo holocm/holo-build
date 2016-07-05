@@ -25,23 +25,17 @@ import (
 	"compress/gzip"
 	"fmt"
 	"strings"
-	"time"
 
 	"../common"
 )
 
 //MakeMTREE generates the mtree metadata archive for this package.
-func MakeMTREE(pkg *common.Package, buildReproducibly bool) ([]byte, error) {
+func MakeMTREE(pkg *common.Package) ([]byte, error) {
 	//this implementation is not particularly clever w.r.t. the use of "/set",
 	//but we use some defaults here to maybe keep the result size down a bit
 	lines := []string{
 		"#mtree",
-		"/set type=file uid=0 gid=0 mode=644",
-	}
-
-	timestamp := " time=0.0"
-	if !buildReproducibly {
-		timestamp = fmt.Sprintf(" time=%d.0", time.Now().Unix())
+		"/set type=file uid=0 gid=0 mode=644 time=0.0",
 	}
 
 	pkg.WalkFSWithAbsolutePaths(func(path string, node common.FSNode) error {
@@ -67,7 +61,6 @@ func MakeMTREE(pkg *common.Package, buildReproducibly bool) ([]byte, error) {
 			if n.Metadata.Mode != 0644 { //mode 0644 is default
 				line += fmt.Sprintf(" mode=%o", n.Metadata.Mode)
 			}
-			line += timestamp
 		case *common.FSRegularFile:
 			// type=file is default
 			if uid := n.Metadata.UID(); uid != 0 { //uid 0 is default
@@ -79,13 +72,12 @@ func MakeMTREE(pkg *common.Package, buildReproducibly bool) ([]byte, error) {
 			if n.Metadata.Mode != 0644 { //mode 0644 is default
 				line += fmt.Sprintf(" mode=%o", n.Metadata.Mode)
 			}
-			line += timestamp
 			line += fmt.Sprintf(" size=%d md5digest=%s sha256digest=%s",
 				len([]byte(n.Content)), n.MD5Digest(), n.SHA256Digest(),
 			)
 		case *common.FSSymlink:
 			// uid=0 gid=0 is default
-			line += " type=link mode=777" + timestamp
+			line += " type=link mode=777"
 			//need to replace spaces in link target since spaces separate
 			line += " link=" + mtreeEscapeString(n.Target)
 		}

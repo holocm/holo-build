@@ -7,8 +7,6 @@
         '--version[Print a short version string.]' \
         '(--stdout --no-stdout)--stdout[Print resulting package on stdout]' \
         '(--stdout --no-stdout)--no-stdout[Write resulting package to the working directory]' \
-        '(--reproducible --no-reproducible)--reproducible[Build a reproducible package with bogus timestamps etc.]' \
-        '(--reproducible --no-reproducible)--no-reproducible[Build a non-reproducible package with actual timestamps etc.]' \
         '(--pacman --debian --rpm)--debian[Build a Debian package]' \
         '(--pacman --debian --rpm)--pacman[Build a pacman package]' \
         '(--pacman --debian --rpm)--rpm[Build an LSB-compliant RPM package (experimental!)]' \

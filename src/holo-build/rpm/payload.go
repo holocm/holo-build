@@ -25,7 +25,6 @@ import (
 	"encoding/binary"
 	"os"
 	"os/exec"
-	"time"
 
 	"../common"
 )
@@ -55,14 +54,7 @@ type cpioHeader struct {
 }
 
 //MakePayload generates the Payload for the given package.
-func MakePayload(pkg *common.Package, buildReproducibly bool) (*Payload, error) {
-	var timestamp uint32
-	if buildReproducibly {
-		timestamp = 0
-	} else {
-		timestamp = uint32(time.Now().Unix())
-	}
-
+func MakePayload(pkg *common.Package) (*Payload, error) {
 	var buf bytes.Buffer
 	inodeNumber := uint32(0)
 
@@ -91,7 +83,7 @@ func MakePayload(pkg *common.Package, buildReproducibly bool) (*Payload, error) 
 			Mode:        cpioFormatInt(node.FileModeForArchive(true)),
 			//UID, GID depend on the node type; see below
 			NumberOfLinks:    cpioOne,
-			ModificationTime: cpioFormatInt(timestamp),
+			ModificationTime: cpioZero, //fixed for reproducability
 			//FileSize depends on the node type; see below
 			DevMajor:  cpioZero,
 			DevMinor:  cpioZero,
