@@ -87,7 +87,7 @@ func dumpRpmLead(reader io.Reader) (string, error) {
 	lines := []string{
 		fmt.Sprintf("RPM format version %d.%d", lead.MajorVersion, lead.MinorVersion),
 		fmt.Sprintf("Type: %d (0 = binary, 1 = source)", lead.Type),
-		fmt.Sprintf("Architecture: %d (0 = noarch, 1 = x86, ...)", lead.Architecture),
+		fmt.Sprintf("Architecture: %d (0 = noarch, 1 = x86 (also x86-64), 2 = Alpha, 3 = Sparc, 4 = MIPS, 5 = PPC, ..., 9 = IA-64, 12 = ARM, ...)", lead.Architecture),
 		//lead.Name is a NUL-terminated (and NUL-padded) string; trim all the NULs at the end
 		fmt.Sprintf("Name: %s", strings.TrimRight(string(lead.Name[:]), "\x00")),
 		fmt.Sprintf("Built for OS: %d (1 = Linux, ...)", lead.OSNum),

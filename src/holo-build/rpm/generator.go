@@ -38,6 +38,26 @@ import (
 //Generator is the common.Generator for RPM packages.
 type Generator struct{}
 
+//Source for this data: `grep arch_canon /usr/lib/rpm/rpmrc`
+var archMap = map[common.Architecture]string{
+	common.Architecture_Any:     "noarch",
+	common.Architecture_I386:    "i686",
+	common.Architecture_X86_64:  "x86_64",
+	common.Architecture_ARMv5:   "armv5tl",
+	common.Architecture_ARMv6h:  "armv6hl",
+	common.Architecture_ARMv7h:  "armv7hl",
+	common.Architecture_AArch64: "aarch64",
+}
+var archIDMap = map[common.Architecture]uint16{
+	common.Architecture_Any:     0,
+	common.Architecture_I386:    1,
+	common.Architecture_X86_64:  1,
+	common.Architecture_ARMv5:   12,
+	common.Architecture_ARMv6h:  12,
+	common.Architecture_ARMv7h:  12,
+	common.Architecture_AArch64: 12,
+}
+
 //Validate implements the common.Generator interface.
 func (g *Generator) Validate(pkg *common.Package) []error {
 	//TODO, (cannot find a reliable cross-distro source of truth for the
@@ -49,7 +69,7 @@ func (g *Generator) Validate(pkg *common.Package) []error {
 func (g *Generator) RecommendedFileName(pkg *common.Package) string {
 	//this is called after Build(), so we can assume that package name,
 	//version, etc. were already validated
-	return fmt.Sprintf("%s-%s.noarch.rpm", pkg.Name, fullVersionString(pkg))
+	return fmt.Sprintf("%s-%s.%s.rpm", pkg.Name, fullVersionString(pkg), archMap[pkg.Architecture])
 }
 
 func versionString(pkg *common.Package) string {

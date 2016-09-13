@@ -33,11 +33,21 @@ import (
 //and derivatives).
 type Generator struct{}
 
+var archMap = map[common.Architecture]string{
+	common.Architecture_Any:     "any",
+	common.Architecture_I386:    "i686",
+	common.Architecture_X86_64:  "x86_64",
+	common.Architecture_ARMv5:   "arm",
+	common.Architecture_ARMv6h:  "armv6h",
+	common.Architecture_ARMv7h:  "armv7h",
+	common.Architecture_AArch64: "aarch64",
+}
+
 //RecommendedFileName implements the common.Generator interface.
 func (g *Generator) RecommendedFileName(pkg *common.Package) string {
 	//this is called after Build(), so we can assume that package name,
 	//version, etc. were already validated
-	return fmt.Sprintf("%s-%s-any.pkg.tar.xz", pkg.Name, fullVersionString(pkg))
+	return fmt.Sprintf("%s-%s-%s.pkg.tar.xz", pkg.Name, fullVersionString(pkg), archMap[pkg.Architecture])
 }
 
 //Validate implements the common.Generator interface.
@@ -50,7 +60,7 @@ func (g *Generator) Validate(pkg *common.Package) []error {
 		RelatedName:    "(?:except:)?(?:group:)?" + nameRx,
 		RelatedVersion: "(?:[0-9]+:)?" + versionRx + "(?:-[1-9][0-9]*)?", //incl. release/epoch
 		FormatName:     "pacman",
-	})
+	}, archMap)
 }
 
 //Build implements the common.Generator interface.
@@ -98,7 +108,7 @@ func writePKGINFO(pkg *common.Package) error {
 		contents += fmt.Sprintf("packager = %s\n", pkg.Author)
 	}
 	contents += fmt.Sprintf("size = %d\n", pkg.FSRoot.InstalledSizeInBytes())
-	contents += "arch = any\n"
+	contents += fmt.Sprintf("arch = %s\n", archMap[pkg.Architecture])
 	contents += "license = custom:none\n"
 	replaces, err := compilePackageRequirements("replaces", pkg.Replaces)
 	if err != nil {

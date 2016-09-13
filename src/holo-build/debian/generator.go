@@ -32,11 +32,21 @@ import (
 //Generator is the common.Generator for Debian packages.
 type Generator struct{}
 
+var archMap = map[common.Architecture]string{
+	common.Architecture_Any:    "all",
+	common.Architecture_I386:   "i386",
+	common.Architecture_X86_64: "amd64",
+	common.Architecture_ARMv5:  "armel",
+	// common.Architecture_ARMv6h is not supported by Debian
+	common.Architecture_ARMv7h:  "armhf",
+	common.Architecture_AArch64: "arm64",
+}
+
 //RecommendedFileName implements the common.Generator interface.
 func (g *Generator) RecommendedFileName(pkg *common.Package) string {
 	//this is called after Build(), so we can assume that package name,
 	//version, etc. were already validated
-	return fmt.Sprintf("%s_%s_any.deb", pkg.Name, fullVersionString(pkg))
+	return fmt.Sprintf("%s_%s_%s.deb", pkg.Name, fullVersionString(pkg), archMap[pkg.Architecture])
 }
 
 //Validate implements the common.Generator interface.
@@ -50,7 +60,7 @@ func (g *Generator) Validate(pkg *common.Package) []error {
 		RelatedName:    nameRx,
 		RelatedVersion: "(?:[0-9]+:)?" + versionRx + "(?:-[1-9][0-9]*)?", //incl. release/epoch
 		FormatName:     "Debian",
-	})
+	}, archMap)
 
 	if pkg.Author == "" {
 		err := errors.New("The \"package.author\" field is required for Debian packages")
@@ -143,7 +153,7 @@ func writeControlFile(pkg *common.Package, controlDir *common.FSDirectory) error
 	//https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-binarycontrolfiles
 	contents := fmt.Sprintf("Package: %s\n", pkg.Name)
 	contents += fmt.Sprintf("Version: %s\n", fullVersionString(pkg))
-	contents += "Architecture: all\n"
+	contents += fmt.Sprintf("Architecture: %s\n", archMap[pkg.Architecture])
 	contents += fmt.Sprintf("Maintainer: %s\n", pkg.Author)
 	contents += fmt.Sprintf("Installed-Size: %d\n", int(pkg.FSRoot.InstalledSizeInBytes()/1024)) // convert bytes to KiB
 	contents += "Section: misc\n"

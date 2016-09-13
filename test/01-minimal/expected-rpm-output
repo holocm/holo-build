@@ -2,7 +2,7 @@
     >> lead section:
         RPM format version 3.0
         Type: 0 (0 = binary, 1 = source)
-        Architecture: 0 (0 = noarch, 1 = x86, ...)
+        Architecture: 0 (0 = noarch, 1 = x86 (also x86-64), 2 = Alpha, 3 = Sparc, 4 = MIPS, 5 = PPC, ..., 9 = IA-64, 12 = ARM, ...)
         Name: the-package-1.0-1
         Built for OS: 1 (1 = Linux, ...)
         Signature type: 5

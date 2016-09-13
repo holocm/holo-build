@@ -71,7 +71,7 @@ func addPackageInformationTags(h *Header, pkg *common.Package) {
 	h.AddStringValue(RpmtagGroup, "System/Management", true)
 
 	h.AddStringValue(RpmtagOs, "linux", false)
-	h.AddStringValue(RpmtagArch, "noarch", false)
+	h.AddStringValue(RpmtagArch, archMap[pkg.Architecture], false)
 
 	h.AddStringValue(RpmtagPayloadFormat, "cpio", false)
 	h.AddStringValue(RpmtagPayloadCompressor, "lzma", false)

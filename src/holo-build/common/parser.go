@@ -55,6 +55,7 @@ type PackageSection struct {
 	Epoch          uint
 	Description    string
 	Author         string
+	Architecture   string
 	Requires       []string
 	Provides       []string
 	Conflicts      []string
@@ -111,6 +112,27 @@ var versionRx = regexp.MustCompile(`^(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*))*$`
 //the author information should be in the form "Firstname Lastname <email.address@server.tld>"
 var authorRx = regexp.MustCompile(`^[^<>]+\s+<[^<>\s]+>$`)
 
+//map supported input strings for architecture to internal architecture enum
+var archMap = map[string]Architecture{
+	"aarch64": Architecture_AArch64,
+	"all":     Architecture_Any, //from Debian
+	"amd64":   Architecture_X86_64,
+	"any":     Architecture_Any,     //from Arch Linux
+	"arm":     Architecture_ARMv5,   //from Arch Linux
+	"arm64":   Architecture_AArch64, //from Debian
+	"armel":   Architecture_ARMv5,   //from Debian
+	"armhf":   Architecture_ARMv7h,  //from Debian
+	"armv5tl": Architecture_ARMv5,   //from Mageia
+	"armv6h":  Architecture_ARMv6h,  //from Arch Linux
+	"armv6hl": Architecture_ARMv6h,  //from OpenSuse
+	"armv7h":  Architecture_ARMv7h,  //from Arch Linux
+	"armv7hl": Architecture_ARMv7h,  //from OpenSuse
+	"i386":    Architecture_I386,
+	"i686":    Architecture_I386,
+	"noarch":  Architecture_Any, //from RPM
+	"x86_64":  Architecture_X86_64,
+}
+
 //ParsePackageDefinition parses a package definition from the given input.
 //The operation is successful if the returned []error is empty.
 func ParsePackageDefinition(input io.Reader, baseDirectory string) (*Package, []error) {
@@ -127,14 +149,15 @@ func ParsePackageDefinition(input io.Reader, baseDirectory string) (*Package, []
 
 	//restructure the parsed data into a common.Package struct
 	pkg := Package{
-		Name:        strings.TrimSpace(p.Package.Name),
-		Version:     strings.TrimSpace(p.Package.Version),
-		Release:     p.Package.Release,
-		Epoch:       p.Package.Epoch,
-		Description: strings.TrimSpace(p.Package.Description),
-		Author:      strings.TrimSpace(p.Package.Author),
-		Actions:     []PackageAction{},
-		FSRoot:      NewFSDirectory(),
+		Name:              strings.TrimSpace(p.Package.Name),
+		Version:           strings.TrimSpace(p.Package.Version),
+		Release:           p.Package.Release,
+		Epoch:             p.Package.Epoch,
+		Description:       strings.TrimSpace(p.Package.Description),
+		Author:            strings.TrimSpace(p.Package.Author),
+		ArchitectureInput: p.Package.Architecture,
+		Actions:           []PackageAction{},
+		FSRoot:            NewFSDirectory(),
 	}
 	pkg.FSRoot.Implicit = true
 
@@ -184,6 +207,15 @@ func ParsePackageDefinition(input io.Reader, baseDirectory string) (*Package, []
 	//given, check the format
 	if pkg.Author != "" && !authorRx.MatchString(pkg.Author) {
 		ec.Addf("Invalid package author \"%s\" (should look like \"Jane Doe <jane.doe@example.org>\")", pkg.Author)
+	}
+
+	//parse architecture string
+	if p.Package.Architecture != "" {
+		var ok bool
+		pkg.Architecture, ok = archMap[p.Package.Architecture]
+		if !ok {
+			ec.Addf("Invalid package architecture \"%s\"", p.Package.Architecture)
+		}
 	}
 
 	//parse relations to other packages

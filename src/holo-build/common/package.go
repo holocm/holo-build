@@ -25,6 +25,20 @@ import (
 	"strings"
 )
 
+//Architecture is an enum that describes the target architecture for this
+//package (or "any" for packages without compiled binaries).
+type Architecture uint
+
+const (
+	Architecture_Any     Architecture = iota //no compiled binaries (default value!)
+	Architecture_I386                        //i386
+	Architecture_X86_64                      //x86_64
+	Architecture_ARMv5                       //ARMv5
+	Architecture_ARMv6h                      //ARMv6h (hardfloat)
+	Architecture_ARMv7h                      //ARMv7h (hardfloat)
+	Architecture_AArch64                     //AArch64 (ARMv8 64-bit)
+)
+
 //Package contains all information about a single package. This representation
 //will be passed into the generator backends.
 type Package struct {
@@ -53,6 +67,12 @@ type Package struct {
 	//"Firstname Lastname <email.address@server.tld>", if this information is
 	//available.
 	Author string
+	//Architecture specifies the target architecture of this package (usually
+	//"any" since holo-build packages tend to not include compiled binaries).
+	Architecture Architecture
+	//ArchitectureInput contains the raw architecture string specified by the
+	//user (used only for error messages).
+	ArchitectureInput string
 	//Requires contains a list of other packages that are required dependencies
 	//for this package and thus must be installed together with this package.
 	//This is called "Depends" by some package managers.

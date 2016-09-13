@@ -44,7 +44,7 @@ type compiledRegexSet struct {
 //ValidateWith validates the package name, version and related packages with
 //the given set of regexes, and returns a non-empty list of errors if
 //validation fails.
-func (pkg *Package) ValidateWith(r RegexSet) []error {
+func (pkg *Package) ValidateWith(r RegexSet, archMap map[Architecture]string) []error {
 	ec := ErrorCollector{}
 
 	cr := &compiledRegexSet{
@@ -64,6 +64,11 @@ func (pkg *Package) ValidateWith(r RegexSet) []error {
 		//this check is only some Defense in Depth; a stricter version format
 		//is already enforced by the generator-independent validation
 		ec.Addf("Package version \"%s\" is not acceptable for %s packages", pkg.Version, cr.FormatName)
+	}
+
+	//check if architecture is supported by this generator
+	if _, ok := archMap[pkg.Architecture]; !ok {
+		ec.Addf("Architecture \"%s\" is not acceptable for %s packages", pkg.ArchitectureInput, cr.FormatName)
 	}
 
 	validatePackageRelations(cr, "requires", pkg.Requires, &ec)

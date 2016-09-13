@@ -46,7 +46,7 @@ func NewLead(pkg *common.Package) *Lead {
 		Magic:        [4]byte{0xed, 0xab, 0xee, 0xdb},
 		Version:      [2]byte{0x03, 0x00},
 		Type:         0, //binary package
-		Architecture: 0, //noarch
+		Architecture: archIDMap[pkg.Architecture],
 		//NameVersionRelease initialized below
 		OperatingSystem: 1, //Linux
 		SignatureType:   5, //signature section follows
