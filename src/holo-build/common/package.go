@@ -30,13 +30,20 @@ import (
 type Architecture uint
 
 const (
-	ArchitectureAny     Architecture = iota //< no compiled binaries (default value!)
-	ArchitectureI386                        //< i386
-	ArchitectureX86_64                      //< x86_64
-	ArchitectureARMv5                       //< ARMv5
-	ArchitectureARMv6h                      //< ARMv6h (hardfloat)
-	ArchitectureARMv7h                      //< ARMv7h (hardfloat)
-	ArchitectureAArch64                     //< AArch64 (ARMv8 64-bit)
+	// ArchitectureAny = no compiled binaries (default value!)
+	ArchitectureAny Architecture = iota
+	// ArchitectureI386 = i386
+	ArchitectureI386
+	// ArchitectureX86_64 = x86_64
+	ArchitectureX86_64
+	// ArchitectureARMv5 = ARMv5
+	ArchitectureARMv5
+	// ArchitectureARMv6h = ARMv6h (hardfloat)
+	ArchitectureARMv6h
+	// ArchitectureARMv7h = ARMv7h (hardfloat)
+	ArchitectureARMv7h
+	// ArchitectureAArch64 = AArch64 (ARMv8 64-bit)
+	ArchitectureAArch64
 )
 
 //Package contains all information about a single package. This representation
