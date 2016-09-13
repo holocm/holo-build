@@ -32,7 +32,7 @@ import (
 )
 
 //DumpRpm dumps RPM packages.
-func DumpRpm(data []byte) (string, error) {
+func DumpRpm(data []byte, withChecksums bool) (string, error) {
 	//We don't have a library for the RPM format, and unfortunately, it's an utter mess.
 	//The main reference that I used (apart from sample RPMs from Fedora, Mageia, and Suse)
 	//is <http://www.rpm.org/max-rpm/s1-rpm-file-format-rpm-file-format.html> and
@@ -58,7 +58,7 @@ func DumpRpm(data []byte) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	payloadDump, err := RecognizeAndDump(payloadData)
+	payloadDump, err := RecognizeAndDump(payloadData, withChecksums)
 	if err != nil {
 		return "", err
 	}

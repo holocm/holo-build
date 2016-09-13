@@ -35,14 +35,14 @@ import (
 )
 
 //DumpTar dumps tar archives.
-func DumpTar(data []byte) (string, error) {
+func DumpTar(data []byte, withChecksums bool) (string, error) {
 	//use "archive/tar" package to read the tar archive
 	tr := tar.NewReader(bytes.NewReader(data))
 	var header *tar.Header
 	var err error
 
 	return dumpArchiveGeneric(
-		"POSIX tar archive", tr,
+		"POSIX tar archive", withChecksums, tr,
 		func() (string, error) { //func gotoNextEntry
 			header, err = tr.Next()
 			if err != nil {
@@ -83,14 +83,14 @@ func DumpTar(data []byte) (string, error) {
 }
 
 //DumpAr dumps ar archives.
-func DumpAr(data []byte) (string, error) {
+func DumpAr(data []byte, withChecksums bool) (string, error) {
 	var header *ar.Header
 	var err error
 	//use "github.com/blakesmith/ar" package to read the ar archive
 	ar := ar.NewReader(bytes.NewReader(data))
 
 	return dumpArchiveGeneric(
-		"ar archive", ar,
+		"ar archive", withChecksums, ar,
 		func() (string, error) { //func gotoNextEntry
 			header, err = ar.Next()
 			if err != nil {
@@ -119,14 +119,14 @@ func DumpAr(data []byte) (string, error) {
 }
 
 //DumpCpio dumps cpio archives.
-func DumpCpio(data []byte) (string, error) {
+func DumpCpio(data []byte, withChecksums bool) (string, error) {
 	//use "github.com/surma/gocpio" package to read the ar archive
 	cr := cpio.NewReader(bytes.NewReader(data))
 	var header *cpio.Header
 	var err error
 
 	return dumpArchiveGeneric(
-		"cpio archive", cr,
+		"cpio archive", withChecksums, cr,
 		func() (string, error) { //func gotoNextEntry
 			header, err = cr.Next()
 			if err != nil {
@@ -173,7 +173,7 @@ func DumpCpio(data []byte) (string, error) {
 }
 
 //The generic parts of DumpTar, DumpAr and DumpCpio.
-func dumpArchiveGeneric(typeString string, reader io.Reader, gotoNextEntry func() (string, error), describeEntry func(idx int) (string, bool, bool, error)) (string, error) {
+func dumpArchiveGeneric(typeString string, withChecksums bool, reader io.Reader, gotoNextEntry func() (string, error), describeEntry func(idx int) (string, bool, bool, error)) (string, error) {
 	dumps := make(map[string]string)
 	var names []string
 
@@ -203,7 +203,7 @@ func dumpArchiveGeneric(typeString string, reader io.Reader, gotoNextEntry func(
 
 		//for regular files, include a dump of the contents
 		if isRegular {
-			dump, err := RecognizeAndDump(data)
+			dump, err := RecognizeAndDump(data, withChecksums)
 			if err != nil {
 				return "", err
 			}

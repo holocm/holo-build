@@ -57,6 +57,9 @@ func main() {
 	lcAll := C.int(0)
 	C.setlocale(lcAll, C.CString("C"))
 
+	//check arguments
+	withChecksums := len(os.Args) > 1 && os.Args[1] == "--with-checksums"
+
 	//read the input from stdin
 	data, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {
@@ -65,7 +68,7 @@ func main() {
 	}
 
 	//recognize the input, while deconstructing it recursively
-	dump, err := impl.RecognizeAndDump(data)
+	dump, err := impl.RecognizeAndDump(data, withChecksums)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)
