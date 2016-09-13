@@ -34,13 +34,13 @@ import (
 type Generator struct{}
 
 var archMap = map[common.Architecture]string{
-	common.Architecture_Any:     "any",
-	common.Architecture_I386:    "i686",
-	common.Architecture_X86_64:  "x86_64",
-	common.Architecture_ARMv5:   "arm",
-	common.Architecture_ARMv6h:  "armv6h",
-	common.Architecture_ARMv7h:  "armv7h",
-	common.Architecture_AArch64: "aarch64",
+	common.ArchitectureAny:     "any",
+	common.ArchitectureI386:    "i686",
+	common.ArchitectureX86_64:  "x86_64",
+	common.ArchitectureARMv5:   "arm",
+	common.ArchitectureARMv6h:  "armv6h",
+	common.ArchitectureARMv7h:  "armv7h",
+	common.ArchitectureAArch64: "aarch64",
 }
 
 //RecommendedFileName implements the common.Generator interface.

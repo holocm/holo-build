@@ -40,22 +40,22 @@ type Generator struct{}
 
 //Source for this data: `grep arch_canon /usr/lib/rpm/rpmrc`
 var archMap = map[common.Architecture]string{
-	common.Architecture_Any:     "noarch",
-	common.Architecture_I386:    "i686",
-	common.Architecture_X86_64:  "x86_64",
-	common.Architecture_ARMv5:   "armv5tl",
-	common.Architecture_ARMv6h:  "armv6hl",
-	common.Architecture_ARMv7h:  "armv7hl",
-	common.Architecture_AArch64: "aarch64",
+	common.ArchitectureAny:     "noarch",
+	common.ArchitectureI386:    "i686",
+	common.ArchitectureX86_64:  "x86_64",
+	common.ArchitectureARMv5:   "armv5tl",
+	common.ArchitectureARMv6h:  "armv6hl",
+	common.ArchitectureARMv7h:  "armv7hl",
+	common.ArchitectureAArch64: "aarch64",
 }
 var archIDMap = map[common.Architecture]uint16{
-	common.Architecture_Any:     0,
-	common.Architecture_I386:    1,
-	common.Architecture_X86_64:  1,
-	common.Architecture_ARMv5:   12,
-	common.Architecture_ARMv6h:  12,
-	common.Architecture_ARMv7h:  12,
-	common.Architecture_AArch64: 12,
+	common.ArchitectureAny:     0,
+	common.ArchitectureI386:    1,
+	common.ArchitectureX86_64:  1,
+	common.ArchitectureARMv5:   12,
+	common.ArchitectureARMv6h:  12,
+	common.ArchitectureARMv7h:  12,
+	common.ArchitectureAArch64: 12,
 }
 
 //Validate implements the common.Generator interface.

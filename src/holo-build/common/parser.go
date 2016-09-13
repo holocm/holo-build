@@ -114,23 +114,23 @@ var authorRx = regexp.MustCompile(`^[^<>]+\s+<[^<>\s]+>$`)
 
 //map supported input strings for architecture to internal architecture enum
 var archMap = map[string]Architecture{
-	"aarch64": Architecture_AArch64,
-	"all":     Architecture_Any, //from Debian
-	"amd64":   Architecture_X86_64,
-	"any":     Architecture_Any,     //from Arch Linux
-	"arm":     Architecture_ARMv5,   //from Arch Linux
-	"arm64":   Architecture_AArch64, //from Debian
-	"armel":   Architecture_ARMv5,   //from Debian
-	"armhf":   Architecture_ARMv7h,  //from Debian
-	"armv5tl": Architecture_ARMv5,   //from Mageia
-	"armv6h":  Architecture_ARMv6h,  //from Arch Linux
-	"armv6hl": Architecture_ARMv6h,  //from OpenSuse
-	"armv7h":  Architecture_ARMv7h,  //from Arch Linux
-	"armv7hl": Architecture_ARMv7h,  //from OpenSuse
-	"i386":    Architecture_I386,
-	"i686":    Architecture_I386,
-	"noarch":  Architecture_Any, //from RPM
-	"x86_64":  Architecture_X86_64,
+	"aarch64": ArchitectureAArch64,
+	"all":     ArchitectureAny, //from Debian
+	"amd64":   ArchitectureX86_64,
+	"any":     ArchitectureAny,     //from Arch Linux
+	"arm":     ArchitectureARMv5,   //from Arch Linux
+	"arm64":   ArchitectureAArch64, //from Debian
+	"armel":   ArchitectureARMv5,   //from Debian
+	"armhf":   ArchitectureARMv7h,  //from Debian
+	"armv5tl": ArchitectureARMv5,   //from Mageia
+	"armv6h":  ArchitectureARMv6h,  //from Arch Linux
+	"armv6hl": ArchitectureARMv6h,  //from OpenSuse
+	"armv7h":  ArchitectureARMv7h,  //from Arch Linux
+	"armv7hl": ArchitectureARMv7h,  //from OpenSuse
+	"i386":    ArchitectureI386,
+	"i686":    ArchitectureI386,
+	"noarch":  ArchitectureAny, //from RPM
+	"x86_64":  ArchitectureX86_64,
 }
 
 //ParsePackageDefinition parses a package definition from the given input.

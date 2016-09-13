@@ -33,13 +33,13 @@ import (
 type Generator struct{}
 
 var archMap = map[common.Architecture]string{
-	common.Architecture_Any:    "all",
-	common.Architecture_I386:   "i386",
-	common.Architecture_X86_64: "amd64",
-	common.Architecture_ARMv5:  "armel",
-	// common.Architecture_ARMv6h is not supported by Debian
-	common.Architecture_ARMv7h:  "armhf",
-	common.Architecture_AArch64: "arm64",
+	common.ArchitectureAny:    "all",
+	common.ArchitectureI386:   "i386",
+	common.ArchitectureX86_64: "amd64",
+	common.ArchitectureARMv5:  "armel",
+	// common.ArchitectureARMv6h is not supported by Debian
+	common.ArchitectureARMv7h:  "armhf",
+	common.ArchitectureAArch64: "arm64",
 }
 
 //RecommendedFileName implements the common.Generator interface.
