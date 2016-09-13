@@ -1,7 +1,7 @@
-(sha256:277c530798e1e516f0a52068ab27b49be5b768fea4c19c487f2743dcc9f405e5) ar archive
-    >> control.tar.gz is regular file (mode: 644, owner: 0, group: 0), content is (sha256:87bf06d33cfee2e12bd689cd6827813b09c1cef77c2b505152a55162c1e11b70) GZip-compressed (sha256:53520dd32bc222869691e13ea73000278d5ea06cd463c18191efdd10dddecdc1) POSIX tar archive
+ar archive
+    >> control.tar.gz is regular file (mode: 644, owner: 0, group: 0), content is GZip-compressed POSIX tar archive
         >> ./ is directory (mode: 755, owner: 0, group: 0)
-        >> ./control is regular file (mode: 644, owner: 0, group: 0), content is (sha256:37691c709050ea119753a1a8eb28c9c7a263720f07f1600302232315296411bd) data as shown below
+        >> ./control is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
             Package: prune-indentation
             Version: 1.0.0-1
             Architecture: all
@@ -11,40 +11,40 @@
             Priority: optional
             Description: prune-indentation
              prune-indentation
-        >> ./md5sums is regular file (mode: 644, owner: 0, group: 0), content is (sha256:cfe059a33df5cc894c0b2e8b2cec9c67302144a6a9b93449e9d7d989c7d713e6) data as shown below
+        >> ./md5sums is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
             19336acc49f29b8dedbcf7321f19f726  etc/no-indent.conf
             f46695565a30f8ccadafde741d7d8309  etc/noprune-explicitly.conf
             88a7007e9dca45b095e46fb3ff81f6ca  etc/noprune-inconsistent-indent.conf
             19336acc49f29b8dedbcf7321f19f726  etc/prune-indent-with-spaces.conf
             651828373f84935a002f1305ef961835  etc/prune-indent-with-tabs.conf
             be44856380472dc06370ce47f741bf89  etc/prune-mixed-indent.conf
-    >> data.tar.xz is regular file (mode: 644, owner: 0, group: 0), content is (sha256:811a7b0f1af1a464cb0ef2aa8cd387f39d4dc78a7f9f72da95e65083d734abd0) XZ-compressed (sha256:b68808d000efd1e880af812f7b5b846e2ae959e5f0df3e97ea6137ef99211e99) POSIX tar archive
+    >> data.tar.xz is regular file (mode: 644, owner: 0, group: 0), content is XZ-compressed POSIX tar archive
         >> ./ is directory (mode: 755, owner: 0, group: 0)
         >> ./etc/ is directory (mode: 755, owner: 0, group: 0)
-        >> ./etc/no-indent.conf is regular file (mode: 644, owner: 0, group: 0), content is (sha256:a2c199fd255e137c58a5324bae630d82fadf29b3b333b5f7598394188c7425af) data as shown below
+        >> ./etc/no-indent.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
             foo foo
                 qux qux
             bar bar
-        >> ./etc/noprune-explicitly.conf is regular file (mode: 644, owner: 0, group: 0), content is (sha256:eea38dc3968470f73064954bba3d10c2acb17d1704f36c6f4ac5d336dd2e6b8c) data as shown below
+        >> ./etc/noprune-explicitly.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
                 foo foo
                     qux qux
                 bar bar
-        >> ./etc/noprune-inconsistent-indent.conf is regular file (mode: 644, owner: 0, group: 0), content is (sha256:dc9439be21284a5bfe0fdcf64ef6b42e56051ef6ec67ad9d18cb08b64f01bafe) data as shown below
+        >> ./etc/noprune-inconsistent-indent.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
             	foo foo
             		qux qux
                 bar bar
-        >> ./etc/prune-indent-with-spaces.conf is regular file (mode: 644, owner: 0, group: 0), content is (sha256:a2c199fd255e137c58a5324bae630d82fadf29b3b333b5f7598394188c7425af) data as shown below
+        >> ./etc/prune-indent-with-spaces.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
             foo foo
                 qux qux
             bar bar
-        >> ./etc/prune-indent-with-tabs.conf is regular file (mode: 644, owner: 0, group: 0), content is (sha256:330d3011f398a4556b82c20a88adf36eb7032ec751fdb7b636e646169ca8ac59) data as shown below
+        >> ./etc/prune-indent-with-tabs.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
             foo foo
             	qux qux
             bar bar
-        >> ./etc/prune-mixed-indent.conf is regular file (mode: 644, owner: 0, group: 0), content is (sha256:b71a5b56654ed363c525a5fbb782d2d8b00563ca87c8a584caf0b28468fd5c6f) data as shown below
+        >> ./etc/prune-mixed-indent.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
             foo foo
               	qux
             bar bar
-    >> debian-binary is regular file (mode: 644, owner: 0, group: 0) at archive position 0, content is (sha256:d526eb4e878a23ef26ae190031b4efd2d58ed66789ac049ea3dbaf74c9df7402) data as shown below
+    >> debian-binary is regular file (mode: 644, owner: 0, group: 0) at archive position 0, content is data as shown below
         2.0
 

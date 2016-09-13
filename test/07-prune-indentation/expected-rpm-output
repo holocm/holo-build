@@ -1,4 +1,4 @@
-(sha256:71952e09e4be389c94070558e3543607e163421f2aaf9b59a0a6da0db333a0e2) RPM package
+RPM package
     >> lead section:
         RPM format version 3.0
         Type: 0 (0 = binary, 1 = source)
@@ -167,28 +167,28 @@
             string: lzma
         tag 1126 (PAYLOADFLAGS): length 1
             string: 5
-    >> payload: (sha256:3db6cd80aad4a6a6502c174c8ad836774a5ae9e3a5f6b227e3796a594dfcba66) LZMA-compressed (sha256:2e0500b2eaef79cff6d5d675dedc9786fdd4c9889f13a542daa0ff1a059e693e) cpio archive
-        >> ./etc/no-indent.conf is regular file (mode: 644, owner: 0, group: 0), content is (sha256:a2c199fd255e137c58a5324bae630d82fadf29b3b333b5f7598394188c7425af) data as shown below
+    >> payload: LZMA-compressed cpio archive
+        >> ./etc/no-indent.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
             foo foo
                 qux qux
             bar bar
-        >> ./etc/noprune-explicitly.conf is regular file (mode: 644, owner: 0, group: 0), content is (sha256:eea38dc3968470f73064954bba3d10c2acb17d1704f36c6f4ac5d336dd2e6b8c) data as shown below
+        >> ./etc/noprune-explicitly.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
                 foo foo
                     qux qux
                 bar bar
-        >> ./etc/noprune-inconsistent-indent.conf is regular file (mode: 644, owner: 0, group: 0), content is (sha256:dc9439be21284a5bfe0fdcf64ef6b42e56051ef6ec67ad9d18cb08b64f01bafe) data as shown below
+        >> ./etc/noprune-inconsistent-indent.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
             	foo foo
             		qux qux
                 bar bar
-        >> ./etc/prune-indent-with-spaces.conf is regular file (mode: 644, owner: 0, group: 0), content is (sha256:a2c199fd255e137c58a5324bae630d82fadf29b3b333b5f7598394188c7425af) data as shown below
+        >> ./etc/prune-indent-with-spaces.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
             foo foo
                 qux qux
             bar bar
-        >> ./etc/prune-indent-with-tabs.conf is regular file (mode: 644, owner: 0, group: 0), content is (sha256:330d3011f398a4556b82c20a88adf36eb7032ec751fdb7b636e646169ca8ac59) data as shown below
+        >> ./etc/prune-indent-with-tabs.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
             foo foo
             	qux qux
             bar bar
-        >> ./etc/prune-mixed-indent.conf is regular file (mode: 644, owner: 0, group: 0), content is (sha256:b71a5b56654ed363c525a5fbb782d2d8b00563ca87c8a584caf0b28468fd5c6f) data as shown below
+        >> ./etc/prune-mixed-indent.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
             foo foo
               	qux
             bar bar

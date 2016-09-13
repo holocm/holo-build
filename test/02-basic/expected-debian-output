@@ -1,7 +1,7 @@
-(sha256:3204cf367599c3c2470ac7aeb090e55342046bf6a6571c13c96cfb721409f6da) ar archive
-    >> control.tar.gz is regular file (mode: 644, owner: 0, group: 0), content is (sha256:c0fb92cf7cf3bf433879fe09c97e1327cd993b5d30dc5342ffd544aaecf6358c) GZip-compressed (sha256:266af4bbc3cfb7cf1d722178ef1b380d40840b29e330a36051705e942482b2be) POSIX tar archive
+ar archive
+    >> control.tar.gz is regular file (mode: 644, owner: 0, group: 0), content is GZip-compressed POSIX tar archive
         >> ./ is directory (mode: 755, owner: 0, group: 0)
-        >> ./control is regular file (mode: 644, owner: 0, group: 0), content is (sha256:872f4e379066cb8a50234b8829c2f4d5b168a8fc744f1d5f0b68292ce7e5c00d) data as shown below
+        >> ./control is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
             Package: foo
             Version: 1.0.2.3-1
             Architecture: all
@@ -15,11 +15,11 @@
             Replaces: foo-bar (<< 2.1)
             Description: my foo bar package
              my foo bar package
-        >> ./md5sums is regular file (mode: 644, owner: 0, group: 0), content is (sha256:3738204a521cf9b92087aebecc69b4e05834dd00f34315ee0856fbc48c4d2aee) data as shown below
+        >> ./md5sums is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
             d41d8cd98f00b204e9800998ecf8427e  etc/empty.toml
             5fb7ba7e8447a836e774b66155f5776a  etc/files/foo.conf
             15dfaf6e4d94d2bf189ea1bed8ea3cd0  etc/files/foo.toml
-        >> ./postinst is regular file (mode: 755, owner: 0, group: 0), content is (sha256:2b42f1c84ae099d59d3a0614e35d4a0419565dc3f49ad71df654d3fe7187a91c) data as shown below
+        >> ./postinst is regular file (mode: 755, owner: 0, group: 0), content is data as shown below
             #!/bin/bash
             chown foouser:foogroup /etc/files/foo.toml
             echo setup
@@ -27,22 +27,22 @@
             echo setup 1
             echo setup 2
             echo setup 2
-        >> ./postrm is regular file (mode: 755, owner: 0, group: 0), content is (sha256:8794a751d1b5de020795d3be95a552b993a8f7b08d4f3dbf34810392d11c90f7) data as shown below
+        >> ./postrm is regular file (mode: 755, owner: 0, group: 0), content is data as shown below
             #!/bin/bash
             echo cleanup
             echo cleanup
             echo cleanup 1
             echo cleanup 1
             echo cleanup 2
-    >> data.tar.xz is regular file (mode: 644, owner: 0, group: 0), content is (sha256:9ba5d2a5c66b155e3265c86b5223b80a2c98d521914133fff3fca90d11196431) XZ-compressed (sha256:f473f444140376b7da9a5a52d0c2fc2cf6135a6898f8ecaeb1ea2f0669ecb235) POSIX tar archive
+    >> data.tar.xz is regular file (mode: 644, owner: 0, group: 0), content is XZ-compressed POSIX tar archive
         >> ./ is directory (mode: 755, owner: 0, group: 0)
         >> ./etc/ is directory (mode: 755, owner: 0, group: 0)
         >> ./etc/empty.toml is regular file (mode: 644, owner: 0, group: 0), content is empty file
         >> ./etc/files/ is directory (mode: 755, owner: 0, group: 0)
-        >> ./etc/files/foo.conf is regular file (mode: 644, owner: 0, group: 0), content is (sha256:f13a55b71d31ec3df35f99d6b6332b23a4967312314456941aff922a7d354818) data as shown below
+        >> ./etc/files/foo.conf is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
             foo
             foo
-        >> ./etc/files/foo.toml is regular file (mode: 644, owner: 0, group: 0), content is (sha256:e2feaebbf4dc2af197ef61f4fc49198be96bea13113b78c26ab57e93d7332011) data as shown below
+        >> ./etc/files/foo.toml is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
             # This testcase covers all the basic syntax elements of package definitions.
             
             [package]
@@ -126,6 +126,6 @@
         >> ./var/lib/foo/ is directory (mode: 755, owner: 0, group: 0)
         >> ./var/lib/foo/bar/ is directory (mode: 700, owner: 4242, group: 2323)
         >> ./var/lib/foo/baz/ is directory (mode: 755, owner: 0, group: 0)
-    >> debian-binary is regular file (mode: 644, owner: 0, group: 0) at archive position 0, content is (sha256:d526eb4e878a23ef26ae190031b4efd2d58ed66789ac049ea3dbaf74c9df7402) data as shown below
+    >> debian-binary is regular file (mode: 644, owner: 0, group: 0) at archive position 0, content is data as shown below
         2.0
 
