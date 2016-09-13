@@ -112,8 +112,10 @@ var versionRx = regexp.MustCompile(`^(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*))*$`
 //the author information should be in the form "Firstname Lastname <email.address@server.tld>"
 var authorRx = regexp.MustCompile(`^[^<>]+\s+<[^<>\s]+>$`)
 
-//map supported input strings for architecture to internal architecture enum
+//map supported input strings for architecture to internal architecture enum;
+//the "BEGIN ARCH" and "END ARCH" comments are used by test/generate-architecture-tests.sh
 var archMap = map[string]Architecture{
+	//BEGIN ARCH
 	"aarch64": ArchitectureAArch64,
 	"all":     ArchitectureAny, //from Debian
 	"amd64":   ArchitectureX86_64,
@@ -131,6 +133,7 @@ var archMap = map[string]Architecture{
 	"i686":    ArchitectureI386,
 	"noarch":  ArchitectureAny, //from RPM
 	"x86_64":  ArchitectureX86_64,
+	//END ARCH
 }
 
 //ParsePackageDefinition parses a package definition from the given input.

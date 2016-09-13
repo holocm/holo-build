@@ -1,0 +1,19 @@
+ar archive
+    >> control.tar.gz is regular file (mode: 644, owner: 0, group: 0), content is GZip-compressed POSIX tar archive
+        >> ./ is directory (mode: 755, owner: 0, group: 0)
+        >> ./control is regular file (mode: 644, owner: 0, group: 0), content is data as shown below
+            Package: test-architecture-string
+            Version: 1.0-1
+            Architecture: amd64
+            Maintainer: Holo Build <holo.build@example.org>
+            Installed-Size: 4
+            Section: misc
+            Priority: optional
+            Description: test-architecture-string
+             test-architecture-string
+        >> ./md5sums is regular file (mode: 644, owner: 0, group: 0), content is empty file
+    >> data.tar.xz is regular file (mode: 644, owner: 0, group: 0), content is XZ-compressed POSIX tar archive
+        >> ./ is directory (mode: 755, owner: 0, group: 0)
+    >> debian-binary is regular file (mode: 644, owner: 0, group: 0) at archive position 0, content is data as shown below
+        2.0
+
