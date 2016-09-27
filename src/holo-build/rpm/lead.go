@@ -24,7 +24,7 @@ import (
 	"bytes"
 	"encoding/binary"
 
-	"../common"
+	"github.com/holocm/holo-build/src/holo-build/common"
 )
 
 //Lead represents the RPM lead (the first header of an RPM file, before the

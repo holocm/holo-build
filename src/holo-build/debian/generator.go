@@ -26,7 +26,7 @@ import (
 	"fmt"
 	"strings"
 
-	"../common"
+	"github.com/holocm/holo-build/src/holo-build/common"
 )
 
 //Generator is the common.Generator for Debian packages.

@@ -23,7 +23,7 @@ package rpm
 import (
 	"fmt"
 
-	"../common"
+	"github.com/holocm/holo-build/src/holo-build/common"
 )
 
 ////////////////////////////////////////////////////////////////////////////////

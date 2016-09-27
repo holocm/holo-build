@@ -27,7 +27,7 @@ import (
 	"sort"
 	"strings"
 
-	"../common"
+	"github.com/holocm/holo-build/src/holo-build/common"
 )
 
 //Renders package relations into .PKGINFO.

@@ -26,7 +26,7 @@ import (
 	"sort"
 	"strings"
 
-	"../common"
+	"github.com/holocm/holo-build/src/holo-build/common"
 )
 
 //Generator is the common.Generator for Pacman packages (as used by Arch Linux

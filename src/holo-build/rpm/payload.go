@@ -26,7 +26,7 @@ import (
 	"os"
 	"os/exec"
 
-	"../common"
+	"github.com/holocm/holo-build/src/holo-build/common"
 )
 
 //Payload represents the compressed CPIO payload of the package.

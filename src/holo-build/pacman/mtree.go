@@ -26,7 +26,7 @@ import (
 	"fmt"
 	"strings"
 
-	"../common"
+	"github.com/holocm/holo-build/src/holo-build/common"
 )
 
 //MakeMTREE generates the mtree metadata archive for this package.

@@ -25,7 +25,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"../common"
+	"github.com/holocm/holo-build/src/holo-build/common"
 )
 
 //MakeHeaderSection produces the header section of an RPM header.

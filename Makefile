@@ -2,12 +2,13 @@ default: prepare-build
 default: build/holo-build build/man/holo-build.8
 
 VERSION := $(shell ./util/find_version.sh)
-GOPATH := # unset (to force people to use golangvend)
+# force people to use golangvend
+GOPATH := $(CURDIR)/.gopath
 
 prepare-build:
 	@mkdir -p build/man
 build/holo-build: src/holo-build/main.go src/holo-build/*/*.go
-	go build --ldflags "-s -w -X _$(CURDIR)/src/holo-build/common.version=$(VERSION)" -o $@ $<
+	go build --ldflags "-s -w -X github.com/holocm/holo-build/src/holo-build/common.version=$(VERSION)" -o $@ github.com/holocm/holo-build/src/holo-build
 build/dump-package: src/dump-package/main.go src/dump-package/*/*.go
 	go build --ldflags "-s -w" -o $@ $<
 

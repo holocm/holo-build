@@ -28,10 +28,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"./common"
-	"./debian"
-	"./pacman"
-	"./rpm"
+	"github.com/holocm/holo-build/src/holo-build/common"
+	"github.com/holocm/holo-build/src/holo-build/debian"
+	"github.com/holocm/holo-build/src/holo-build/pacman"
+	"github.com/holocm/holo-build/src/holo-build/rpm"
 )
 
 type options struct {
