@@ -20,44 +20,17 @@
 
 package common
 
-import (
-	"fmt"
-	"io/ioutil"
-	"os"
-	"strings"
-)
+import "strings"
 
 //Build builds the package using the given Generator.
-func (pkg *Package) Build(generator Generator, printToStdout bool) error {
+func (pkg *Package) Build(generator Generator) ([]byte, error) {
 	//do magical Holo integration tasks
 	pkg.doMagicalHoloIntegration()
 	//move unmaterializable filesystem metadata into the setupScript
 	pkg.postponeUnmaterializableFSMetadata()
 
 	//build package
-	pkgBytes, err := generator.Build(pkg)
-	if err != nil {
-		return err
-	}
-
-	//write package, either to stdout or to the working directory
-	if printToStdout {
-		_, err := os.Stdout.Write(pkgBytes)
-		if err != nil {
-			return err
-		}
-	} else {
-		pkgFile := generator.RecommendedFileName(pkg)
-		if strings.ContainsAny(pkgFile, "/ \t\r\n") {
-			return fmt.Errorf("Unexpected filename generated: \"%s\"", pkgFile)
-		}
-		err := ioutil.WriteFile(pkgFile, pkgBytes, 0666)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return generator.Build(pkg)
 }
 
 func (pkg *Package) doMagicalHoloIntegration() {

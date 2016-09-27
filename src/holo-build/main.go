@@ -78,17 +78,22 @@ func main() {
 	}
 
 	//print filename instead of building package, if requested
+	pkgFile := generator.RecommendedFileName(pkg)
 	if opts.filenameOnly {
-		fmt.Println(generator.RecommendedFileName(pkg))
+		fmt.Println(pkgFile)
 		return
 	}
 
 	//build package
-	err := pkg.Build(generator, opts.printToStdout)
+	pkgBytes, err := pkg.Build(generator)
 	if err != nil {
-		showError(fmt.Errorf("cannot build %s: %s",
-			generator.RecommendedFileName(pkg), err.Error(),
-		))
+		showError(fmt.Errorf("cannot build %s: %s", pkgFile, err.Error()))
+		os.Exit(2)
+	}
+
+	err = pkg.WriteOutput(generator, pkgBytes, opts.printToStdout)
+	if err != nil {
+		showError(fmt.Errorf("cannot write %s: %s", pkgFile, err.Error()))
 		os.Exit(2)
 	}
 }
