@@ -4,13 +4,18 @@ default: build/holo-build build/man/holo-build.8
 VERSION := $(shell ./util/find_version.sh)
 # force people to use golangvend
 GOPATH := $(CURDIR)/.gopath
+# compatibility with Go 1.5
+GOCC := env GO15VENDOREXPERIMENT=1 go
+
+env:
+	@env
 
 prepare-build:
 	@mkdir -p build/man
 build/holo-build: src/holo-build/main.go src/holo-build/*/*.go
-	go build --ldflags "-s -w -X github.com/holocm/holo-build/src/holo-build/common.version=$(VERSION)" -o $@ github.com/holocm/holo-build/src/holo-build
+	$(GOCC) build --ldflags "-s -w -X github.com/holocm/holo-build/src/holo-build/common.version=$(VERSION)" -o $@ github.com/holocm/holo-build/src/holo-build
 build/dump-package: src/dump-package/main.go src/dump-package/*/*.go
-	go build --ldflags "-s -w" -o $@ github.com/holocm/holo-build/src/dump-package
+	$(GOCC) build --ldflags "-s -w" -o $@ github.com/holocm/holo-build/src/dump-package
 
 # manpages are generated using pod2man (which comes with Perl and therefore
 # should be readily available on almost every Unix system)
