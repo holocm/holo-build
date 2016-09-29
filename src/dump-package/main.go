@@ -27,7 +27,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"./impl"
+	"github.com/holocm/holo-build/src/dump-package/impl"
 )
 
 //This program is used by the holo-build tests to extract generated packages and render

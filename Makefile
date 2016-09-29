@@ -10,7 +10,7 @@ prepare-build:
 build/holo-build: src/holo-build/main.go src/holo-build/*/*.go
 	go build --ldflags "-s -w -X github.com/holocm/holo-build/src/holo-build/common.version=$(VERSION)" -o $@ github.com/holocm/holo-build/src/holo-build
 build/dump-package: src/dump-package/main.go src/dump-package/*/*.go
-	go build --ldflags "-s -w" -o $@ $<
+	go build --ldflags "-s -w" -o $@ github.com/holocm/holo-build/src/dump-package
 
 # manpages are generated using pod2man (which comes with Perl and therefore
 # should be readily available on almost every Unix system)
