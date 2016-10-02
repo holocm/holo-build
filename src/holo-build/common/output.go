@@ -21,19 +21,49 @@
 package common
 
 import (
+	"bytes"
+	"io"
 	"io/ioutil"
 	"os"
 )
 
 //WriteOutput will write the generated package to a file (or stdout) if
 //required.
-func (pkg *Package) WriteOutput(generator Generator, pkgBytes []byte, printToStdout bool) error {
+func (pkg *Package) WriteOutput(generator Generator, pkgBytes []byte, printToStdout bool) (wasWritten bool, e error) {
 	//print on stdout does not require additional logic
 	if printToStdout {
 		_, err := os.Stdout.Write(pkgBytes)
-		return err
+		return false, err
 	}
 
+	//only write file if content has changed
 	pkgFile := generator.RecommendedFileName(pkg)
-	return ioutil.WriteFile(pkgFile, pkgBytes, 0666)
+	fileHandle, err := os.Open(pkgFile)
+	if err == nil {
+		defer fileHandle.Close()
+		equal, err := readerEqualTo(fileHandle, pkgBytes)
+		if equal || err != nil {
+			return false, err
+		}
+	} else {
+		if !os.IsNotExist(err) {
+			return false, err
+		}
+	}
+
+	return true, ioutil.WriteFile(pkgFile, pkgBytes, 0666)
+}
+
+//Return true if the reader contains exactly the given byte string.
+func readerEqualTo(r io.Reader, str []byte) (bool, error) {
+	buf := make([]byte, len(str))
+	_, err := io.ReadFull(r, buf)
+	switch err {
+	case io.ErrUnexpectedEOF:
+		return false, nil
+	case nil:
+		return bytes.Equal(buf, str), nil
+	default:
+		return false, err
+	}
 }

@@ -91,11 +91,17 @@ func main() {
 		os.Exit(2)
 	}
 
-	err = pkg.WriteOutput(generator, pkgBytes, opts.printToStdout)
+	wasWritten, err := pkg.WriteOutput(generator, pkgBytes, opts.printToStdout)
 	if err != nil {
 		showError(fmt.Errorf("cannot write %s: %s", pkgFile, err.Error()))
 		os.Exit(2)
 	}
+
+	if wasWritten {
+		os.Exit(0)
+	}
+
+	//TODO: more stuff coming
 }
 
 func parseArgs() (result options, exit bool) {
