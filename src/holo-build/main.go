@@ -39,6 +39,7 @@ type options struct {
 	inputFileName string
 	printToStdout bool
 	filenameOnly  bool
+	withForce     bool
 }
 
 func main() {
@@ -91,7 +92,7 @@ func main() {
 		os.Exit(2)
 	}
 
-	wasWritten, err := pkg.WriteOutput(generator, pkgBytes, opts.printToStdout)
+	wasWritten, err := pkg.WriteOutput(generator, pkgBytes, opts.printToStdout, opts.withForce)
 	if err != nil {
 		showError(fmt.Errorf("cannot write %s: %s", pkgFile, err.Error()))
 		os.Exit(2)
@@ -119,6 +120,10 @@ func parseArgs() (result options, exit bool) {
 		case "--version":
 			fmt.Println(common.VersionString())
 			return opts, true
+		case "--force":
+			opts.withForce = true
+		case "--no-force":
+			opts.withForce = false
 		case "--stdout":
 			opts.printToStdout = true
 		case "--no-stdout":
@@ -171,9 +176,12 @@ func parseArgs() (result options, exit bool) {
 
 func printHelp() {
 	program := os.Args[0]
-	fmt.Printf("Usage: %s <options> <definitionfile> > packagefile\n\nOptions:\n", program)
+	fmt.Printf("Usage: %s <options> <definitionfile>\n\nOptions:\n", program)
+	fmt.Println("  --suggest-filename\tDo not compile package; just print the suggested filename")
 	fmt.Println("  --stdout\t\tPrint resulting package on stdout")
 	fmt.Println("  --no-stdout\t\tWrite resulting package to the working directory (default)")
+	fmt.Println("  --force\t\tOverwrite target file if it exists")
+	fmt.Println("  --no-force\t\tFail if target file exists (default)\n")
 	fmt.Println("  --debian\t\tBuild a Debian package")
 	fmt.Println("  --pacman\t\tBuild a pacman package")
 	fmt.Println("  --rpm\t\t\tBuild an RPM package\n")

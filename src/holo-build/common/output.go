@@ -22,6 +22,7 @@ package common
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"io/ioutil"
 	"os"
@@ -29,7 +30,7 @@ import (
 
 //WriteOutput will write the generated package to a file (or stdout) if
 //required.
-func (pkg *Package) WriteOutput(generator Generator, pkgBytes []byte, printToStdout bool) (wasWritten bool, e error) {
+func (pkg *Package) WriteOutput(generator Generator, pkgBytes []byte, printToStdout, withForce bool) (wasWritten bool, e error) {
 	//print on stdout does not require additional logic
 	if printToStdout {
 		_, err := os.Stdout.Write(pkgBytes)
@@ -46,7 +47,11 @@ func (pkg *Package) WriteOutput(generator Generator, pkgBytes []byte, printToStd
 			return false, err
 		}
 	} else {
-		if !os.IsNotExist(err) {
+		if os.IsNotExist(err) {
+			if !withForce {
+				return false, errors.New("file exists already (use --force to overwrite)")
+			}
+		} else {
 			return false, err
 		}
 	}

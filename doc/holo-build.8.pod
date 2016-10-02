@@ -70,6 +70,17 @@ the naming convention for the corresponding output package format. If
 B<--stdout> is given, the package will be printed directly to standard output
 instead.
 
+This switch has no effect when C<--suggest-filename> is in effect.
+
+=item B<--force>/B<--no-force>
+
+By default, C<holo-build> will fail if the target file already exists. This
+behavior protects against the user forgetting to increase the version when
+editing the package description. With C<--force>, the target file will be
+overwritten when it exists.
+
+This switch has no effect when C<--stdout> or C<--suggest-filename> is in effect.
+
 =item B<--pacman>
 
 Generate a C<pacman> package (suitable for Arch Linux and derivatives). This is
