@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-# This script generates testcases for all architecture strings that are
-# recognized by holo-build. It does not generate the expected-* files, though.
-# These shall be checked manually.
+# This script generates compiler testcases for all architecture strings that
+# are recognized by holo-build. It does not generate the expected-* files,
+# though. These shall be checked manually.
 #
 # The testcases are important to verify that the architecture strings are
 # correctly translated by each generator to those recognized by the target
@@ -21,7 +21,7 @@ set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 
 sed -n '/^\s*\/\/BEGIN ARCH$/,/^\s*\/\/END ARCH$/{/:/p}' src/holo-build/common/parser.go | cut -d\" -f2 | while read ARCH_STRING; do
-    TEST_DIR="test/architecture-${ARCH_STRING}"
+    TEST_DIR="test/compiler/architecture-${ARCH_STRING}"
     mkdir -p "${TEST_DIR}"
     echo "${TEMPLATE/ARCH/${ARCH_STRING}}" > "${TEST_DIR}/input.toml"
 done
