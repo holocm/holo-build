@@ -15,9 +15,14 @@ run_testcase() {
     fi
     # set cwd!
     cd "$TESTCASE_DIR"
+    # reset state of testcase directory
+    git clean -dXfq .
 
     # run test
-    ./run.sh > stdout 2> stderr
+    env INPUT_TOML=../input.toml \
+        HOLO_BUILD=../../../build/holo-build \
+        DUMP_PACKAGE=../../../build/dump-package \
+        ./run.sh > stdout 2> stderr
 
     # strip ANSI colors from error output
     sed -i 's/\x1b\[[0-9;]*m//g' stderr

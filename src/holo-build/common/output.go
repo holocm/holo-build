@@ -22,7 +22,6 @@ package common
 
 import (
 	"bytes"
-	"errors"
 	"io"
 	"io/ioutil"
 	"os"
@@ -39,20 +38,18 @@ func (pkg *Package) WriteOutput(generator Generator, pkgBytes []byte, printToStd
 
 	//only write file if content has changed
 	pkgFile := generator.RecommendedFileName(pkg)
-	fileHandle, err := os.Open(pkgFile)
-	if err == nil {
-		defer fileHandle.Close()
-		equal, err := readerEqualTo(fileHandle, pkgBytes)
-		if equal || err != nil {
-			return false, err
-		}
-	} else {
-		if os.IsNotExist(err) {
-			if !withForce {
-				return false, errors.New("file exists already (use --force to overwrite)")
+	if !withForce {
+		fileHandle, err := os.Open(pkgFile)
+		if err == nil {
+			defer fileHandle.Close()
+			equal, err := readerEqualTo(fileHandle, pkgBytes)
+			if equal || err != nil {
+				return false, err
 			}
 		} else {
-			return false, err
+			if !os.IsNotExist(err) {
+				return false, err
+			}
 		}
 	}
 
