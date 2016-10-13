@@ -27,6 +27,7 @@ build/man/%: doc/%.pod
 test: check # just a synonym
 check: default build/dump-package
 	@bash test/compiler/run_tests.sh
+	@bash test/interface/run_tests.sh
 
 install: default src/holo-build.sh util/autocomplete.bash util/autocomplete.zsh
 	install -D -m 0755 src/holo-build.sh      "$(DESTDIR)/usr/bin/holo-build"

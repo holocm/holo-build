@@ -1,5 +1,4 @@
-Test suite for `holo-build`
-===========================
+# Compiler test suite for `holo-build`
 
 The `holo-build` binary is tested using test package definitions, which are
 built into packages with all available generators. The resulting packages are
@@ -26,7 +25,7 @@ by ascending test complexity (so that when something breaks, it breaks in the
 easy tests first and you'll have an easier time figuring out the bug). Each
 test case looks like this:
 
-    test/holo-build/                     <-- this directory
+    test/compiler/                       <-- this directory
         01-minimal/                      <-- the directory for the test setup
             input.toml                   <-- package definition file
             suggested-filenames          <-- output of `holo-build --suggest-filename` for each generator
@@ -41,29 +40,27 @@ generator. `holo-build` is called as
 
     holo-build --$g --stdout < input.toml 2> $g-stderr-output | dump-package > $g-output
 
-Running the tests
------------------
+## Running the tests
 
 To run all the tests, use the make targets `test` or `check` in the top-level
-directory or say
+directory. To run just the compiler tests, do:
 
-    bash test/run_tests.sh
+    bash test/compiler/run_tests.sh
 
-To run just some tests, give the test names (the directory names below the
+To run just some compiler tests, give the test names (the directory names below the
 `test/holo-build` directory) as arguments:
 
-    bash test/run_tests.sh 01-minimal
+    bash test/compiler/run_tests.sh 01-minimal
 
 The test will usually output just a progress display (one line per test case).
 If a test fails, the failing parts will be printed on the command line. To flag
 test failure when run in Continuous Integration setups, `run_tests.sh` will
 exit with non-zero status when one or more test cases fail.
 
-Writing new testcases
----------------------
+## Writing new testcases
 
 To build a new testcase, first create the test directory and its `input.toml`.
-THis file should also contain an explanation of what the testcase checks.
+This file should also contain an explanation of what the testcase checks.
 
 Now run your testcase. It will obviously fail since all the files that it
 compares its build results to are missing. But we can use these build results
@@ -75,4 +72,4 @@ as basis for the missing files. Copy
 for each generator `$g`. And the most important step of them all, before
 checking them into source control, verify carefully that these files really
 contain the *expected* results of the testcase run. When that is done, your
-testcase should now pass.  Or not, if the code needs fixing. ;)
+testcase should now pass. Or not, if the code needs fixing. ;)

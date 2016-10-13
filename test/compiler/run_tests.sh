@@ -4,8 +4,8 @@
 TESTS_DIR="$(readlink -f "$(dirname $0)")"
 
 run_testcase() {
-    local TEST_NAME=$1
-    echo ">> Running testcase $TEST_NAME..."
+    local TEST_NAME="$1"
+    echo ">> Running compiler testcase $TEST_NAME..."
 
     # determine testcase location
     local TESTCASE_DIR="$TESTS_DIR/$TEST_NAME"
@@ -25,13 +25,13 @@ run_testcase() {
     for GENERATOR in debian pacman rpm; do
         # check suggested filename
         (
-            FILENAME="$(../../build/holo-build --suggest-filename --$GENERATOR < input.toml 2>/dev/null)"
+            FILENAME="$(../../../build/holo-build --suggest-filename --$GENERATOR < input.toml 2>/dev/null)"
             echo "$GENERATOR: ${FILENAME:-no output}"
         ) >> suggested-filenames
 
         # run holo-build, decompose result with dump-package (see src/dump-package/)
-        ../../build/holo-build --stdout --$GENERATOR < input.toml 2> $GENERATOR-error-output \
-            | ../../build/dump-package &> $GENERATOR-output
+        ../../../build/holo-build --stdout --$GENERATOR < input.toml 2> $GENERATOR-error-output \
+            | ../../../build/dump-package &> $GENERATOR-output
 
         # strip ANSI colors from error output
         sed 's/\x1b\[[0-9;]*m//g' < $GENERATOR-error-output > $GENERATOR-error-output.new
@@ -72,8 +72,8 @@ else
 fi
 
 if [ $TEST_EXIT_CODE = 0 ]; then
-    echo ">> All tests for holo-build completed successfully."
+    echo ">> All compiler tests for holo-build completed successfully."
 else
-    echo "!! Some or all tests for holo-build failed. Please check the output above for more information."
+    echo "!! Some or all compiler tests for holo-build failed. Please check the output above for more information."
 fi
 exit $TEST_EXIT_CODE
