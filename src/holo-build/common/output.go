@@ -28,16 +28,19 @@ import (
 )
 
 //WriteOutput will write the generated package to a file (or stdout) if
-//required.
-func (pkg *Package) WriteOutput(generator Generator, pkgBytes []byte, printToStdout, withForce bool) (wasWritten bool, e error) {
+//required. If the given file name is "-", stdout will be written to.
+//If the given file name is empty, a name is chosen automatically.
+func (pkg *Package) WriteOutput(generator Generator, pkgBytes []byte, pkgFile string, withForce bool) (wasWritten bool, e error) {
 	//print on stdout does not require additional logic
-	if printToStdout {
+	if pkgFile == "-" {
 		_, err := os.Stdout.Write(pkgBytes)
 		return false, err
 	}
 
 	//only write file if content has changed
-	pkgFile := generator.RecommendedFileName(pkg)
+	if pkgFile == "" {
+		pkgFile = generator.RecommendedFileName(pkg)
+	}
 	if !withForce {
 		fileHandle, err := os.Open(pkgFile)
 		if err == nil {

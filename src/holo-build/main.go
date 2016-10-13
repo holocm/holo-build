@@ -35,11 +35,11 @@ import (
 )
 
 type options struct {
-	generator     common.Generator
-	inputFileName string
-	printToStdout bool
-	filenameOnly  bool
-	withForce     bool
+	generator      common.Generator
+	inputFileName  string //or "" for stdin
+	outputFileName string //or "" for automatic or "-" for stdout
+	filenameOnly   bool
+	withForce      bool
 }
 
 func main() {
@@ -92,7 +92,7 @@ func main() {
 		os.Exit(2)
 	}
 
-	wasWritten, err := pkg.WriteOutput(generator, pkgBytes, opts.printToStdout, opts.withForce)
+	wasWritten, err := pkg.WriteOutput(generator, pkgBytes, opts.outputFileName, opts.withForce)
 	if err != nil {
 		showError(fmt.Errorf("cannot write %s: %s", pkgFile, err.Error()))
 		os.Exit(2)
@@ -125,9 +125,11 @@ func parseArgs() (result options, exit bool) {
 		case "--no-force":
 			opts.withForce = false
 		case "--stdout":
-			opts.printToStdout = true
+			opts.outputFileName = "-"
 		case "--no-stdout":
-			opts.printToStdout = false
+			if opts.outputFileName == "-" {
+				opts.outputFileName = ""
+			}
 		case "--suggest-filename":
 			opts.filenameOnly = true
 		case "--reproducible", "--no-reproducible":
