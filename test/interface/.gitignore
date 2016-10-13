@@ -1,4 +1,4 @@
 # artifacts from successful testcases
 stderr
 stdout
-package_1.0-1_all.deb
+*.deb
