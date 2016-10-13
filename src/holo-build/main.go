@@ -98,7 +98,7 @@ func main() {
 		os.Exit(2)
 	}
 
-	if wasWritten {
+	if !wasWritten {
 		os.Exit(0)
 	}
 
