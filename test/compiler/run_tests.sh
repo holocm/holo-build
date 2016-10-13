@@ -30,7 +30,7 @@ run_testcase() {
         ) >> suggested-filenames
 
         # run holo-build, decompose result with dump-package (see src/dump-package/)
-        ../../../build/holo-build --stdout --$GENERATOR < input.toml 2> $GENERATOR-error-output \
+        ../../../build/holo-build -o - --format=$GENERATOR < input.toml 2> $GENERATOR-error-output \
             | ../../../build/dump-package &> $GENERATOR-output
 
         # strip ANSI colors from error output

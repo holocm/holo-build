@@ -26,12 +26,12 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/holocm/holo-build/src/holo-build/common"
 	"github.com/holocm/holo-build/src/holo-build/debian"
 	"github.com/holocm/holo-build/src/holo-build/pacman"
 	"github.com/holocm/holo-build/src/holo-build/rpm"
+	"github.com/ogier/pflag"
 )
 
 type options struct {
@@ -43,10 +43,7 @@ type options struct {
 }
 
 func main() {
-	opts, earlyExit := parseArgs()
-	if earlyExit {
-		return
-	}
+	opts := parseArgs()
 	generator := opts.generator
 
 	//read package definition from stdin
@@ -105,75 +102,109 @@ func main() {
 	//TODO: more stuff coming
 }
 
-func parseArgs() (result options, exit bool) {
-	//default settings
-	var opts options
+func parseArgs() options {
+	//TODO: remove everything that is flagged as deprecated
+	withForce := pflag.BoolP("force", "f", false, "Overwrite existing output file")
+	formatString := pflag.String("format", "", "Output file format (\"debian\", \"pacman\" or \"rpm\")")
+	formatDebian := pflag.Bool("debian", false, "Generate Debian package (deprecated, use \"--format debian\" instead)")
+	formatPacman := pflag.Bool("pacman", false, "Generate Pacman package (deprecated, use \"--format pacman\" instead)")
+	formatRPM := pflag.Bool("rpm", false, "Generate RPM package (deprecated, use \"--format rpm\" instead)")
+	outputFileName := pflag.StringP("output", "o", "", "Output file name (or \"-\" for standard output)")
+	outputStdout := pflag.Bool("stdout", false, "Write package to standard output (deprecated, use \"-o -\" instead)")
+	noOutputStdout := pflag.Bool("no-stdout", false, "Revert --stdout (deprecated, use \"-o\" instead)")
+	reproducible := pflag.Bool("reproducible", false, "Deprecated, no effect")
+	noReproducible := pflag.Bool("no-reproducible", false, "Deprecated, no effect")
+	suggestFileName := pflag.Bool("suggest-filename", false, "Only print the suggested filename for this package")
+	showVersion := pflag.BoolP("version", "V", false, "Show program version")
 
-	//parse arguments
-	args := os.Args[1:]
-	hasArgsError := false
-	for _, arg := range args {
-		switch arg {
-		case "--help":
-			printHelp()
-			return opts, true
-		case "--version":
-			fmt.Println(common.VersionString())
-			return opts, true
-		case "--force":
-			opts.withForce = true
-		case "--no-force":
-			opts.withForce = false
-		case "--stdout":
-			opts.outputFileName = "-"
-		case "--no-stdout":
-			if opts.outputFileName == "-" {
-				opts.outputFileName = ""
-			}
-		case "--suggest-filename":
-			opts.filenameOnly = true
-		case "--reproducible", "--no-reproducible":
-			//no effect anymore - TODO: remove in 2.0
-		case "--pacman":
-			if opts.generator != nil {
-				showError(errors.New("Multiple package formats specified."))
-				hasArgsError = true
-			}
-			opts.generator = &pacman.Generator{}
-		case "--debian":
-			if opts.generator != nil {
-				showError(errors.New("Multiple package formats specified."))
-				hasArgsError = true
-			}
-			opts.generator = &debian.Generator{}
-		case "--rpm":
-			if opts.generator != nil {
-				showError(errors.New("Multiple package formats specified."))
-				hasArgsError = true
-			}
-			opts.generator = &rpm.Generator{}
-		//NOTE: When adding new package formats here, don't forget to update
-		//holo-build.sh accordingly!
-		default:
-			//the first positional argument is used as input file name
-			if opts.inputFileName == "" && !strings.HasPrefix(arg, "-") {
-				opts.inputFileName = arg
-			} else {
-				showError(fmt.Errorf("Unrecognized argument: '%s'", arg))
-				hasArgsError = true
-			}
+	pflag.Parse()
+
+	if *noOutputStdout {
+		showError(errors.New("--no-stdout is deprecated"))
+		*outputStdout = false
+	}
+	if *noReproducible {
+		showError(errors.New("--no-reproducible is deprecated and can safely be removed"))
+		*reproducible = false
+	}
+
+	if *showVersion {
+		fmt.Println(common.VersionString())
+		os.Exit(0)
+	}
+
+	if *reproducible {
+		showError(errors.New("--reproducible is deprecated and can safely be removed"))
+	}
+
+	var hasArgsError bool
+	if *outputStdout {
+		showError(errors.New("--output is deprecated - use \"-o -\" instead"))
+		if *outputFileName != "" {
+			showError(errors.New("--output and --stdout may not be used at the same time"))
+			hasArgsError = true
 		}
-	}
-	if hasArgsError {
-		printHelp()
-		os.Exit(1)
-	}
-	if opts.generator == nil {
-		showError(errors.New("No package format specified. Use the wrapper script at /usr/bin/holo-build to autoselect a package format."))
-		os.Exit(1)
+		*outputFileName = "-"
 	}
 
-	return opts, false
+	switch {
+	case *formatDebian:
+		showError(errors.New("--debian is deprecated - use \"--format debian\" instead"))
+		if *formatString != "" {
+			showError(errors.New("--debian and --format may not be used at the same time"))
+			hasArgsError = true
+		}
+		*formatString = "debian"
+	case *formatPacman:
+		showError(errors.New("--pacman is deprecated - use \"--format pacman\" instead"))
+		if *formatString != "" {
+			showError(errors.New("--pacman and --format may not be used at the same time"))
+			hasArgsError = true
+		}
+		*formatString = "pacman"
+	case *formatRPM:
+		showError(errors.New("--rpm is deprecated - use \"--format rpm\" instead"))
+		if *formatString != "" {
+			showError(errors.New("--rpm and --format may not be used at the same time"))
+			hasArgsError = true
+		}
+		*formatString = "rpm"
+	}
+
+	var generator common.Generator
+	switch *formatString {
+	case "debian":
+		generator = &debian.Generator{}
+	case "pacman":
+		generator = &pacman.Generator{}
+	case "rpm":
+		generator = &rpm.Generator{}
+	case "":
+		showError(errors.New("No package format specified. Use the wrapper script at /usr/bin/holo-build to autoselect a package format."))
+		hasArgsError = true
+	}
+
+	var inputFileName string
+	switch len(pflag.Args()) {
+	case 0:
+		inputFileName = "" //use stdin
+	case 1:
+		inputFileName = pflag.Arg(0)
+	default:
+		showError(errors.New("Multiple input files specified."))
+		hasArgsError = true
+	}
+
+	if hasArgsError {
+		os.Exit(1)
+	}
+	return options{
+		generator:      generator,
+		inputFileName:  inputFileName,
+		outputFileName: *outputFileName,
+		filenameOnly:   *suggestFileName,
+		withForce:      *withForce,
+	}
 }
 
 func printHelp() {

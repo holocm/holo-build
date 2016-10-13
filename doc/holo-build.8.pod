@@ -63,14 +63,11 @@ is read from standard input instead.
 
 =over 4
 
-=item B<--stdout>/B<--no-stdout>
+=item B<--output> I<filename>
 
-By default, the resulting package will be placed in the working directory using
-the naming convention for the corresponding output package format. If
-B<--stdout> is given, the package will be printed directly to standard output
-instead.
-
-This switch has no effect when C<--suggest-filename> is in effect.
+Write the resulting package to I<filename>. If not given, write the package into
+the working directory using the naming convention for the corresponding output
+package format. If the I<filename> is C<->, write the package to standard output.
 
 =item B<--force>/B<--no-force>
 
@@ -79,24 +76,15 @@ behavior protects against the user forgetting to increase the version when
 editing the package description. With C<--force>, the target file will be
 overwritten when it exists.
 
-This switch has no effect when C<--stdout> or C<--suggest-filename> is in effect.
+This switch has no effect when C<--output -> or C<--suggest-filename> is in effect.
 
-=item B<--pacman>
+=item B<--format> I<format>
 
-Generate a C<pacman> package (suitable for Arch Linux and derivatives). This is
-the default under suitable distributions.
+Generate a package of the specified format, instead of the default package
+format for the current distribution. Valid values are C<debian>, C<pacman> and
+C<rpm>.
 
-=item B<--debian>
-
-Generate a Debian package (suitable for Debian and derivatives). This is
-the default under suitable distributions.
-
-=item B<--rpm> (experimental)
-
-Generate an LSB-compliant RPM package (suitable for Redhat, Fedora, Suse,
-Mageia and derivatives). This is the default under suitable distributions.
-
-B<WARNING:> The RPM generator is considered experimental because RPM is
+B<WARNING:> RPM generation is considered experimental because RPM is
 underdocumented and a bizarrely baroque format to begin with.
 
 =item B<--suggest-filename>
@@ -113,19 +101,14 @@ targeted distribution:
     name = "foo"
     version = "1.0"
 
-    $ holo-build --suggest-filename --debian < input.toml
+    $ holo-build --suggest-filename --format debian < input.toml
     foo_1.0-1_any.deb
-    $ holo-build --suggest-filename --pacman < input.toml
+    $ holo-build --suggest-filename --format pacman < input.toml
     foo-1.0-1-any.pkg.tar.xz
 
 This option can be used when auto-generating Makefiles, where the output
 filename needs to be known before C<holo-build> runs (for purposes of dependency
 resolution).
-
-=item B<--reproducible> (deprecated)
-
-This switch does not have any effect anymore and will be removed in the next
-major version. Packages are now always generated reproducibly.
 
 =item B<--help>
 
@@ -134,6 +117,30 @@ Print out usage information.
 =item B<--version>
 
 Print out holo-build's version string.
+
+=back
+
+=head2 Deprecated options
+
+These switches will be removed in the next major version.
+
+=over 4
+
+=item B<--debian>
+
+Use C<--format debian> instead.
+
+=item B<--pacman>
+
+Use C<--format pacman> instead.
+
+=item B<--reproducible>
+
+No effect. All packages are now built reproducibly.
+
+=item B<--rpm>
+
+Use C<--format rpm> instead.
 
 =back
 
