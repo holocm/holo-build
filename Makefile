@@ -3,9 +3,7 @@ default: build/holo-build build/man/holo-build.8
 
 VERSION := $(shell ./util/find_version.sh)
 # force people to use golangvend
-GOPATH := $(CURDIR)/.gopath
-# compatibility with Go 1.5
-GOCC := env GO15VENDOREXPERIMENT=1 go
+GOCC := env GOPATH=$(CURDIR)/.gopath go
 
 env:
 	@env
