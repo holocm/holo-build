@@ -142,6 +142,10 @@ No effect. All packages are now built reproducibly.
 
 Use C<--format rpm> instead.
 
+=item B<--stdout>
+
+Use C<--output -> instead.
+
 =back
 
 =head1 PACKAGE DESCRIPTION FORMAT
