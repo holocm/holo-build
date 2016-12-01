@@ -207,21 +207,6 @@ func parseArgs() options {
 	}
 }
 
-func printHelp() {
-	program := os.Args[0]
-	fmt.Printf("Usage: %s <options> <definitionfile>\n\nOptions:\n", program)
-	fmt.Println("  --suggest-filename\tDo not compile package; just print the suggested filename")
-	fmt.Println("  --stdout\t\tPrint resulting package on stdout")
-	fmt.Println("  --no-stdout\t\tWrite resulting package to the working directory (default)")
-	fmt.Println("  --force\t\tOverwrite target file if it exists")
-	fmt.Println("  --no-force\t\tFail if target file exists (default)\n")
-	fmt.Println("  --debian\t\tBuild a Debian package")
-	fmt.Println("  --pacman\t\tBuild a pacman package")
-	fmt.Println("  --rpm\t\t\tBuild an RPM package\n")
-	fmt.Println("If no options are given, the package format for the current distribution is selected.\n")
-	fmt.Println("If the definition file is not given as an argument, it will be read from standard input.\n")
-}
-
 func showError(err error) {
 	fmt.Fprintf(os.Stderr, "\x1b[31m\x1b[1m!!\x1b[0m %s\n", err.Error())
 }
