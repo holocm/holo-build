@@ -21,7 +21,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -85,13 +84,13 @@ func main() {
 	//build package
 	pkgBytes, err := pkg.Build(generator)
 	if err != nil {
-		showError(fmt.Errorf("cannot build %s: %s", pkgFile, err.Error()))
+		showErrorMsg("cannot build %s: %s", pkgFile, err.Error())
 		os.Exit(2)
 	}
 
 	wasWritten, err := pkg.WriteOutput(generator, pkgBytes, opts.outputFileName, opts.withForce)
 	if err != nil {
-		showError(fmt.Errorf("cannot write %s: %s", pkgFile, err.Error()))
+		showErrorMsg("cannot write %s: %s", pkgFile, err.Error())
 		os.Exit(2)
 	}
 
@@ -120,11 +119,11 @@ func parseArgs() options {
 	pflag.Parse()
 
 	if *noOutputStdout {
-		showError(errors.New("--no-stdout is deprecated - use \"--output ''\" instead"))
+		showErrorMsg("--no-stdout is deprecated - use \"--output ''\" instead")
 		*outputStdout = false
 	}
 	if *noReproducible {
-		showError(errors.New("--no-reproducible is deprecated and can safely be removed"))
+		showErrorMsg("--no-reproducible is deprecated and can safely be removed")
 		*reproducible = false
 	}
 
@@ -134,14 +133,14 @@ func parseArgs() options {
 	}
 
 	if *reproducible {
-		showError(errors.New("--reproducible is deprecated and can safely be removed"))
+		showErrorMsg("--reproducible is deprecated and can safely be removed")
 	}
 
 	var hasArgsError bool
 	if *outputStdout {
-		showError(errors.New("--stdout is deprecated - use \"--output -\" instead"))
+		showErrorMsg("--stdout is deprecated - use \"--output -\" instead")
 		if *outputFileName != "" {
-			showError(errors.New("--output and --stdout may not be used at the same time"))
+			showErrorMsg("--output and --stdout may not be used at the same time")
 			hasArgsError = true
 		}
 		*outputFileName = "-"
@@ -149,23 +148,23 @@ func parseArgs() options {
 
 	switch {
 	case *formatDebian:
-		showError(errors.New("--debian is deprecated - use \"--format debian\" instead"))
+		showErrorMsg("--debian is deprecated - use \"--format debian\" instead")
 		if *formatString != "" {
-			showError(errors.New("--debian and --format may not be used at the same time"))
+			showErrorMsg("--debian and --format may not be used at the same time")
 			hasArgsError = true
 		}
 		*formatString = "debian"
 	case *formatPacman:
-		showError(errors.New("--pacman is deprecated - use \"--format pacman\" instead"))
+		showErrorMsg("--pacman is deprecated - use \"--format pacman\" instead")
 		if *formatString != "" {
-			showError(errors.New("--pacman and --format may not be used at the same time"))
+			showErrorMsg("--pacman and --format may not be used at the same time")
 			hasArgsError = true
 		}
 		*formatString = "pacman"
 	case *formatRPM:
-		showError(errors.New("--rpm is deprecated - use \"--format rpm\" instead"))
+		showErrorMsg("--rpm is deprecated - use \"--format rpm\" instead")
 		if *formatString != "" {
-			showError(errors.New("--rpm and --format may not be used at the same time"))
+			showErrorMsg("--rpm and --format may not be used at the same time")
 			hasArgsError = true
 		}
 		*formatString = "rpm"
@@ -180,10 +179,10 @@ func parseArgs() options {
 	case "rpm":
 		generator = &rpm.Generator{}
 	case "":
-		showError(errors.New("No package format specified. Use the wrapper script at /usr/bin/holo-build to autoselect a package format."))
+		showErrorMsg("No package format specified. Use the wrapper script at /usr/bin/holo-build to autoselect a package format.")
 		hasArgsError = true
 	default:
-		showError(fmt.Errorf("Invalid package format: '%s'", *formatString))
+		showErrorMsg("Invalid package format: '%s'", *formatString)
 		hasArgsError = true
 	}
 
@@ -194,7 +193,7 @@ func parseArgs() options {
 	case 1:
 		inputFileName = pflag.Arg(0)
 	default:
-		showError(errors.New("Multiple input files specified."))
+		showErrorMsg("Multiple input files specified.")
 		hasArgsError = true
 	}
 
@@ -211,5 +210,12 @@ func parseArgs() options {
 }
 
 func showError(err error) {
-	fmt.Fprintf(os.Stderr, "\x1b[31m\x1b[1m!!\x1b[0m %s\n", err.Error())
+	showErrorMsg(err.Error())
+}
+
+func showErrorMsg(msg string, args ...interface{}) {
+	if len(args) > 0 {
+		msg = fmt.Sprintf(msg, args...)
+	}
+	fmt.Fprintf(os.Stderr, "\x1b[31m\x1b[1m!!\x1b[0m %s\n", msg)
 }
