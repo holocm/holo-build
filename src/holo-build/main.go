@@ -182,6 +182,9 @@ func parseArgs() options {
 	case "":
 		showError(errors.New("No package format specified. Use the wrapper script at /usr/bin/holo-build to autoselect a package format."))
 		hasArgsError = true
+	default:
+		showError(fmt.Errorf("Invalid package format: '%s'", *formatString))
+		hasArgsError = true
 	}
 
 	var inputFileName string
