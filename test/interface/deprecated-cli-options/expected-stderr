@@ -1,0 +1,19 @@
+building with --reproducible
+!! --reproducible is deprecated and can safely be removed
+building with --no-reproducible
+!! --no-reproducible is deprecated and can safely be removed
+building with --debian
+!! --debian is deprecated - use "--format debian" instead
+building with --format=debian
+building with --rpm
+!! --rpm is deprecated - use "--format rpm" instead
+building with --format=rpm
+building with --pacman
+!! --pacman is deprecated - use "--format pacman" instead
+building with --format=pacman
+building with --stdout
+!! --stdout is deprecated - use "--output -" instead
+building with --output=-
+building with --no-stdout
+!! --no-stdout is deprecated - use "--output ''" instead
+building with --output=""

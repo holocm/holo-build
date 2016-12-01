@@ -120,7 +120,7 @@ func parseArgs() options {
 	pflag.Parse()
 
 	if *noOutputStdout {
-		showError(errors.New("--no-stdout is deprecated"))
+		showError(errors.New("--no-stdout is deprecated - use \"--output ''\" instead"))
 		*outputStdout = false
 	}
 	if *noReproducible {
@@ -139,7 +139,7 @@ func parseArgs() options {
 
 	var hasArgsError bool
 	if *outputStdout {
-		showError(errors.New("--output is deprecated - use \"-o -\" instead"))
+		showError(errors.New("--stdout is deprecated - use \"--output -\" instead"))
 		if *outputFileName != "" {
 			showError(errors.New("--output and --stdout may not be used at the same time"))
 			hasArgsError = true

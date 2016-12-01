@@ -1,0 +1,12 @@
+package1.deb: Debian binary package (format 2.0)
+package2.deb: Debian binary package (format 2.0)
+package1.deb: Debian binary package (format 2.0)
+package2.deb: Debian binary package (format 2.0)
+package1.rpm: RPM v3.0 bin
+package2.rpm: RPM v3.0 bin
+package1.pkg.tar.xz: XZ compressed data
+package2.pkg.tar.xz: XZ compressed data
+package1.deb: Debian binary package (format 2.0)
+package2.deb: Debian binary package (format 2.0)
+package1.deb: Debian binary package (format 2.0)
+package2.deb: Debian binary package (format 2.0)

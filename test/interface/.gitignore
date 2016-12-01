@@ -2,3 +2,5 @@
 stderr
 stdout
 *.deb
+*.rpm
+*.pkg.tar.xz
