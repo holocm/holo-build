@@ -1,0 +1,7 @@
+checking successful rebuild
+checking forceful rebuild
+./package.deb
+checking rebuild with error
+package.deb: data
+checking forceful rebuild without error
+package.deb: Debian binary package (format 2.0)

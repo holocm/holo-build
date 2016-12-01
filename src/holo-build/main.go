@@ -80,6 +80,9 @@ func main() {
 		fmt.Println(pkgFile)
 		return
 	}
+	if opts.outputFileName != "" {
+		pkgFile = opts.outputFileName
+	}
 
 	//build package
 	pkgBytes, err := pkg.Build(generator)

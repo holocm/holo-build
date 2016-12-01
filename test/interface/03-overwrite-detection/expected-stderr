@@ -1,0 +1,5 @@
+checking successful rebuild
+checking forceful rebuild
+checking rebuild with error
+!! cannot write package.deb: file already exists and has different contents; won't overwrite without --force
+checking forceful rebuild without error

@@ -22,6 +22,7 @@ package common
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"io/ioutil"
 	"os"
@@ -49,10 +50,11 @@ func (pkg *Package) WriteOutput(generator Generator, pkgBytes []byte, pkgFile st
 			if equal || err != nil {
 				return false, err
 			}
-		} else {
-			if !os.IsNotExist(err) {
-				return false, err
-			}
+			return true, errors.New("file already exists and has different contents; won't overwrite without --force")
+		}
+
+		if !os.IsNotExist(err) {
+			return false, err
 		}
 	}
 
