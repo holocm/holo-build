@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # check that --reproducible and --no-reproducible produce the same output
 
