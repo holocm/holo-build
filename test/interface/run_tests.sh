@@ -16,7 +16,7 @@ run_testcase() {
     # set cwd!
     cd "$TESTCASE_DIR"
     # reset state of testcase directory
-    git clean -dXfq .
+    rm -f -- stdout stderr *.deb *.pkg.tar.xz *.rpm
 
     # run test
     env INPUT_TOML=../input.toml \

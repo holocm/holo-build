@@ -1,3 +1,36 @@
+v1.5 (2017-02-20)
+=================
+
+Deprecation notices:
+
+- The `--debian`, `--pacman` and `--rpm` options are deprecated. Use the new
+  option `--format={debian,pacman,rpm}` instead.
+- The `--stdout` option and its negation are deprecated. Use the new `--output`
+  option instead.
+
+New features:
+
+- The invocation syntax was cleaned up. The new options `--format` and
+  `--output` replace multiple other options which are now deprecated (see
+  above).
+- `holo-build` will complain when trying to overwrite an existing target file
+  unless instructed to do so with the new `--force` option. No complaint will be
+  issued if the target file is identical to what `holo-build` would've written.
+- The much-outdated shell completion widgets were updated and now implement the
+  full invocation syntax, except for deprecated options.
+
+v1.4 (2016-09-13)
+=================
+
+New features:
+
+- The new `package.architecture` field can be used to build packages
+  with compiled binaries for selected x86 and ARM architectures.
+
+Miscellaneous:
+
+- Fix unit test failure in Go 1.7.
+
 v1.3 (2016-06-07)
 =================
 
