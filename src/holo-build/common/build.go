@@ -40,7 +40,9 @@ func (pkg *Package) doMagicalHoloIntegration() {
 		if strings.HasPrefix(path, "/usr/share/holo/") {
 			//extract the plugin ID from the path
 			pathParts := strings.Split(path, "/")
-			if len(pathParts) > 4 {
+			if len(pathParts) > 5 {
+				//NOTE: not > 4, but > 5, since we only want entries that are
+				//strictly below, rather than at, "/usr/share/holo/$plugin_id"
 				plugins[pathParts[4]] = true
 			}
 		}
