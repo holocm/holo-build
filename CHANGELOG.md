@@ -1,5 +1,4 @@
-v1.5 (2017-02-20)
-=================
+# v1.5 (2017-02-20)
 
 Deprecation notices:
 
@@ -19,8 +18,7 @@ New features:
 - The much-outdated shell completion widgets were updated and now implement the
   full invocation syntax, except for deprecated options.
 
-v1.4 (2016-09-13)
-=================
+# v1.4 (2016-09-13)
 
 New features:
 
@@ -31,8 +29,7 @@ Miscellaneous:
 
 - Fix unit test failure in Go 1.7.
 
-v1.3 (2016-06-07)
-=================
+# v1.3 (2016-06-07)
 
 Deprecation notices:
 
@@ -59,8 +56,7 @@ Miscellaneous:
 
 - Strip binaries during build.
 
-v1.2 (2016-02-25)
-=================
+# v1.2 (2016-02-25)
 
 New features:
 
@@ -77,16 +73,14 @@ Miscellaneous:
 - Use golangvend to simplify the management of library dependencies.
 - Share validation logic between generators.
 
-v1.1.1 (2016-01-30)
-===================
+# v1.1.1 (2016-01-30)
 
 Bugfixes:
 
 - Fix a bug which caused symlinks in packages to be unpacked as empty regular
   files.
 
-v1.1 (2016-01-30)
-=================
+# v1.1 (2016-01-30)
 
 Changes:
 
@@ -98,13 +92,11 @@ Bugfixes:
 - Fix a syntax error in the zsh autocompletion.
 - Fix various small errors in the manpage.
 
-v1.0 (2015-12-04)
-=================
+# v1.0 (2015-12-04)
 
 No changes compared to the beta release.
 
-v1.0-beta.1 (2015-12-03)
-========================
+# v1.0-beta.1 (2015-12-03)
 
 Changes:
 
