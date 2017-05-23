@@ -182,11 +182,11 @@ output format may impose additional charset or size restrictions on the package
 name. As a rule of thumb, the pattern C<[a-z0-9-]+> is a safe set of allowed
 package names.
 
-For C<--debian>, the package name may contain C<[a-z0-9+-.]>, but the first
-character must be alphanumeric.
+For C<--format=debian>, the package name may contain C<[a-z0-9+-.]>, but the
+first character must be alphanumeric.
 
-For C<--pacman>, the package name may contain C<[a-z0-9@._+-]>, but the first
-character may not be a hyphen.
+For C<--format=pacman>, the package name may contain C<[a-z0-9@._+-]>, but the
+first character may not be a hyphen.
 
 =item B<version> (string, required)
 
@@ -215,7 +215,7 @@ to be distinguishable from one another.
 
 A description of the purpose and contents of this package.
 
-=item B<author> (string, required for C<--debian>)
+=item B<author> (string, required for C<--format=debian>)
 
 The name and mail address of the package author, in the form C<< Name <address> >>:
 
@@ -260,12 +260,12 @@ requirement
 
 is implied automatically.
 
-For C<--pacman> only, a special syntax is allowed to require complete package
-groups (by giving the groupname with a C<group:> prefix), and to exclude
-certain packages or package groups from this group requirement (by prefixing the
-dependency with C<except:>). For example, to have the package require all packages
-from the C<xorg> group, except for the C<xorg-drivers> group and the
-C<xorg-docs> package:
+For C<--format=pacman> only, a special syntax is allowed to require complete
+package groups (by giving the groupname with a C<group:> prefix), and to
+exclude certain packages or package groups from this group requirement (by
+prefixing the dependency with C<except:>). For example, to have the package
+require all packages from the C<xorg> group, except for the C<xorg-drivers>
+group and the C<xorg-docs> package:
 
     [package]
     requires = [
@@ -287,16 +287,16 @@ can be specified with the same syntax as for C<requires>.
     name     = "rewrite-of-foo"
     provides = [ "foo = 2.1" ] # this package acts like foo-2.1
 
-For C<--debian>, the provided version syntax is not allowed. C<provides> may
-only contain plain package names.
+For C<--format=debian>, the provided version syntax is not allowed. C<provides>
+may only contain plain package names.
 
 =item B<conflicts> (array of strings)
 
 A list of other packages that may not be installed when this package is
 installed. Version tests can be added using the same syntax as for C<requires>.
 
-For C<--pacman>, the same special syntax is allowed as for C<requires>; see
-there for details.
+For C<--format=pacman>, the same special syntax is allowed as for C<requires>;
+see there for details.
 
 =item B<replaces> (array of strings)
 
@@ -309,8 +309,8 @@ If this package can replace the obsolete package, but it shall not be replaced
 automatically, don't use this; reference the obsolete package in both
 C<provides> and C<conflicts> instead.
 
-For C<--pacman>, the same special syntax is allowed as for C<requires>; see
-there for details.
+For C<--format=pacman>, the same special syntax is allowed as for C<requires>;
+see there for details.
 
 =item B<setupScript> (string, deprecated)
 
@@ -457,8 +457,9 @@ a name will result in the file being packaged as belonging to user/group
 C<root>, and the actual user/group will be applied at install time using
 L<chown(1)> or L<chgrp(1)>.
 
-B<BUG:> For C<--rpm>, specification of numeric IDs is broken. When encountering
-a numeric user/group ID in a holo-build package, RPM will say things like
+B<BUG:> For C<--format=rpm>, specification of numeric IDs is broken. When
+encountering a numeric user/group ID in a holo-build package, RPM will say
+things like
 
     user 42 does not exist - using root
     group 42 does not exist - using root
