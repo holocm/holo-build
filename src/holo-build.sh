@@ -41,5 +41,6 @@ case ",$DIST_IDS," in
         echo "!! Running on an unrecognized distribution. Distribution IDs: $DIST_IDS" >&2
         echo ">> Please report this error at <https://github.com/holocm/holo-build/issues/new>" >&2
         echo ">> and include the contents of your /etc/os-release file." >&2
+        exit 255
         ;;
 esac
