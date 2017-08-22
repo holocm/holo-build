@@ -1,3 +1,10 @@
+# v1.5.1 (TBD)
+
+Bugfixes:
+
+- Fix a reproducibility bug where the generated package was not deterministic
+  when dependencies on more than one Holo plugin were implied.
+
 # v1.5 (2017-02-20)
 
 Deprecation notices:

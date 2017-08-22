@@ -20,7 +20,10 @@
 
 package common
 
-import "strings"
+import (
+	"sort"
+	"strings"
+)
 
 //Build builds the package using the given Generator.
 func (pkg *Package) Build(generator Generator) ([]byte, error) {
@@ -52,8 +55,15 @@ func (pkg *Package) doMagicalHoloIntegration() {
 		return
 	}
 
-	//it does -> add all these Holo plugins to the list of requirements...
+	//it does -> sort list of plugins for reproducibility...
+	pluginIDs := make([]string, 0, len(plugins))
 	for pluginID := range plugins {
+		pluginIDs = append(pluginIDs, pluginID)
+	}
+	sort.Strings(pluginIDs)
+
+	//add all these Holo plugins to the list of requirements...
+	for _, pluginID := range pluginIDs {
 		depName := "holo-" + pluginID
 		hasDep := false
 		for _, rel := range pkg.Requires {
