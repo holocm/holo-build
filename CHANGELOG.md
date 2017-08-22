@@ -1,9 +1,14 @@
-# v1.5.1 (TBD)
+# v1.5.1 (2017-08-22)
 
 Bugfixes:
 
 - Fix a reproducibility bug where the generated package was not deterministic
   when dependencies on more than one Holo plugin were implied.
+
+Changes:
+
+- `/usr/bin/holo-build` now exits with non-zero status when no package format
+  was given and automatic selection fails.
 
 # v1.5 (2017-02-20)
 
