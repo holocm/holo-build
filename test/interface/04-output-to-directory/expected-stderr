@@ -1,0 +1,3 @@
+checking existing output directory
+checking missing output directory
+!! cannot write does/not/exist: open does/not/exist: no such file or directory

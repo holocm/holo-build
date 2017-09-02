@@ -39,9 +39,6 @@ func (pkg *Package) WriteOutput(generator Generator, pkgBytes []byte, pkgFile st
 	}
 
 	//only write file if content has changed
-	if pkgFile == "" {
-		pkgFile = generator.RecommendedFileName(pkg)
-	}
 	if !withForce {
 		fileHandle, err := os.Open(pkgFile)
 		if err == nil {

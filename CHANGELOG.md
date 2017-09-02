@@ -1,3 +1,11 @@
+# v1.6 (TBD)
+
+New features:
+
+- The `-o/--output` option now accepts directory names in addition to file
+  names. If a directory is given, the package will be placed in there using the
+  naming convention for the selected package format.
+
 # v1.5.1 (2017-08-22)
 
 Bugfixes:

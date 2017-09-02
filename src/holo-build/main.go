@@ -81,7 +81,17 @@ func main() {
 		return
 	}
 	if opts.outputFileName != "" {
-		pkgFile = opts.outputFileName
+		if opts.outputFileName == "-" {
+			pkgFile = "-"
+		} else {
+			//use opts.outputFileName directly if a file, or choose it inside there if a directory
+			fi, err := os.Stat(opts.outputFileName)
+			if err == nil && fi.Mode().IsDir() {
+				pkgFile = filepath.Join(opts.outputFileName, pkgFile)
+			} else {
+				pkgFile = opts.outputFileName
+			}
+		}
 	}
 
 	//build package
@@ -91,7 +101,7 @@ func main() {
 		os.Exit(2)
 	}
 
-	wasWritten, err := pkg.WriteOutput(generator, pkgBytes, opts.outputFileName, opts.withForce)
+	wasWritten, err := pkg.WriteOutput(generator, pkgBytes, pkgFile, opts.withForce)
 	if err != nil {
 		showErrorMsg("cannot write %s: %s", pkgFile, err.Error())
 		os.Exit(2)

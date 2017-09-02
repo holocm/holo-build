@@ -67,7 +67,9 @@ is read from standard input instead.
 
 Write the resulting package to I<filename>. If not given, write the package into
 the working directory using the naming convention for the corresponding output
-package format. If the I<filename> is C<->, write the package to standard output.
+package format. If I<filename> refers to a directory, write the package into this
+directory using the naming convention for the corresponding output package format.
+If the I<filename> is C<->, write the package to standard output.
 
 =item B<--force>/B<--no-force>
 
