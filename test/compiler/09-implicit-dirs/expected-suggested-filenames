@@ -1,3 +1,4 @@
+alpine: implicit-dirs-1.0-r1.apk
 debian: implicit-dirs_1.0-1_all.deb
 pacman: implicit-dirs-1.0-1-any.pkg.tar.xz
 rpm: implicit-dirs-1.0-1.noarch.rpm

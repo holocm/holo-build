@@ -1,0 +1,2 @@
+!! Version in "foo-baz = 2:6.2" is not acceptable for Alpine packages (found in provides)
+!! The "package.conflicts" field is not supported for Alpine packages

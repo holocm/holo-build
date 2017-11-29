@@ -1,3 +1,4 @@
+alpine: no output
 debian: no output
 pacman: pacman-group-dependencies-1.0.0-1-any.pkg.tar.xz
 rpm: pacman-group-dependencies-1.0.0-1.noarch.rpm

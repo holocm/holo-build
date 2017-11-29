@@ -1,3 +1,4 @@
+alpine: the-package-1.0-r1.apk
 debian: no output
 pacman: the-package-1.0-1-any.pkg.tar.xz
 rpm: the-package-1.0-1.noarch.rpm

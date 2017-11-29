@@ -1,3 +1,4 @@
+alpine: no output
 debian: test-architecture-string_1.0-1_armel.deb
 pacman: test-architecture-string-1.0-1-arm.pkg.tar.xz
 rpm: test-architecture-string-1.0-1.armv5tl.rpm

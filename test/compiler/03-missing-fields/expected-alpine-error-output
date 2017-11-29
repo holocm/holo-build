@@ -1,0 +1,10 @@
+!! Missing package name
+!! Missing package version
+!! group 0 is invalid: missing "name" attribute
+!! user 0 is invalid: missing "name" attribute
+!! action 0 is invalid: missing or empty "on" attribute
+!! action 1 is invalid: missing or empty "content" attribute
+!! directory 1 is invalid: missing "path" attribute
+!! file 1 is invalid: missing "path" attribute
+!! file "/etc/this-not-either.conf" is invalid: missing content
+!! symlink 0 is invalid: missing "path" attribute

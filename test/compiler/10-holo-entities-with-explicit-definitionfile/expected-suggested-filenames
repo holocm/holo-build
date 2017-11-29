@@ -1,3 +1,4 @@
+alpine: holo-entities-1.0-r1.apk
 debian: holo-entities_1.0-1_all.deb
 pacman: holo-entities-1.0-1-any.pkg.tar.xz
 rpm: holo-entities-1.0-1.noarch.rpm

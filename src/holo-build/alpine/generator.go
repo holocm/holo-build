@@ -46,14 +46,13 @@ var archMap = map[common.Architecture]string{
 
 //RecommendedFileName implements the common.Generator interface.
 func (g *Generator) RecommendedFileName(pkg *common.Package) string {
-	//this is called after Build(), so we can assume that package name,
+	//this is called after Validate(), so we can assume that package name,
 	//version, etc. were already validated
 	return fmt.Sprintf("%s-%s.apk", pkg.Name, fullVersionString(pkg))
 }
 
 func fullVersionString(pkg *common.Package) string {
-	str := fmt.Sprintf("%s-r%d", pkg.Version, pkg.Release)
-	return str
+	return fmt.Sprintf("%s-r%d", pkg.Version, pkg.Release)
 }
 
 //Validate implements the common.Generator interface.

@@ -2,6 +2,8 @@
 holo-build-*-*
 # artifacts from successful testcases
 suggested-filenames
+alpine-output
+alpine-error-output
 debian-output
 debian-error-output
 pacman-output

@@ -1,3 +1,4 @@
+alpine: holo-integration-1.0-r1.apk
 debian: holo-integration_1.0-1_all.deb
 pacman: holo-integration-1.0-1-any.pkg.tar.xz
 rpm: holo-integration-1.0-1.noarch.rpm

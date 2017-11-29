@@ -1,0 +1,26 @@
+!! Invalid package name "invalid/package" (may not contain slashes or newlines)
+!! Invalid package version "1.0-alpha.1" (must be a chain of numbers like "1.2.0" or "20151104")
+!! Invalid package author "John Doe" (should look like "Jane Doe <jane.doe@example.org>")
+!! Invalid package reference in requires: "holo += 2.0"
+!! Invalid package reference in provides: "=1.1"
+!! Invalid package reference in conflicts: "bar< =2.0"
+!! group "$users" is invalid: name is not an acceptable group name
+!! group "$users" is invalid: if "gid" is given, then "system" is useless
+!! user "john+doe" is invalid: name is not an acceptable user name
+!! user "john+doe" is invalid: if "uid" is given, then "system" is useless
+!! user "john+doe" is invalid: "$users" is not an acceptable group name
+!! user "john+doe" is invalid: "$(/$" is not an acceptable group name
+!! user "john+doe" is invalid: home directory "etc/foo/" must be an absolute path
+!! user "john+doe" is invalid: home directory "etc/foo/" has trailing slash(es)
+!! action 0 is invalid: unacceptable value "error" for "on" attribute
+!! directory "/var/lib/foo/bar/" is invalid: trailing slash(es)
+!! directory "/var/lib/foo/bar/" is invalid: cannot parse mode "read/write" (strconv.ParseUint: parsing "read/write": invalid syntax)
+!! directory "/var/lib/foo/bar/" is invalid: user or group ID "-23" may not be negative
+!! directory "/var/lib/foo/bar/" is invalid: user or group ID "-42" may not be negative
+!! file "foo/bar.conf" is invalid: must be an absolute path
+!! file "foo/bar.conf" is invalid: cannot use both `content` and `contentFrom`
+!! file "foo/bar.conf" is invalid: "owner"/"group" attributes must be strings or integers, found type bool
+!! file "foo/bar.conf" is invalid: "owner"/"group" attributes must be strings or integers, found type []interface {}
+!! file "/etc/foo" is invalid: "john+doe" is not an acceptable user or group name
+!! file "/etc/foo" is invalid: "$users" is not an acceptable user or group name
+!! failed to insert "/etc/foo" into the package file system: duplicate entry

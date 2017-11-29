@@ -1,3 +1,4 @@
+alpine: the-package-1.0-r1.apk
 debian: the-package_1.0-1_all.deb
 pacman: the-package-1.0-1-any.pkg.tar.xz
 rpm: the-package-1.0-1.noarch.rpm

@@ -1,3 +1,4 @@
+alpine: no output
 debian: no output
 pacman: foo-1.0.2.3-1-any.pkg.tar.xz
 rpm: foo-1.0.2.3-1.noarch.rpm

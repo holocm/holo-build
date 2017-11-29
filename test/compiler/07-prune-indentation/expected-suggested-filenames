@@ -1,3 +1,4 @@
+alpine: prune-indentation-1.0.0-r1.apk
 debian: prune-indentation_1.0.0-1_all.deb
 pacman: prune-indentation-1.0.0-1-any.pkg.tar.xz
 rpm: prune-indentation-1.0.0-1.noarch.rpm
