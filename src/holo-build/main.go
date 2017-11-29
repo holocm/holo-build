@@ -26,6 +26,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/holocm/holo-build/src/holo-build/alpine"
 	"github.com/holocm/holo-build/src/holo-build/common"
 	"github.com/holocm/holo-build/src/holo-build/debian"
 	"github.com/holocm/holo-build/src/holo-build/pacman"
@@ -117,7 +118,7 @@ func main() {
 func parseArgs() options {
 	//TODO: remove everything that is flagged as deprecated
 	withForce := pflag.BoolP("force", "f", false, "Overwrite existing output file")
-	formatString := pflag.String("format", "", "Output file format (\"debian\", \"pacman\" or \"rpm\")")
+	formatString := pflag.String("format", "", "Output file format (\"alpine\", \"debian\", \"pacman\" or \"rpm\")")
 	formatDebian := pflag.Bool("debian", false, "Generate Debian package (deprecated, use \"--format debian\" instead)")
 	formatPacman := pflag.Bool("pacman", false, "Generate Pacman package (deprecated, use \"--format pacman\" instead)")
 	formatRPM := pflag.Bool("rpm", false, "Generate RPM package (deprecated, use \"--format rpm\" instead)")
@@ -185,6 +186,8 @@ func parseArgs() options {
 
 	var generator common.Generator
 	switch *formatString {
+	case "alpine":
+		generator = &alpine.Generator{}
 	case "debian":
 		generator = &debian.Generator{}
 	case "pacman":

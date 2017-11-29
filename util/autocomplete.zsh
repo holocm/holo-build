@@ -4,6 +4,7 @@
 {
     local -a _commands
     _commands=(
+        'alpine:APK package (suitable for Alpine and derivatives)'
         'debian:Debian package (suitable for Debian, Ubuntu and derivatives)'
         'pacman:Pacman package (suitable for Arch and derivatives)'
         'rpm:RPM package (suitable for Fedora, Suse, Mageia and derivatives)'

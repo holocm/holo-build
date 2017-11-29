@@ -6,7 +6,7 @@ _holo_build() {
         COMPREPLY=( $(compgen -W "-f --force --format --help -o --output --suggest-filename -V --version" -- "$cur") )
     elif [ "$COMP_CWORD" -gt 0 ]; then
         if [[ $prev = --format ]]; then
-            COMPREPLY=( $(compgen -W "debian pacman rpm" -- "$cur") )
+            COMPREPLY=( $(compgen -W "alpine debian pacman rpm" -- "$cur") )
         fi
     fi
 }

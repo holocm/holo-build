@@ -107,6 +107,20 @@ func (d *FSDirectory) ToTarArchive(leadingDot, skipRootDirectory bool) ([]byte, 
 	return buf.Bytes(), err
 }
 
+//CompressGZ is a wrapper around gzip.Writer.
+func CompressGZ(data []byte) ([]byte, error) {
+	var buf bytes.Buffer
+	w := gzip.NewWriter(&buf)
+
+	_, err := w.Write(data)
+	if err != nil {
+		return nil, err
+	}
+
+	err = w.Close()
+	return buf.Bytes(), err
+}
+
 //ToTarGZArchive is identical to ToTarArchive, but GZip-compresses the result.
 func (d *FSDirectory) ToTarGZArchive(leadingDot, skipRootDirectory bool) ([]byte, error) {
 	data, err := d.ToTarArchive(leadingDot, skipRootDirectory)
@@ -114,16 +128,7 @@ func (d *FSDirectory) ToTarGZArchive(leadingDot, skipRootDirectory bool) ([]byte
 		return nil, err
 	}
 
-	var buf bytes.Buffer
-	w := gzip.NewWriter(&buf)
-
-	_, err = w.Write(data)
-	if err != nil {
-		return nil, err
-	}
-
-	err = w.Close()
-	return buf.Bytes(), err
+	return CompressGZ(data)
 }
 
 //ToTarXZArchive is identical to ToTarArchive, but GZip-compresses the result.

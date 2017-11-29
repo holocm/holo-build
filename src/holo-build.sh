@@ -32,6 +32,7 @@ done
 DIST_IDS="$(echo "$ID $ID_LIKE" | tr ' ' ',')"
 
 case ",$DIST_IDS," in
+    *,alpine,*) exec /usr/lib/holo/holo-build --format=alpine "$@" ;;
     *,arch,*)   exec /usr/lib/holo/holo-build --format=pacman "$@" ;;
     *,debian,*) exec /usr/lib/holo/holo-build --format=debian "$@" ;;
     *,fedora,*) exec /usr/lib/holo/holo-build --format=rpm "$@" ;;

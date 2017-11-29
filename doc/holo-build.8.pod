@@ -83,8 +83,9 @@ This switch has no effect when C<--output -> or C<--suggest-filename> is in effe
 =item B<--format> I<format>
 
 Generate a package of the specified format, instead of the default package
-format for the current distribution. Valid values are C<debian>, C<pacman> and
-C<rpm>.
+format for the current distribution. Valid values are C<alpine>, C<debian>,
+C<pacman> and C<rpm>. Note that C<alpine> does not support all features of the
+package description format (see below).
 
 B<WARNING:> RPM generation is considered experimental because RPM is
 underdocumented and a bizarrely baroque format to begin with.
@@ -103,8 +104,10 @@ targeted distribution:
     name = "foo"
     version = "1.0"
 
+    $ holo-build --suggest-filename --format alpine < input.toml
+    foo-1.0-r1.apk
     $ holo-build --suggest-filename --format debian < input.toml
-    foo_1.0-1_any.deb
+    foo_1.0-1_all.deb
     $ holo-build --suggest-filename --format pacman < input.toml
     foo-1.0-1-any.pkg.tar.xz
 
@@ -184,6 +187,9 @@ output format may impose additional charset or size restrictions on the package
 name. As a rule of thumb, the pattern C<[a-z0-9-]+> is a safe set of allowed
 package names.
 
+For C<--format=alpine>, the package name may contain C<[a-z0-9-]>, but the
+first character must be alphanumeric.
+
 For C<--format=debian>, the package name may contain C<[a-z0-9+-.]>, but the
 first character must be alphanumeric.
 
@@ -200,7 +206,7 @@ dots:
     version = "0.10"
     version = "20151015"
 
-=item B<epoch> (unsigned integer)
+=item B<epoch> (unsigned integer, not supported for C<--format=alpine>)
 
 An increase in the epoch (default: 0) can be used to force the package to be
 seen as newer than any previous version with a lower epoch. This is used when
@@ -292,7 +298,7 @@ can be specified with the same syntax as for C<requires>.
 For C<--format=debian>, the provided version syntax is not allowed. C<provides>
 may only contain plain package names.
 
-=item B<conflicts> (array of strings)
+=item B<conflicts> (array of strings, not supported for C<--format=alpine>)
 
 A list of other packages that may not be installed when this package is
 installed. Version tests can be added using the same syntax as for C<requires>.
@@ -602,14 +608,6 @@ functionally equivalent to:
 The actual syntax and semantics of C<[[user]]> and C<[[group]]> sections is
 described in L<holo-users-groups(8)>.
 
-=for Comment
-################################################################################
-# NOTE: This document generates both the manpage and the website's             #
-#       man-holo.html. The following sections only appear in the manpage.      #
-################################################################################
-
-=begin :man
-
 =head1 SEE ALSO
 
 L<holo(8)>
@@ -621,7 +619,5 @@ Stefan Majewsky
 Further documentation is available at the project homepage: http://holocm.org
 
 Please report any issues and feature requests at Github: http://github.com/holocm/holo/issues
-
-=end :man
 
 =cut
