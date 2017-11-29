@@ -132,6 +132,7 @@ var archMap = map[string]Architecture{
 	"i386":    ArchitectureI386,
 	"i686":    ArchitectureI386,
 	"noarch":  ArchitectureAny, //from RPM
+	"x86":     ArchitectureI386,
 	"x86_64":  ArchitectureX86_64,
 	//END ARCH
 }

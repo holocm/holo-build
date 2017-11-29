@@ -236,7 +236,7 @@ The target architecture of the package. The default (C<any>) is fine unless the
 package contains compiled binaries. Valid values include:
 
     all any noarch
-    i386 i686
+    x86 i386 i686
     x86_64 amd64
     arm armel armv5tl
     armv6h armv6hl

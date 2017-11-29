@@ -1,0 +1,4 @@
+alpine: test-architecture-string-1.0-r1.apk
+debian: test-architecture-string_1.0-1_i386.deb
+pacman: test-architecture-string-1.0-1-i686.pkg.tar.xz
+rpm: test-architecture-string-1.0-1.i686.rpm
