@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Copyright 2015 Stefan Majewsky <majewsky@gmx.net>
 #
