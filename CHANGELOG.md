@@ -1,3 +1,10 @@
+# v1.5.2 (2017-12-05)
+
+Bugfixes:
+
+- Fix invocation on Debian (and other distributions where `/bin/sh` is not a
+  bash).
+
 # v1.5.1 (2017-08-22)
 
 Bugfixes:
