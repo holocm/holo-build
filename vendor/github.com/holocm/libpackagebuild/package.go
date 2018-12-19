@@ -181,7 +181,7 @@ func (p *Package) Script(actionType uint) string {
 
 //InsertFSNode inserts a filesystem.Node into the package's FSRoot at the given
 //absolute path.
-func (p *Package) InsertFSNode(entry filesystem.Node, absolutePath string) error {
+func (p *Package) InsertFSNode(absolutePath string, entry filesystem.Node) error {
 	relPath, err := filepath.Rel("/", absolutePath)
 	if err != nil {
 		return err

@@ -232,7 +232,7 @@ func ParsePackageDefinition(input io.Reader, baseDirectory string) (*build.Packa
 	//compile entity definition file
 	entityNode, entityPath := compileEntityDefinitions(p.Package, p.Group, p.User, ec)
 	if entityNode != nil && entityPath != "" {
-		ec.Add(pkg.InsertFSNode(entityNode, entityPath))
+		ec.Add(pkg.InsertFSNode(entityPath, entityNode))
 	}
 
 	//parse and validate actions
@@ -256,7 +256,7 @@ func ParsePackageDefinition(input io.Reader, baseDirectory string) (*build.Packa
 			Group: parseUserOrGroupRef(dirSection.Group, ec, entryDesc),
 		}
 		if isPathValid {
-			ec.Add(pkg.InsertFSNode(dirNode, path))
+			ec.Add(pkg.InsertFSNode(path, dirNode))
 		}
 	}
 
@@ -274,7 +274,7 @@ func ParsePackageDefinition(input io.Reader, baseDirectory string) (*build.Packa
 			},
 		}
 		if isPathValid {
-			ec.Add(pkg.InsertFSNode(node, path))
+			ec.Add(pkg.InsertFSNode(path, node))
 		}
 	}
 
@@ -288,7 +288,7 @@ func ParsePackageDefinition(input io.Reader, baseDirectory string) (*build.Packa
 
 		node := &filesystem.Symlink{Target: symlinkSection.Target}
 		if isPathValid {
-			ec.Add(pkg.InsertFSNode(node, path))
+			ec.Add(pkg.InsertFSNode(path, node))
 		}
 	}
 

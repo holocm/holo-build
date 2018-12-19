@@ -1,1 +1,1 @@
-!! Type mismatch for 'common.PackageDefinition.File': Type mismatch for 'common.FileSection.Mode': Expected string but found 'int64'.
+!! Type mismatch for 'main.PackageDefinition.File': Type mismatch for 'main.FileSection.Mode': Expected string but found 'int64'.

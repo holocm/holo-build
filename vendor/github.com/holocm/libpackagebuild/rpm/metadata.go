@@ -1,20 +1,19 @@
 /*******************************************************************************
 *
-* Copyright 2016 Stefan Majewsky <majewsky@gmx.net>
+* Copyright 2015-2018 Stefan Majewsky <majewsky@gmx.net>
 *
-* This file is part of Holo.
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You should have received a copy of the License along with this
+* program. If not, you may obtain a copy of the License at
 *
-* Holo is free software: you can redistribute it and/or modify it under the
-* terms of the GNU General Public License as published by the Free Software
-* Foundation, either version 3 of the License, or (at your option) any later
-* version.
+*     http://www.apache.org/licenses/LICENSE-2.0
 *
-* Holo is distributed in the hope that it will be useful, but WITHOUT ANY
-* WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-* A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License along with
-* Holo. If not, see <http://www.gnu.org/licenses/>.
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
 *
 *******************************************************************************/
 
@@ -233,17 +232,17 @@ var rpmlibPseudoDependencies = []rpmlibPseudoDependency{
 	//indicate that RPMTAG_PROVIDENAME and RPMTAG_OBSOLETENAME may have a
 	//version associated with them (as if the presence of
 	//RPMTAG_PROVIDEVERSION and RPMTAG_OBSOLETEVERSION is not enough)
-	rpmlibPseudoDependency{"VersionedDependencies", "3.0.3-1"},
+	{"VersionedDependencies", "3.0.3-1"},
 	//indicate that filenames in the payload are represented in the
 	//RPMTAG_DIRINDEXES, RPMTAG_DIRNAME and RPMTAG_BASENAMES indexes
 	//(again, as if the presence of these tags wasn't evidence enough)
-	rpmlibPseudoDependency{"CompressedFileNames", "3.0.4-1"},
+	{"CompressedFileNames", "3.0.4-1"},
 	//title says it all; apparently RPM devs haven't got the memo that you can
 	//easily identify compression formats by the first few bytes
-	rpmlibPseudoDependency{"PayloadIsLzma", "4.4.6-1"},
+	{"PayloadIsLzma", "4.4.6-1"},
 	//path names in the CPIO payload start with "./" because apparently you
 	//cannot read that from the payload itself
-	rpmlibPseudoDependency{"PayloadFilesHavePrefix", "4.0-1"},
+	{"PayloadFilesHavePrefix", "4.0-1"},
 }
 
 var flagsForConstraintRelation = map[string]int32{
@@ -265,7 +264,7 @@ func serializeRelations(h *rpmHeader, rels []build.PackageRelation, namesTag, fl
 			rels = append(rels, build.PackageRelation{
 				RelatedPackage: "rpmlib(" + dep.Name + ")",
 				Constraints: []build.VersionConstraint{
-					build.VersionConstraint{Relation: "rpmlib", Version: dep.Version},
+					{Relation: "rpmlib", Version: dep.Version},
 				},
 			})
 		}
