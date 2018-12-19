@@ -18,6 +18,7 @@
 *
 *******************************************************************************/
 
+//Package pacman provides a build.Generator for Pacman packages (as used by Arch Linux).
 package pacman
 
 import (
@@ -204,7 +205,7 @@ func writeINSTALL(pkg *build.Package) {
 }
 
 func writeMTREE(pkg *build.Package) error {
-	contents, err := MakeMTREE(pkg)
+	contents, err := makeMTREE(pkg)
 	if err != nil {
 		return err
 	}

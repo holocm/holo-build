@@ -29,12 +29,12 @@ import (
 	"github.com/holocm/libpackagebuild/filesystem"
 )
 
-//MakeHeaderSection produces the header section of an RPM header.
-func MakeHeaderSection(pkg *build.Package, payload *Payload) []byte {
-	h := &Header{}
+//makeHeaderSection produces the header section of an RPM header.
+func makeHeaderSection(pkg *build.Package, payload *rpmPayload) []byte {
+	h := &rpmHeader{}
 
 	addPackageInformationTags(h, pkg)
-	h.AddInt32Value(RpmtagArchiveSize, []int32{int32(payload.UncompressedSize)})
+	h.AddInt32Value(rpmtagArchiveSize, []int32{int32(payload.UncompressedSize)})
 
 	addInstallationTags(h, pkg)
 
@@ -42,26 +42,26 @@ func MakeHeaderSection(pkg *build.Package, payload *Payload) []byte {
 
 	addDependencyInformationTags(h, pkg)
 
-	return h.ToBinary(RpmtagHeaderImmutable)
+	return h.ToBinary(rpmtagHeaderImmutable)
 }
 
 //see [LSB,25.2.4.1]
-func addPackageInformationTags(h *Header, pkg *build.Package) {
-	h.AddStringValue(RpmtagName, pkg.Name, false)
-	h.AddStringValue(RpmtagVersion, versionString(pkg), false)
-	h.AddStringValue(RpmtagRelease, fmt.Sprintf("%d", pkg.Release), false)
+func addPackageInformationTags(h *rpmHeader, pkg *build.Package) {
+	h.AddStringValue(rpmtagName, pkg.Name, false)
+	h.AddStringValue(rpmtagVersion, versionString(pkg), false)
+	h.AddStringValue(rpmtagRelease, fmt.Sprintf("%d", pkg.Release), false)
 
 	//summary == first line of description
 	descSplit := strings.SplitN(pkg.Description, "\n", 2)
-	h.AddStringValue(RpmtagSummary, descSplit[0], true)
-	h.AddStringValue(RpmtagDescription, pkg.Description, true)
+	h.AddStringValue(rpmtagSummary, descSplit[0], true)
+	h.AddStringValue(rpmtagDescription, pkg.Description, true)
 	sizeInBytes := int32(pkg.FSRoot.InstalledSizeInBytes())
-	h.AddInt32Value(RpmtagSize, []int32{sizeInBytes})
+	h.AddInt32Value(rpmtagSize, []int32{sizeInBytes})
 
-	h.AddStringValue(RpmtagLicense, "None", false)
+	h.AddStringValue(rpmtagLicense, "None", false)
 
 	if pkg.Author != "" {
-		h.AddStringValue(RpmtagPackager, pkg.Author, false)
+		h.AddStringValue(rpmtagPackager, pkg.Author, false)
 	}
 
 	//source for valid package groups:
@@ -69,30 +69,30 @@ func addPackageInformationTags(h *Header, pkg *build.Package) {
 	//There is no such link for Fedora. Fedora treats the Group tag as optional
 	//even though [LSB] says it's required. Source:
 	//  <https://fedoraproject.org/wiki/Packaging:Guidelines?rd=Packaging/Guidelines#Group_tag>
-	h.AddStringValue(RpmtagGroup, "System/Management", true)
+	h.AddStringValue(rpmtagGroup, "System/Management", true)
 
-	h.AddStringValue(RpmtagOs, "linux", false)
-	h.AddStringValue(RpmtagArch, archMap[pkg.Architecture], false)
+	h.AddStringValue(rpmtagOs, "linux", false)
+	h.AddStringValue(rpmtagArch, archMap[pkg.Architecture], false)
 
-	h.AddStringValue(RpmtagPayloadFormat, "cpio", false)
-	h.AddStringValue(RpmtagPayloadCompressor, "lzma", false)
-	h.AddStringValue(RpmtagPayloadFlags, "5", false)
+	h.AddStringValue(rpmtagPayloadFormat, "cpio", false)
+	h.AddStringValue(rpmtagPayloadCompressor, "lzma", false)
+	h.AddStringValue(rpmtagPayloadFlags, "5", false)
 }
 
 //see [LSB,25.2.4.2]
-func addInstallationTags(h *Header, pkg *build.Package) {
+func addInstallationTags(h *rpmHeader, pkg *build.Package) {
 	if script := pkg.Script(build.SetupAction); script != "" {
-		h.AddStringValue(RpmtagPostIn, script, false)
-		h.AddStringValue(RpmtagPostInProg, "/bin/sh", false)
+		h.AddStringValue(rpmtagPostIn, script, false)
+		h.AddStringValue(rpmtagPostInProg, "/bin/sh", false)
 	}
 	if script := pkg.Script(build.CleanupAction); script != "" {
-		h.AddStringValue(RpmtagPostUn, script, false)
-		h.AddStringValue(RpmtagPostUnProg, "/bin/sh", false)
+		h.AddStringValue(rpmtagPostUn, script, false)
+		h.AddStringValue(rpmtagPostUnProg, "/bin/sh", false)
 	}
 }
 
 //see [LSB,25.2.4.3]
-func addFileInformationTags(h *Header, pkg *build.Package) {
+func addFileInformationTags(h *rpmHeader, pkg *build.Package) {
 	var (
 		sizes       []int32
 		modes       []int16
@@ -159,7 +159,7 @@ func addFileInformationTags(h *Header, pkg *build.Package) {
 			sizes = append(sizes, int32(len(n.Content)))
 			md5s = append(md5s, n.MD5Digest())
 			linktos = append(linktos, "")
-			flags = append(flags, RpmfileNoReplace)
+			flags = append(flags, rpmfileNoReplace)
 			ownerNames = append(ownerNames, idToString(n.Metadata.UID()))
 			groupNames = append(groupNames, idToString(n.Metadata.GID()))
 		case *filesystem.Symlink:
@@ -174,21 +174,21 @@ func addFileInformationTags(h *Header, pkg *build.Package) {
 		return nil
 	})
 
-	h.AddInt32Value(RpmtagFileSizes, sizes)
-	h.AddInt16Value(RpmtagFileModes, modes)
-	h.AddInt16Value(RpmtagFileRdevs, rdevs)
-	h.AddInt32Value(RpmtagFileMtimes, mtimes)
-	h.AddStringArrayValue(RpmtagFileMD5s, md5s)
-	h.AddStringArrayValue(RpmtagFileLinktos, linktos)
-	h.AddInt32Value(RpmtagFileFlags, flags)
-	h.AddStringArrayValue(RpmtagFileUserName, ownerNames)
-	h.AddStringArrayValue(RpmtagFileGroupName, groupNames)
-	h.AddInt32Value(RpmtagFileDevices, devices)
-	h.AddInt32Value(RpmtagFileInodes, inodes)
-	h.AddStringArrayValue(RpmtagFileLangs, langs)
-	h.AddInt32Value(RpmtagDirIndexes, dirIndexes)
-	h.AddStringArrayValue(RpmtagBasenames, basenames)
-	h.AddStringArrayValue(RpmtagDirNames, dirnames)
+	h.AddInt32Value(rpmtagFileSizes, sizes)
+	h.AddInt16Value(rpmtagFileModes, modes)
+	h.AddInt16Value(rpmtagFileRdevs, rdevs)
+	h.AddInt32Value(rpmtagFileMtimes, mtimes)
+	h.AddStringArrayValue(rpmtagFileMD5s, md5s)
+	h.AddStringArrayValue(rpmtagFileLinktos, linktos)
+	h.AddInt32Value(rpmtagFileFlags, flags)
+	h.AddStringArrayValue(rpmtagFileUserName, ownerNames)
+	h.AddStringArrayValue(rpmtagFileGroupName, groupNames)
+	h.AddInt32Value(rpmtagFileDevices, devices)
+	h.AddInt32Value(rpmtagFileInodes, inodes)
+	h.AddStringArrayValue(rpmtagFileLangs, langs)
+	h.AddInt32Value(rpmtagDirIndexes, dirIndexes)
+	h.AddStringArrayValue(rpmtagBasenames, basenames)
+	h.AddStringArrayValue(rpmtagDirNames, dirnames)
 }
 
 //If `list` contains `value`, otherwise append `value` to `list`.
@@ -213,15 +213,15 @@ func idToString(id uint32) string {
 }
 
 //see [LSB,25.2.4.4]
-func addDependencyInformationTags(h *Header, pkg *build.Package) {
+func addDependencyInformationTags(h *rpmHeader, pkg *build.Package) {
 	serializeRelations(h, pkg.Requires,
-		RpmtagRequireName, RpmtagRequireFlags, RpmtagRequireVersion)
+		rpmtagRequireName, rpmtagRequireFlags, rpmtagRequireVersion)
 	serializeRelations(h, pkg.Provides,
-		RpmtagProvideName, RpmtagProvideFlags, RpmtagProvideVersion)
+		rpmtagProvideName, rpmtagProvideFlags, rpmtagProvideVersion)
 	serializeRelations(h, pkg.Conflicts,
-		RpmtagConflictName, RpmtagConflictFlags, RpmtagConflictVersion)
+		rpmtagConflictName, rpmtagConflictFlags, rpmtagConflictVersion)
 	serializeRelations(h, pkg.Replaces,
-		RpmtagObsoleteName, RpmtagObsoleteFlags, RpmtagObsoleteVersion)
+		rpmtagObsoleteName, rpmtagObsoleteFlags, rpmtagObsoleteVersion)
 }
 
 type rpmlibPseudoDependency struct {
@@ -247,20 +247,20 @@ var rpmlibPseudoDependencies = []rpmlibPseudoDependency{
 }
 
 var flagsForConstraintRelation = map[string]int32{
-	"<":      RpmsenseLess,
-	"<=":     RpmsenseLess | RpmsenseEqual,
-	"=":      RpmsenseEqual,
-	">=":     RpmsenseGreater | RpmsenseEqual,
-	">":      RpmsenseGreater,
-	"rpmlib": RpmsenseRpmlib | RpmsenseLess | RpmsenseEqual,
+	"<":      rpmsenseLess,
+	"<=":     rpmsenseLess | rpmsenseEqual,
+	"=":      rpmsenseEqual,
+	">=":     rpmsenseGreater | rpmsenseEqual,
+	">":      rpmsenseGreater,
+	"rpmlib": rpmsenseRpmlib | rpmsenseLess | rpmsenseEqual,
 }
 
-func serializeRelations(h *Header, rels []build.PackageRelation, namesTag, flagsTag, versionsTag uint32) {
+func serializeRelations(h *rpmHeader, rels []build.PackageRelation, namesTag, flagsTag, versionsTag uint32) {
 	//for the Requires list, we need to add pseudo-dependencies to describe the
 	//structure of our package (because apparently a custom key-value database
 	//wasn't enough, so they built a second key-value database inside the
 	//requirements array -- BRILLIANT!)
-	if namesTag == RpmtagRequireName {
+	if namesTag == rpmtagRequireName {
 		for _, dep := range rpmlibPseudoDependencies {
 			rels = append(rels, build.PackageRelation{
 				RelatedPackage: "rpmlib(" + dep.Name + ")",
@@ -281,7 +281,7 @@ func serializeRelations(h *Header, rels []build.PackageRelation, namesTag, flags
 		if len(rel.Constraints) == 0 {
 			//case 1: no version constraints -> generate one relation for the RelatedPackage
 			names = append(names, rel.RelatedPackage)
-			flags = append(flags, RpmsenseAny)
+			flags = append(flags, rpmsenseAny)
 			versions = append(versions, "")
 		} else {
 			//case 2: no version constraints -> generate one relation per constraint

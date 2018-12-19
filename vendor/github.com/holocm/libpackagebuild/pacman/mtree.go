@@ -30,8 +30,8 @@ import (
 	"github.com/holocm/libpackagebuild/filesystem"
 )
 
-//MakeMTREE generates the mtree metadata archive for this package.
-func MakeMTREE(pkg *build.Package) ([]byte, error) {
+//makeMTREE generates the mtree metadata archive for this package.
+func makeMTREE(pkg *build.Package) ([]byte, error) {
 	//this implementation is not particularly clever w.r.t. the use of "/set",
 	//but we use some defaults here to maybe keep the result size down a bit
 	lines := []string{

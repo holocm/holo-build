@@ -18,6 +18,7 @@
 *
 *******************************************************************************/
 
+//Package debian provides a build.Generator for Debian packages.
 package debian
 
 import (

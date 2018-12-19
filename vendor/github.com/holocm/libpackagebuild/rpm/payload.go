@@ -30,8 +30,8 @@ import (
 	"github.com/holocm/libpackagebuild/filesystem"
 )
 
-//Payload represents the compressed CPIO payload of the package.
-type Payload struct {
+//rpmPayload represents the compressed CPIO payload of the package.
+type rpmPayload struct {
 	Binary           []byte
 	CompressedSize   uint32
 	UncompressedSize uint32
@@ -55,7 +55,7 @@ type cpioHeader struct {
 }
 
 //MakePayload generates the Payload for the given package.
-func MakePayload(pkg *build.Package) (*Payload, error) {
+func makePayload(pkg *build.Package) (*rpmPayload, error) {
 	var buf bytes.Buffer
 	inodeNumber := uint32(0)
 
@@ -145,7 +145,7 @@ func MakePayload(pkg *build.Package) (*Payload, error) {
 	cmd.Stderr = os.Stderr
 	compressed, err := cmd.Output()
 
-	return &Payload{
+	return &rpmPayload{
 		Binary:           compressed,
 		CompressedSize:   uint32(len(compressed)),
 		UncompressedSize: uint32(len(uncompressed)),

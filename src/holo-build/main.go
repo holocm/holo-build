@@ -27,10 +27,10 @@ import (
 	"path/filepath"
 
 	"github.com/holocm/holo-build/src/holo-build/common"
-	"github.com/holocm/holo-build/src/holo-build/debian"
-	"github.com/holocm/holo-build/src/holo-build/pacman"
-	"github.com/holocm/holo-build/src/holo-build/rpm"
 	build "github.com/holocm/libpackagebuild"
+	"github.com/holocm/libpackagebuild/debian"
+	"github.com/holocm/libpackagebuild/pacman"
+	"github.com/holocm/libpackagebuild/rpm"
 	"github.com/ogier/pflag"
 )
 

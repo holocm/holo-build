@@ -18,6 +18,7 @@
 *
 *******************************************************************************/
 
+//Package rpm provides a build.Generator for RPM packages.
 package rpm
 
 import (
@@ -97,16 +98,16 @@ func (g *Generator) Build() ([]byte, error) {
 	pkg.PrepareBuild()
 
 	//assemble CPIO-LZMA payload
-	payload, err := MakePayload(pkg)
+	payload, err := makePayload(pkg)
 	if err != nil {
 		return nil, err
 	}
 
 	//produce header sections in reverse order (since most of them depend on
 	//what comes after them)
-	headerSection := MakeHeaderSection(pkg, payload)
-	signatureSection := MakeSignatureSection(headerSection, payload)
-	lead := NewLead(pkg).ToBinary()
+	headerSection := makeHeaderSection(pkg, payload)
+	signatureSection := makeSignatureSection(headerSection, payload)
+	lead := newLead(pkg).ToBinary()
 
 	//combine everything with the correct alignment
 	combined1 := appendAlignedTo8Byte(lead, signatureSection)

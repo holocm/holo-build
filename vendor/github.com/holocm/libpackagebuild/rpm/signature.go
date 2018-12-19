@@ -26,19 +26,19 @@ import (
 	"encoding/hex"
 )
 
-//MakeSignatureSection produces the signature section of an RPM header.
-func MakeSignatureSection(headerSection []byte, payload *Payload) []byte {
-	h := &Header{}
+//makeSignatureSection produces the signature section of an RPM header.
+func makeSignatureSection(headerSection []byte, payload *rpmPayload) []byte {
+	h := &rpmHeader{}
 
 	//NOTE that some fields validate both header+payload, some only the
 	//payload, and some only the header. This is all according to the
 	//specification, no matter how insane. [LSB, 25.2.3]
 
 	//size information
-	h.AddInt32Value(RpmsigtagSize, []int32{
+	h.AddInt32Value(rpmsigtagSize, []int32{
 		int32(uint32(len(headerSection)) + payload.CompressedSize),
 	})
-	h.AddInt32Value(RpmsigtagPayloadSize, []int32{
+	h.AddInt32Value(rpmsigtagPayloadSize, []int32{
 		int32(payload.UncompressedSize),
 	})
 
@@ -46,14 +46,14 @@ func MakeSignatureSection(headerSection []byte, payload *Payload) []byte {
 	sha1digest := sha1.New()
 	sha1digest.Write(headerSection)
 	sha1sum := hex.EncodeToString(sha1digest.Sum(nil))
-	h.AddStringValue(RpmsigtagSHA1, sha1sum, false)
+	h.AddStringValue(rpmsigtagSHA1, sha1sum, false)
 
 	//MD5 digest of header + payload section
 	md5digest := md5.New()
 	md5digest.Write(headerSection)
 	md5digest.Write(payload.Binary)
 	md5sum := md5digest.Sum(nil)
-	h.AddBinaryValue(RpmsigtagMD5, md5sum)
+	h.AddBinaryValue(rpmsigtagMD5, md5sum)
 
-	return h.ToBinary(RpmtagHeaderSignatures)
+	return h.ToBinary(rpmtagHeaderSignatures)
 }

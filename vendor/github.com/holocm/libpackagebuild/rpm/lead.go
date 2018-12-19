@@ -27,9 +27,9 @@ import (
 	build "github.com/holocm/libpackagebuild"
 )
 
-//Lead represents the RPM lead (the first header of an RPM file, before the
+//rpmLead represents the RPM lead (the first header of an RPM file, before the
 //actual header sections).
-type Lead struct {
+type rpmLead struct {
 	Magic              [4]byte
 	Version            [2]byte
 	Type               uint16
@@ -40,9 +40,9 @@ type Lead struct {
 	Reserved           [16]byte
 }
 
-//NewLead creates a lead for the given package.
-func NewLead(pkg *build.Package) *Lead {
-	lead := &Lead{
+//newLead creates a lead for the given package.
+func newLead(pkg *build.Package) *rpmLead {
+	lead := &rpmLead{
 		Magic:        [4]byte{0xed, 0xab, 0xee, 0xdb},
 		Version:      [2]byte{0x03, 0x00},
 		Type:         0, //binary package
@@ -74,7 +74,7 @@ func NewLead(pkg *build.Package) *Lead {
 }
 
 //ToBinary returns the binary encoding for this lead.
-func (l *Lead) ToBinary() []byte {
+func (l *rpmLead) ToBinary() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.BigEndian, l)
 	return buf.Bytes()
