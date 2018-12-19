@@ -3,17 +3,17 @@ default: build/holo-build build/man/holo-build.8
 
 VERSION := $(shell ./util/find_version.sh)
 # force people to use golangvend
-GOCC := env GOPATH=$(CURDIR)/.gopath go
+GOCC := env GOPATH=$(CURDIR)/.gopath GOBIN=$(CURDIR)/build go
 
 env:
 	@env
 
 prepare-build:
 	@mkdir -p build/man
-build/holo-build: src/holo-build/main.go src/holo-build/*/*.go
-	$(GOCC) build --ldflags "-s -w -X github.com/holocm/holo-build/src/holo-build/common.version=$(VERSION)" -o $@ github.com/holocm/holo-build/src/holo-build
-build/dump-package: src/dump-package/main.go src/dump-package/*/*.go
-	$(GOCC) build --ldflags "-s -w" -o $@ github.com/holocm/holo-build/src/dump-package
+build/holo-build: FORCE
+	$(GOCC) install --ldflags "-s -w -X github.com/holocm/holo-build/src/holo-build/common.version=$(VERSION)" github.com/holocm/holo-build/src/holo-build
+build/dump-package: FORCE
+	$(GOCC) install --ldflags "-s -w" github.com/holocm/holo-build/src/dump-package
 
 # manpages are generated using pod2man (which comes with Perl and therefore
 # should be readily available on almost every Unix system)
@@ -34,4 +34,4 @@ install: default src/holo-build.sh util/autocomplete.bash util/autocomplete.zsh
 	install -D -m 0644 util/autocomplete.bash "$(DESTDIR)/usr/share/bash-completion/completions/holo-build"
 	install -D -m 0644 util/autocomplete.zsh  "$(DESTDIR)/usr/share/zsh/site-functions/_holo-build"
 
-.PHONY: prepare-build test check install
+.PHONY: prepare-build test check install FORCE

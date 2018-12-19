@@ -18,7 +18,7 @@
 *
 *******************************************************************************/
 
-package common
+package main
 
 //this is populated at compile time, see Makefile
 var version string

@@ -26,7 +26,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/holocm/holo-build/src/holo-build/common"
 	build "github.com/holocm/libpackagebuild"
 	"github.com/holocm/libpackagebuild/debian"
 	"github.com/holocm/libpackagebuild/pacman"
@@ -57,7 +56,7 @@ func main() {
 		}
 		baseDirectory = filepath.Dir(opts.inputFileName)
 	}
-	pkg, errs := common.ParsePackageDefinition(input, baseDirectory)
+	pkg, errs := ParsePackageDefinition(input, baseDirectory)
 
 	//initialize generator
 	generator := opts.generatorFactory(pkg)
@@ -98,14 +97,14 @@ func main() {
 	}
 
 	//build package
-	common.DoMagicalHoloIntegration(pkg)
+	DoMagicalHoloIntegration(pkg)
 	pkgBytes, err := generator.Build()
 	if err != nil {
 		showErrorMsg("cannot build %s: %s", pkgFile, err.Error())
 		os.Exit(2)
 	}
 
-	wasWritten, err := common.WriteOutput(pkgBytes, pkgFile, opts.withForce)
+	wasWritten, err := WriteOutput(pkgBytes, pkgFile, opts.withForce)
 	if err != nil {
 		showErrorMsg("cannot write %s: %s", pkgFile, err.Error())
 		os.Exit(2)
@@ -145,7 +144,7 @@ func parseArgs() options {
 	}
 
 	if *showVersion {
-		fmt.Println(common.VersionString())
+		fmt.Println(VersionString())
 		os.Exit(0)
 	}
 
