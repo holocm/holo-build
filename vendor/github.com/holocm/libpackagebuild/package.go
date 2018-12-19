@@ -1,28 +1,30 @@
 /*******************************************************************************
 *
-* Copyright 2015 Stefan Majewsky <majewsky@gmx.net>
+* Copyright 2015-2018 Stefan Majewsky <majewsky@gmx.net>
 *
-* This file is part of Holo.
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You should have received a copy of the License along with this
+* program. If not, you may obtain a copy of the License at
 *
-* Holo is free software: you can redistribute it and/or modify it under the
-* terms of the GNU General Public License as published by the Free Software
-* Foundation, either version 3 of the License, or (at your option) any later
-* version.
+*     http://www.apache.org/licenses/LICENSE-2.0
 *
-* Holo is distributed in the hope that it will be useful, but WITHOUT ANY
-* WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-* A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License along with
-* Holo. If not, see <http://www.gnu.org/licenses/>.
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
 *
 *******************************************************************************/
 
-package common
+package build
 
 import (
+	"fmt"
 	"path/filepath"
 	"strings"
+
+	"github.com/holocm/libpackagebuild/filesystem"
 )
 
 //Architecture is an enum that describes the target architecture for this
@@ -51,15 +53,10 @@ const (
 type Package struct {
 	//Name is the package name.
 	Name string
-	//Version is the version for the package contents. While many package
-	//formats are more or less liberal about the format of version strings,
-	//holo-build requires versions to adhere to the Semantic Version format
-	//(semver.org). Build metadata is not supported, while as an extension, we
-	//support an arbitrary number of segments in the initial
-	//"MAJOR.MINOR.PATCH" part.
+	//Version is the version for the package contents.
 	Version string
 	//Release is a counter that can be increased when the same version of one
-	//hologram needs to be rebuilt. The default value is 1.
+	//package needs to be rebuilt. The default value shall be 1.
 	Release uint
 	//Epoch is a counter that can be increased when the version of a newer
 	//package is smaller than the previous version, thus breaking normal
@@ -74,8 +71,7 @@ type Package struct {
 	//"Firstname Lastname <email.address@server.tld>", if this information is
 	//available.
 	Author string
-	//Architecture specifies the target architecture of this package (usually
-	//"any" since holo-build packages tend to not include compiled binaries).
+	//Architecture specifies the target architecture of this package.
 	Architecture Architecture
 	//ArchitectureInput contains the raw architecture string specified by the
 	//user (used only for error messages).
@@ -99,7 +95,7 @@ type Package struct {
 	Actions []PackageAction
 	//FSRoot represents the root directory of the package's file system, and
 	//contains all other files and directories recursively.
-	FSRoot *FSDirectory
+	FSRoot *filesystem.Directory
 }
 
 //PackageRelation declares a relation to another package. For the related
@@ -151,6 +147,16 @@ const (
 	CleanupAction
 )
 
+//PrepareBuild executes common preparation steps. This should be called by each
+//generator's Build() implementation.
+func (p *Package) PrepareBuild() {
+	script := p.FSRoot.PostponeUnmaterializable("/")
+	if script != "" {
+		script = strings.TrimSuffix(script, "\n")
+		p.PrependActions(PackageAction{Type: SetupAction, Content: script})
+	}
+}
+
 //PrependActions prepends elements to p.Actions.
 func (p *Package) PrependActions(actions ...PackageAction) {
 	p.Actions = append(actions, p.Actions...)
@@ -173,29 +179,29 @@ func (p *Package) Script(actionType uint) string {
 	return strings.TrimSpace(strings.Join(scripts, "\n"))
 }
 
-//InsertFSNode inserts an FSNode into the package's FSRoot at the given
+//InsertFSNode inserts a filesystem.Node into the package's FSRoot at the given
 //absolute path.
-func (p *Package) InsertFSNode(entry FSNode, absolutePath string, ec *ErrorCollector) {
+func (p *Package) InsertFSNode(entry filesystem.Node, absolutePath string) error {
 	relPath, err := filepath.Rel("/", absolutePath)
 	if err != nil {
-		ec.Add(err)
-		return
+		return err
 	}
 	err = p.FSRoot.Insert(entry, strings.Split(relPath, "/"), "/")
 	if err != nil {
-		ec.Addf("failed to insert \"%s\" into the package file system: %s", absolutePath, err.Error())
+		return fmt.Errorf("failed to insert \"%s\" into the package file system: %s", absolutePath, err.Error())
 	}
+	return nil
 }
 
 //WalkFSWithAbsolutePaths wraps the FSRoot.Wrap function, yielding absolute
 //paths (with a leading slash) to the callback.
-func (p *Package) WalkFSWithAbsolutePaths(callback func(absolutePath string, node FSNode) error) error {
+func (p *Package) WalkFSWithAbsolutePaths(callback func(absolutePath string, node filesystem.Node) error) error {
 	return p.FSRoot.Walk("/", callback)
 }
 
 //WalkFSWithRelativePaths wraps the FSRoot.Wrap function, yielding paths
 //relative to the FSRoot (without leading slash) to the callback. The FSRoot
 //itself will be visited with `relativePath = ""`.
-func (p *Package) WalkFSWithRelativePaths(callback func(relativePath string, node FSNode) error) error {
+func (p *Package) WalkFSWithRelativePaths(callback func(relativePath string, node filesystem.Node) error) error {
 	return p.FSRoot.Walk("", callback)
 }

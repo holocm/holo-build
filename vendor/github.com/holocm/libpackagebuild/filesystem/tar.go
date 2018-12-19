@@ -1,29 +1,29 @@
 /*******************************************************************************
 *
-* Copyright 2016 Stefan Majewsky <majewsky@gmx.net>
+* Copyright 2015-2018 Stefan Majewsky <majewsky@gmx.net>
 *
-* This file is part of Holo.
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You should have received a copy of the License along with this
+* program. If not, you may obtain a copy of the License at
 *
-* Holo is free software: you can redistribute it and/or modify it under the
-* terms of the GNU General Public License as published by the Free Software
-* Foundation, either version 3 of the License, or (at your option) any later
-* version.
+*     http://www.apache.org/licenses/LICENSE-2.0
 *
-* Holo is distributed in the hope that it will be useful, but WITHOUT ANY
-* WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-* A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License along with
-* Holo. If not, see <http://www.gnu.org/licenses/>.
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
 *
 *******************************************************************************/
 
-package common
+package filesystem
 
 import (
 	"archive/tar"
 	"bytes"
 	"compress/gzip"
+	"io"
 	"os"
 	"os/exec"
 	"strings"
@@ -34,17 +34,16 @@ import (
 //filesystem entries in it.
 //
 //With `leadingDot = true`, generate entry paths like `./foo/bar.conf`.
-//WIth `leadingDot = false`, generate entry paths like `foo/bar.conf`.
+//With `leadingDot = false`, generate entry paths like `foo/bar.conf`.
 //
 //With `skipRootDirectory = true`, don't generate an entry for the root
 //directory in the resulting package.
-func (d *FSDirectory) ToTarArchive(leadingDot, skipRootDirectory bool) ([]byte, error) {
-	var buf bytes.Buffer
-	tw := tar.NewWriter(&buf)
+func (d *Directory) ToTarArchive(w io.Writer, leadingDot, skipRootDirectory bool) error {
+	tw := tar.NewWriter(w)
 
 	timestamp := time.Unix(0, 0)
 
-	err := d.Walk(".", func(path string, node FSNode) error {
+	err := d.Walk(".", func(path string, node Node) error {
 		if !leadingDot {
 			path = strings.TrimPrefix(path, "./")
 		}
@@ -54,7 +53,7 @@ func (d *FSDirectory) ToTarArchive(leadingDot, skipRootDirectory bool) ([]byte, 
 
 		var err error
 		switch n := node.(type) {
-		case *FSDirectory:
+		case *Directory:
 			err = tw.WriteHeader(&tar.Header{
 				Name:       path + "/",
 				Typeflag:   tar.TypeDir,
@@ -65,7 +64,7 @@ func (d *FSDirectory) ToTarArchive(leadingDot, skipRootDirectory bool) ([]byte, 
 				AccessTime: timestamp,
 				ChangeTime: timestamp,
 			})
-		case *FSRegularFile:
+		case *RegularFile:
 			err = tw.WriteHeader(&tar.Header{
 				Name:       path,
 				Size:       int64(len([]byte(n.Content))),
@@ -77,7 +76,7 @@ func (d *FSDirectory) ToTarArchive(leadingDot, skipRootDirectory bool) ([]byte, 
 				AccessTime: timestamp,
 				ChangeTime: timestamp,
 			})
-		case *FSSymlink:
+		case *Symlink:
 			err = tw.WriteHeader(&tar.Header{
 				Name:       path,
 				Typeflag:   tar.TypeSymlink,
@@ -93,49 +92,44 @@ func (d *FSDirectory) ToTarArchive(leadingDot, skipRootDirectory bool) ([]byte, 
 		if err != nil {
 			return err
 		}
-		if n, ok := node.(*FSRegularFile); ok {
+		if n, ok := node.(*RegularFile); ok {
 			_, err = tw.Write([]byte(n.Content))
 			return err
 		}
 		return nil
 	})
 	if err != nil {
-		return nil, err
+		tw.Close()
+		return err
 	}
 
-	err = tw.Close()
-	return buf.Bytes(), err
+	return tw.Close()
 }
 
 //ToTarGZArchive is identical to ToTarArchive, but GZip-compresses the result.
-func (d *FSDirectory) ToTarGZArchive(leadingDot, skipRootDirectory bool) ([]byte, error) {
-	data, err := d.ToTarArchive(leadingDot, skipRootDirectory)
+func (d *Directory) ToTarGZArchive(w io.Writer, leadingDot, skipRootDirectory bool) error {
+	gzw := gzip.NewWriter(w)
+
+	err := d.ToTarArchive(gzw, leadingDot, skipRootDirectory)
 	if err != nil {
-		return nil, err
+		gzw.Close()
+		return err
 	}
-
-	var buf bytes.Buffer
-	w := gzip.NewWriter(&buf)
-
-	_, err = w.Write(data)
-	if err != nil {
-		return nil, err
-	}
-
-	err = w.Close()
-	return buf.Bytes(), err
+	return gzw.Close()
 }
 
 //ToTarXZArchive is identical to ToTarArchive, but GZip-compresses the result.
-func (d *FSDirectory) ToTarXZArchive(leadingDot, skipRootDirectory bool) ([]byte, error) {
-	data, err := d.ToTarArchive(leadingDot, skipRootDirectory)
+func (d *Directory) ToTarXZArchive(w io.Writer, leadingDot, skipRootDirectory bool) error {
+	var buf bytes.Buffer
+	err := d.ToTarArchive(&buf, leadingDot, skipRootDirectory)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	//since we don't have a "compress/xz" package, use the "xz" binary instead
 	cmd := exec.Command("xz", "--compress")
-	cmd.Stdin = bytes.NewReader(data)
+	cmd.Stdin = &buf
+	cmd.Stdout = w
 	cmd.Stderr = os.Stderr
-	return cmd.Output()
+	return cmd.Run()
 }

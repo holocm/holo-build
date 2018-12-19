@@ -26,6 +26,7 @@ import (
 	"strings"
 
 	"github.com/BurntSushi/toml"
+	"github.com/holocm/libpackagebuild/filesystem"
 )
 
 //This file contains the parts of parser.go relating to the support for entity
@@ -60,7 +61,7 @@ var userOrGroupRx = regexp.MustCompile(`^[a-z_][a-z0-9_-]*\$?$`)
 
 //parseUserOrGroupRef is used for references to users/groups in FS entries.
 //Those references can either be an integer ID or a string name.
-func parseUserOrGroupRef(value interface{}, ec *ErrorCollector, entryDesc string) *IntOrString {
+func parseUserOrGroupRef(value interface{}, ec *ErrorCollector, entryDesc string) *filesystem.IntOrString {
 	//default value
 	if value == nil {
 		return nil
@@ -74,12 +75,12 @@ func parseUserOrGroupRef(value interface{}, ec *ErrorCollector, entryDesc string
 		if val >= 1<<32 {
 			ec.Addf("%s is invalid: user or group ID \"%d\" does not fit in uint32", entryDesc, val)
 		}
-		return &IntOrString{Int: uint32(val)}
+		return &filesystem.IntOrString{Int: uint32(val)}
 	case string:
 		if !userOrGroupRx.MatchString(val) {
 			ec.Addf("%s is invalid: \"%s\" is not an acceptable user or group name", entryDesc, val)
 		}
-		return &IntOrString{Str: val}
+		return &filesystem.IntOrString{Str: val}
 	default:
 		ec.Addf("%s is invalid: \"owner\"/\"group\" attributes must be strings or integers, found type %T", entryDesc, value)
 		return nil
@@ -88,7 +89,7 @@ func parseUserOrGroupRef(value interface{}, ec *ErrorCollector, entryDesc string
 
 var definitionFileRx = regexp.MustCompile(`^/usr/share/holo/users-groups/[^/]+.toml$`)
 
-func compileEntityDefinitions(pkg PackageSection, groups []GroupSection, users []UserSection, ec *ErrorCollector) (node FSNode, path string) {
+func compileEntityDefinitions(pkg PackageSection, groups []GroupSection, users []UserSection, ec *ErrorCollector) (node filesystem.Node, path string) {
 	//only add an entity definition file if it is required
 	if len(groups) == 0 && len(users) == 0 {
 		return nil, ""
@@ -130,9 +131,9 @@ func compileEntityDefinitions(pkg PackageSection, groups []GroupSection, users [
 	pruneRx := regexp.MustCompile(`(?m:^\s*[a-z]+ = (?:0|""|false)$)\n`)
 	content := pruneRx.ReplaceAllString(string(buf.Bytes()), "")
 
-	return &FSRegularFile{
+	return &filesystem.RegularFile{
 		Content:  content,
-		Metadata: FSNodeMetadata{Mode: 0644},
+		Metadata: filesystem.NodeMetadata{Mode: 0644},
 	}, path
 }
 

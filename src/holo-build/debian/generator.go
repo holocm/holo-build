@@ -26,35 +26,46 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/holocm/holo-build/src/holo-build/common"
+	build "github.com/holocm/libpackagebuild"
+	"github.com/holocm/libpackagebuild/filesystem"
 )
 
-//Generator is the common.Generator for Debian packages.
-type Generator struct{}
-
-var archMap = map[common.Architecture]string{
-	common.ArchitectureAny:    "all",
-	common.ArchitectureI386:   "i386",
-	common.ArchitectureX86_64: "amd64",
-	common.ArchitectureARMv5:  "armel",
-	// common.ArchitectureARMv6h is not supported by Debian
-	common.ArchitectureARMv7h:  "armhf",
-	common.ArchitectureAArch64: "arm64",
+//Generator is the build.Generator for Debian packages.
+type Generator struct {
+	Package *build.Package
 }
 
-//RecommendedFileName implements the common.Generator interface.
-func (g *Generator) RecommendedFileName(pkg *common.Package) string {
+//GeneratorFactory spawns Generator instances. It satisfies the build.GeneratorFactory type.
+func GeneratorFactory(pkg *build.Package) build.Generator {
+	return &Generator{Package: pkg}
+}
+
+var archMap = map[build.Architecture]string{
+	build.ArchitectureAny:    "all",
+	build.ArchitectureI386:   "i386",
+	build.ArchitectureX86_64: "amd64",
+	build.ArchitectureARMv5:  "armel",
+	// build.ArchitectureARMv6h is not supported by Debian
+	build.ArchitectureARMv7h:  "armhf",
+	build.ArchitectureAArch64: "arm64",
+}
+
+//RecommendedFileName implements the build.Generator interface.
+func (g *Generator) RecommendedFileName() string {
 	//this is called after Build(), so we can assume that package name,
 	//version, etc. were already validated
+	pkg := g.Package
 	return fmt.Sprintf("%s_%s_%s.deb", pkg.Name, fullVersionString(pkg), archMap[pkg.Architecture])
 }
 
-//Validate implements the common.Generator interface.
-func (g *Generator) Validate(pkg *common.Package) []error {
+//Validate implements the build.Generator interface.
+func (g *Generator) Validate() []error {
+	pkg := g.Package
+
 	//reference: https://www.debian.org/doc/debian-policy/ch-controlfields.html
 	var nameRx = `[a-z0-9][a-z0-9+-.]+`
 	var versionRx = `[0-9][A-Za-z0-9.+:~-]*`
-	errs := pkg.ValidateWith(common.RegexSet{
+	errs := pkg.ValidateWith(build.RegexSet{
 		PackageName:    nameRx,
 		PackageVersion: versionRx,
 		RelatedName:    nameRx,
@@ -77,7 +88,7 @@ func (g *Generator) Validate(pkg *common.Package) []error {
 	return errs
 }
 
-func fullVersionString(pkg *common.Package) string {
+func fullVersionString(pkg *build.Package) string {
 	str := fmt.Sprintf("%s-%d", pkg.Version, pkg.Release)
 	if pkg.Epoch > 0 {
 		str = fmt.Sprintf("%d:%s", pkg.Epoch, str)
@@ -90,10 +101,14 @@ type arArchiveEntry struct {
 	Data []byte
 }
 
-//Build implements the common.Generator interface.
-func (g *Generator) Build(pkg *common.Package) ([]byte, error) {
+//Build implements the build.Generator interface.
+func (g *Generator) Build() ([]byte, error) {
+	pkg := g.Package
+	pkg.PrepareBuild()
+
 	//compress data.tar.xz
-	dataTar, err := pkg.FSRoot.ToTarXZArchive(true, false)
+	var dataTar bytes.Buffer
+	err := pkg.FSRoot.ToTarXZArchive(&dataTar, true, false)
 	if err != nil {
 		return nil, err
 	}
@@ -108,13 +123,13 @@ func (g *Generator) Build(pkg *common.Package) ([]byte, error) {
 	return buildArArchive([]arArchiveEntry{
 		arArchiveEntry{"debian-binary", []byte("2.0\n")},
 		arArchiveEntry{"control.tar.gz", controlTar},
-		arArchiveEntry{"data.tar.xz", dataTar},
+		arArchiveEntry{"data.tar.xz", dataTar.Bytes()},
 	})
 }
 
-func buildControlTar(pkg *common.Package) ([]byte, error) {
+func buildControlTar(pkg *build.Package) ([]byte, error) {
 	//prepare a directory into which to put all these files
-	controlDir := common.NewFSDirectory()
+	controlDir := filesystem.NewDirectory()
 
 	//place all the required files in there (NOTE: using the conffiles file
 	//does not seem to be appropriate for our use-case, although I'll let more
@@ -126,29 +141,31 @@ func buildControlTar(pkg *common.Package) ([]byte, error) {
 	writeMD5SumsFile(pkg, controlDir)
 
 	//write postinst script if necessary
-	script := pkg.Script(common.SetupAction)
+	script := pkg.Script(build.SetupAction)
 	if script != "" {
 		script := "#!/bin/bash\n" + script + "\n"
-		controlDir.Entries["postinst"] = &common.FSRegularFile{
+		controlDir.Entries["postinst"] = &filesystem.RegularFile{
 			Content:  script,
-			Metadata: common.FSNodeMetadata{Mode: 0755},
+			Metadata: filesystem.NodeMetadata{Mode: 0755},
 		}
 	}
 
 	//write postrm script if necessary
-	script = pkg.Script(common.CleanupAction)
+	script = pkg.Script(build.CleanupAction)
 	if script != "" {
 		script := "#!/bin/bash\n" + script + "\n"
-		controlDir.Entries["postrm"] = &common.FSRegularFile{
+		controlDir.Entries["postrm"] = &filesystem.RegularFile{
 			Content:  script,
-			Metadata: common.FSNodeMetadata{Mode: 0755},
+			Metadata: filesystem.NodeMetadata{Mode: 0755},
 		}
 	}
 
-	return controlDir.ToTarGZArchive(true, false)
+	var buf bytes.Buffer
+	err = controlDir.ToTarGZArchive(&buf, true, false)
+	return buf.Bytes(), err
 }
 
-func writeControlFile(pkg *common.Package, controlDir *common.FSDirectory) error {
+func writeControlFile(pkg *build.Package, controlDir *filesystem.Directory) error {
 	//reference for this file:
 	//https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-binarycontrolfiles
 	contents := fmt.Sprintf("Package: %s\n", pkg.Name)
@@ -191,14 +208,14 @@ func writeControlFile(pkg *common.Package, controlDir *common.FSDirectory) error
 	}
 	contents += fmt.Sprintf("Description: %s\n %s\n", desc, desc)
 
-	controlDir.Entries["control"] = &common.FSRegularFile{
+	controlDir.Entries["control"] = &filesystem.RegularFile{
 		Content:  contents,
-		Metadata: common.FSNodeMetadata{Mode: 0644},
+		Metadata: filesystem.NodeMetadata{Mode: 0644},
 	}
 	return nil
 }
 
-func compilePackageRelations(relType string, rels []common.PackageRelation) (string, error) {
+func compilePackageRelations(relType string, rels []build.PackageRelation) (string, error) {
 	if len(rels) == 0 {
 		return "", nil
 	}
@@ -228,11 +245,11 @@ func compilePackageRelations(relType string, rels []common.PackageRelation) (str
 	return fmt.Sprintf("%s: %s\n", relType, strings.Join(entries, ", ")), nil
 }
 
-func writeMD5SumsFile(pkg *common.Package, controlDir *common.FSDirectory) {
+func writeMD5SumsFile(pkg *build.Package, controlDir *filesystem.Directory) {
 	//calculate MD5 sums for all regular files in this package
 	var lines []string
-	pkg.WalkFSWithRelativePaths(func(path string, node common.FSNode) error {
-		file, ok := node.(*common.FSRegularFile)
+	pkg.WalkFSWithRelativePaths(func(path string, node filesystem.Node) error {
+		file, ok := node.(*filesystem.RegularFile)
 		if !ok {
 			return nil //look only at regular files
 		}
@@ -240,9 +257,9 @@ func writeMD5SumsFile(pkg *common.Package, controlDir *common.FSDirectory) {
 		return nil
 	})
 
-	controlDir.Entries["md5sums"] = &common.FSRegularFile{
+	controlDir.Entries["md5sums"] = &filesystem.RegularFile{
 		Content:  strings.Join(lines, ""),
-		Metadata: common.FSNodeMetadata{Mode: 0644},
+		Metadata: filesystem.NodeMetadata{Mode: 0644},
 	}
 }
 

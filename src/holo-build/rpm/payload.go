@@ -26,7 +26,8 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/holocm/holo-build/src/holo-build/common"
+	build "github.com/holocm/libpackagebuild"
+	"github.com/holocm/libpackagebuild/filesystem"
 )
 
 //Payload represents the compressed CPIO payload of the package.
@@ -54,7 +55,7 @@ type cpioHeader struct {
 }
 
 //MakePayload generates the Payload for the given package.
-func MakePayload(pkg *common.Package) (*Payload, error) {
+func MakePayload(pkg *build.Package) (*Payload, error) {
 	var buf bytes.Buffer
 	inodeNumber := uint32(0)
 
@@ -65,10 +66,10 @@ func MakePayload(pkg *common.Package) (*Payload, error) {
 
 	//assemble the CPIO archive
 	//(NOTE: This traversal works in the same way as the one in addFileInformationTags.)
-	pkg.WalkFSWithAbsolutePaths(func(path string, node common.FSNode) error {
+	pkg.WalkFSWithAbsolutePaths(func(path string, node filesystem.Node) error {
 		//skip implicitly created directories (as rpmbuild-constructed CPIO
 		//archives apparently do)
-		if n, ok := node.(*common.FSDirectory); ok {
+		if n, ok := node.(*filesystem.Directory); ok {
 			if n.Implicit {
 				return nil
 			}
@@ -96,15 +97,15 @@ func MakePayload(pkg *common.Package) (*Payload, error) {
 		var data []byte
 
 		switch n := node.(type) {
-		case *common.FSDirectory:
+		case *filesystem.Directory:
 			header.UID = cpioFormatInt(n.Metadata.UID())
 			header.GID = cpioFormatInt(n.Metadata.GID())
 			header.FileSize = cpioZero
-		case *common.FSRegularFile:
+		case *filesystem.RegularFile:
 			header.UID = cpioFormatInt(n.Metadata.UID())
 			header.GID = cpioFormatInt(n.Metadata.GID())
 			data = []byte(n.Content)
-		case *common.FSSymlink:
+		case *filesystem.Symlink:
 			header.UID = cpioZero
 			header.GID = cpioZero
 			data = []byte(n.Target)

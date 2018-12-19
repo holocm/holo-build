@@ -32,6 +32,8 @@ import (
 	"strings"
 
 	"github.com/BurntSushi/toml"
+	build "github.com/holocm/libpackagebuild"
+	"github.com/holocm/libpackagebuild/filesystem"
 )
 
 //PackageDefinition only needs a nice exported name for the TOML parser to
@@ -114,31 +116,31 @@ var authorRx = regexp.MustCompile(`^[^<>]+\s+<[^<>\s]+>$`)
 
 //map supported input strings for architecture to internal architecture enum;
 //the "BEGIN ARCH" and "END ARCH" comments are used by test/generate-architecture-tests.sh
-var archMap = map[string]Architecture{
+var archMap = map[string]build.Architecture{
 	//BEGIN ARCH
-	"aarch64": ArchitectureAArch64,
-	"all":     ArchitectureAny, //from Debian
-	"amd64":   ArchitectureX86_64,
-	"any":     ArchitectureAny,     //from Arch Linux
-	"arm":     ArchitectureARMv5,   //from Arch Linux
-	"arm64":   ArchitectureAArch64, //from Debian
-	"armel":   ArchitectureARMv5,   //from Debian
-	"armhf":   ArchitectureARMv7h,  //from Debian
-	"armv5tl": ArchitectureARMv5,   //from Mageia
-	"armv6h":  ArchitectureARMv6h,  //from Arch Linux
-	"armv6hl": ArchitectureARMv6h,  //from OpenSuse
-	"armv7h":  ArchitectureARMv7h,  //from Arch Linux
-	"armv7hl": ArchitectureARMv7h,  //from OpenSuse
-	"i386":    ArchitectureI386,
-	"i686":    ArchitectureI386,
-	"noarch":  ArchitectureAny, //from RPM
-	"x86_64":  ArchitectureX86_64,
+	"aarch64": build.ArchitectureAArch64,
+	"all":     build.ArchitectureAny, //from Debian
+	"amd64":   build.ArchitectureX86_64,
+	"any":     build.ArchitectureAny,     //from Arch Linux
+	"arm":     build.ArchitectureARMv5,   //from Arch Linux
+	"arm64":   build.ArchitectureAArch64, //from Debian
+	"armel":   build.ArchitectureARMv5,   //from Debian
+	"armhf":   build.ArchitectureARMv7h,  //from Debian
+	"armv5tl": build.ArchitectureARMv5,   //from Mageia
+	"armv6h":  build.ArchitectureARMv6h,  //from Arch Linux
+	"armv6hl": build.ArchitectureARMv6h,  //from OpenSuse
+	"armv7h":  build.ArchitectureARMv7h,  //from Arch Linux
+	"armv7hl": build.ArchitectureARMv7h,  //from OpenSuse
+	"i386":    build.ArchitectureI386,
+	"i686":    build.ArchitectureI386,
+	"noarch":  build.ArchitectureAny, //from RPM
+	"x86_64":  build.ArchitectureX86_64,
 	//END ARCH
 }
 
 //ParsePackageDefinition parses a package definition from the given input.
 //The operation is successful if the returned []error is empty.
-func ParsePackageDefinition(input io.Reader, baseDirectory string) (*Package, []error) {
+func ParsePackageDefinition(input io.Reader, baseDirectory string) (*build.Package, []error) {
 	//read from input
 	blob, err := ioutil.ReadAll(input)
 	if err != nil {
@@ -151,7 +153,7 @@ func ParsePackageDefinition(input io.Reader, baseDirectory string) (*Package, []
 	}
 
 	//restructure the parsed data into a common.Package struct
-	pkg := Package{
+	pkg := build.Package{
 		Name:              strings.TrimSpace(p.Package.Name),
 		Version:           strings.TrimSpace(p.Package.Version),
 		Release:           p.Package.Release,
@@ -159,23 +161,23 @@ func ParsePackageDefinition(input io.Reader, baseDirectory string) (*Package, []
 		Description:       strings.TrimSpace(p.Package.Description),
 		Author:            strings.TrimSpace(p.Package.Author),
 		ArchitectureInput: p.Package.Architecture,
-		Actions:           []PackageAction{},
-		FSRoot:            NewFSDirectory(),
+		Actions:           []build.PackageAction{},
+		FSRoot:            filesystem.NewDirectory(),
 	}
 	pkg.FSRoot.Implicit = true
 
 	if script := strings.TrimSpace(p.Package.SetupScript); script != "" {
 		WarnDeprecatedKey("package.setupScript")
-		pkg.AppendActions(PackageAction{
-			Type:    SetupAction,
+		pkg.AppendActions(build.PackageAction{
+			Type:    build.SetupAction,
 			Content: script,
 		})
 	}
 
 	if script := strings.TrimSpace(p.Package.CleanupScript); script != "" {
 		WarnDeprecatedKey("package.cleanupScript")
-		pkg.AppendActions(PackageAction{
-			Type:    CleanupAction,
+		pkg.AppendActions(build.PackageAction{
+			Type:    build.CleanupAction,
 			Content: script,
 		})
 	}
@@ -230,7 +232,7 @@ func ParsePackageDefinition(input io.Reader, baseDirectory string) (*Package, []
 	//compile entity definition file
 	entityNode, entityPath := compileEntityDefinitions(p.Package, p.Group, p.User, ec)
 	if entityNode != nil && entityPath != "" {
-		pkg.InsertFSNode(entityNode, entityPath, ec)
+		ec.Add(pkg.InsertFSNode(entityNode, entityPath))
 	}
 
 	//parse and validate actions
@@ -247,14 +249,14 @@ func ParsePackageDefinition(input io.Reader, baseDirectory string) (*Package, []
 		isPathValid := validatePath(path, ec, "directory", idx)
 
 		entryDesc := fmt.Sprintf("directory \"%s\"", path)
-		dirNode := NewFSDirectory()
-		dirNode.Metadata = FSNodeMetadata{
+		dirNode := filesystem.NewDirectory()
+		dirNode.Metadata = filesystem.NodeMetadata{
 			Mode:  parseFileMode(dirSection.Mode, 0755, ec, entryDesc),
 			Owner: parseUserOrGroupRef(dirSection.Owner, ec, entryDesc),
 			Group: parseUserOrGroupRef(dirSection.Group, ec, entryDesc),
 		}
 		if isPathValid {
-			pkg.InsertFSNode(dirNode, path, ec)
+			ec.Add(pkg.InsertFSNode(dirNode, path))
 		}
 	}
 
@@ -263,16 +265,16 @@ func ParsePackageDefinition(input io.Reader, baseDirectory string) (*Package, []
 		isPathValid := validatePath(path, ec, "file", idx)
 
 		entryDesc := fmt.Sprintf("file \"%s\"", path)
-		node := &FSRegularFile{
+		node := &filesystem.RegularFile{
 			Content: parseFileContent(fileSection.Content, fileSection.ContentFrom, fileSection.Raw, baseDirectory, ec, entryDesc),
-			Metadata: FSNodeMetadata{
+			Metadata: filesystem.NodeMetadata{
 				Mode:  parseFileMode(fileSection.Mode, 0644, ec, entryDesc),
 				Owner: parseUserOrGroupRef(fileSection.Owner, ec, entryDesc),
 				Group: parseUserOrGroupRef(fileSection.Group, ec, entryDesc),
 			},
 		}
 		if isPathValid {
-			pkg.InsertFSNode(node, path, ec)
+			ec.Add(pkg.InsertFSNode(node, path))
 		}
 	}
 
@@ -284,9 +286,9 @@ func ParsePackageDefinition(input io.Reader, baseDirectory string) (*Package, []
 			ec.Addf("symlink \"%s\" is invalid: missing target", path)
 		}
 
-		node := &FSSymlink{Target: symlinkSection.Target}
+		node := &filesystem.Symlink{Target: symlinkSection.Target}
 		if isPathValid {
-			pkg.InsertFSNode(node, path, ec)
+			ec.Add(pkg.InsertFSNode(node, path))
 		}
 	}
 
@@ -297,8 +299,8 @@ func ParsePackageDefinition(input io.Reader, baseDirectory string) (*Package, []
 var relatedPackageRx = regexp.MustCompile(`^([^\s<=>]+)\s*(?:(<=?|>=?|=)\s*([^\s<=>]+))?$`)
 var providesPackageRx = regexp.MustCompile(`^([^\s<=>]+)\s*(?:(=)\s*([^\s<=>]+))?$`)
 
-func parseRelatedPackages(relType string, specs []string, ec *ErrorCollector) []PackageRelation {
-	rels := make([]PackageRelation, 0, len(specs))
+func parseRelatedPackages(relType string, specs []string, ec *ErrorCollector) []build.PackageRelation {
+	rels := make([]build.PackageRelation, 0, len(specs))
 	idxByName := make(map[string]int, len(specs))
 
 	for _, spec := range specs {
@@ -322,12 +324,12 @@ func parseRelatedPackages(relType string, specs []string, ec *ErrorCollector) []
 			//no, add a new one and remember it for later additional constraints
 			idx = len(rels)
 			idxByName[name] = idx
-			rels = append(rels, PackageRelation{RelatedPackage: name})
+			rels = append(rels, build.PackageRelation{RelatedPackage: name})
 		}
 
 		//add version constraint if one was specified
 		if match[2] != "" {
-			constraint := VersionConstraint{Relation: match[2], Version: match[3]}
+			constraint := build.VersionConstraint{Relation: match[2], Version: match[3]}
 			rels[idx].Constraints = append(rels[idx].Constraints, constraint)
 		}
 	}
@@ -337,11 +339,11 @@ func parseRelatedPackages(relType string, specs []string, ec *ErrorCollector) []
 
 //maps string values of "action.on" to internal enum values
 var actionTypeMap = map[string]uint{
-	"setup":   SetupAction,
-	"cleanup": CleanupAction,
+	"setup":   build.SetupAction,
+	"cleanup": build.CleanupAction,
 }
 
-func parseAction(data ActionSection, ec *ErrorCollector, entryIdx int) (action PackageAction, isValid bool) {
+func parseAction(data ActionSection, ec *ErrorCollector, entryIdx int) (action build.PackageAction, isValid bool) {
 	action.Type, isValid = actionTypeMap[data.On]
 	if !isValid {
 		if data.On == "" {

@@ -21,40 +21,50 @@
 package pacman
 
 import (
+	"bytes"
 	"fmt"
 	"regexp"
 	"sort"
 	"strings"
 
-	"github.com/holocm/holo-build/src/holo-build/common"
+	build "github.com/holocm/libpackagebuild"
+	"github.com/holocm/libpackagebuild/filesystem"
 )
 
-//Generator is the common.Generator for Pacman packages (as used by Arch Linux
+//Generator is the build.Generator for Pacman packages (as used by Arch Linux
 //and derivatives).
-type Generator struct{}
-
-var archMap = map[common.Architecture]string{
-	common.ArchitectureAny:     "any",
-	common.ArchitectureI386:    "i686",
-	common.ArchitectureX86_64:  "x86_64",
-	common.ArchitectureARMv5:   "arm",
-	common.ArchitectureARMv6h:  "armv6h",
-	common.ArchitectureARMv7h:  "armv7h",
-	common.ArchitectureAArch64: "aarch64",
+type Generator struct {
+	Package *build.Package
 }
 
-//RecommendedFileName implements the common.Generator interface.
-func (g *Generator) RecommendedFileName(pkg *common.Package) string {
+//GeneratorFactory spawns Generator instances. It satisfies the build.GeneratorFactory type.
+func GeneratorFactory(pkg *build.Package) build.Generator {
+	return &Generator{Package: pkg}
+}
+
+var archMap = map[build.Architecture]string{
+	build.ArchitectureAny:     "any",
+	build.ArchitectureI386:    "i686",
+	build.ArchitectureX86_64:  "x86_64",
+	build.ArchitectureARMv5:   "arm",
+	build.ArchitectureARMv6h:  "armv6h",
+	build.ArchitectureARMv7h:  "armv7h",
+	build.ArchitectureAArch64: "aarch64",
+}
+
+//RecommendedFileName implements the build.Generator interface.
+func (g *Generator) RecommendedFileName() string {
 	//this is called after Build(), so we can assume that package name,
 	//version, etc. were already validated
+	pkg := g.Package
 	return fmt.Sprintf("%s-%s-%s.pkg.tar.xz", pkg.Name, fullVersionString(pkg), archMap[pkg.Architecture])
 }
 
-//Validate implements the common.Generator interface.
-func (g *Generator) Validate(pkg *common.Package) []error {
+//Validate implements the build.Generator interface.
+func (g *Generator) Validate() []error {
 	var nameRx = `[a-z0-9@._+][a-z0-9@._+-]*`
 	var versionRx = `[a-zA-Z0-9._]+`
-	return pkg.ValidateWith(common.RegexSet{
+	return g.Package.ValidateWith(build.RegexSet{
 		PackageName:    nameRx,
 		PackageVersion: versionRx,
 		RelatedName:    "(?:except:)?(?:group:)?" + nameRx,
@@ -63,8 +73,11 @@ func (g *Generator) Validate(pkg *common.Package) []error {
 	}, archMap)
 }
 
-//Build implements the common.Generator interface.
-func (g *Generator) Build(pkg *common.Package) ([]byte, error) {
+//Build implements the build.Generator interface.
+func (g *Generator) Build() ([]byte, error) {
+	pkg := g.Package
+	pkg.PrepareBuild()
+
 	//write .PKGINFO
 	err := writePKGINFO(pkg)
 	if err != nil {
@@ -81,10 +94,12 @@ func (g *Generator) Build(pkg *common.Package) ([]byte, error) {
 	}
 
 	//compress package
-	return pkg.FSRoot.ToTarXZArchive(false, true)
+	var buf bytes.Buffer
+	err = pkg.FSRoot.ToTarXZArchive(&buf, false, true)
+	return buf.Bytes(), err
 }
 
-func fullVersionString(pkg *common.Package) string {
+func fullVersionString(pkg *build.Package) string {
 	str := fmt.Sprintf("%s-%d", pkg.Version, pkg.Release)
 	if pkg.Epoch > 0 {
 		str = fmt.Sprintf("%d:%s", pkg.Epoch, str)
@@ -92,7 +107,7 @@ func fullVersionString(pkg *common.Package) string {
 	return str
 }
 
-func writePKGINFO(pkg *common.Package) error {
+func writePKGINFO(pkg *build.Package) error {
 	//normalize package description like makepkg does
 	desc := regexp.MustCompile(`\s+`).ReplaceAllString(strings.TrimSpace(pkg.Description), " ")
 
@@ -145,17 +160,17 @@ func writePKGINFO(pkg *common.Package) error {
 	contents += "makepkgopt = !debug\n"
 
 	//write .PKGINFO
-	pkg.FSRoot.Entries[".PKGINFO"] = &common.FSRegularFile{
+	pkg.FSRoot.Entries[".PKGINFO"] = &filesystem.RegularFile{
 		Content:  contents,
-		Metadata: common.FSNodeMetadata{Mode: 0644},
+		Metadata: filesystem.NodeMetadata{Mode: 0644},
 	}
 	return nil
 }
 
-func compileBackupMarkers(pkg *common.Package) string {
+func compileBackupMarkers(pkg *build.Package) string {
 	var lines []string
-	pkg.WalkFSWithRelativePaths(func(path string, node common.FSNode) error {
-		if _, ok := node.(*common.FSRegularFile); !ok {
+	pkg.WalkFSWithRelativePaths(func(path string, node filesystem.Node) error {
+		if _, ok := node.(*filesystem.RegularFile); !ok {
 			return nil //look only at regular files
 		}
 		if !strings.HasPrefix(path, "usr/share/holo/") {
@@ -167,13 +182,13 @@ func compileBackupMarkers(pkg *common.Package) string {
 	return strings.Join(lines, "")
 }
 
-func writeINSTALL(pkg *common.Package) {
+func writeINSTALL(pkg *build.Package) {
 	//assemble the contents for the .INSTALL file
 	contents := ""
-	if script := pkg.Script(common.SetupAction); script != "" {
+	if script := pkg.Script(build.SetupAction); script != "" {
 		contents += fmt.Sprintf("post_install() {\n%s\n}\npost_upgrade() {\npost_install\n}\n", script)
 	}
-	if script := pkg.Script(common.CleanupAction); script != "" {
+	if script := pkg.Script(build.CleanupAction); script != "" {
 		contents += fmt.Sprintf("post_remove() {\n%s\n}\n", script)
 	}
 
@@ -182,21 +197,21 @@ func writeINSTALL(pkg *common.Package) {
 		return
 	}
 
-	pkg.FSRoot.Entries[".INSTALL"] = &common.FSRegularFile{
+	pkg.FSRoot.Entries[".INSTALL"] = &filesystem.RegularFile{
 		Content:  contents,
-		Metadata: common.FSNodeMetadata{Mode: 0644},
+		Metadata: filesystem.NodeMetadata{Mode: 0644},
 	}
 }
 
-func writeMTREE(pkg *common.Package) error {
+func writeMTREE(pkg *build.Package) error {
 	contents, err := MakeMTREE(pkg)
 	if err != nil {
 		return err
 	}
 
-	pkg.FSRoot.Entries[".MTREE"] = &common.FSRegularFile{
+	pkg.FSRoot.Entries[".MTREE"] = &filesystem.RegularFile{
 		Content:  string(contents),
-		Metadata: common.FSNodeMetadata{Mode: 0644},
+		Metadata: filesystem.NodeMetadata{Mode: 0644},
 	}
 	return nil
 }

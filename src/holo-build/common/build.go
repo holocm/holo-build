@@ -23,23 +23,17 @@ package common
 import (
 	"sort"
 	"strings"
+
+	build "github.com/holocm/libpackagebuild"
+	"github.com/holocm/libpackagebuild/filesystem"
 )
 
-//Build builds the package using the given Generator.
-func (pkg *Package) Build(generator Generator) ([]byte, error) {
-	//do magical Holo integration tasks
-	pkg.doMagicalHoloIntegration()
-	//move unmaterializable filesystem metadata into the setupScript
-	pkg.postponeUnmaterializableFSMetadata()
-
-	//build package
-	return generator.Build(pkg)
-}
-
-func (pkg *Package) doMagicalHoloIntegration() {
+//DoMagicalHoloIntegration makes the implicit "holo apply" setup script and the
+//implicit "holo-$PLUGIN" dependencies explicit.
+func DoMagicalHoloIntegration(pkg *build.Package) {
 	//does this package need to provision stuff with Holo plugins?
 	plugins := make(map[string]bool)
-	pkg.WalkFSWithAbsolutePaths(func(path string, node FSNode) error {
+	pkg.WalkFSWithAbsolutePaths(func(path string, node filesystem.Node) error {
 		if strings.HasPrefix(path, "/usr/share/holo/") {
 			//extract the plugin ID from the path
 			pathParts := strings.Split(path, "/")
@@ -73,38 +67,13 @@ func (pkg *Package) doMagicalHoloIntegration() {
 			}
 		}
 		if !hasDep {
-			pkg.Requires = append(pkg.Requires, PackageRelation{RelatedPackage: depName})
+			pkg.Requires = append(pkg.Requires, build.PackageRelation{RelatedPackage: depName})
 		}
 	}
 
 	//...and run `holo apply` during setup/cleanup
 	pkg.PrependActions(
-		PackageAction{Type: SetupAction, Content: "holo apply"},
-		PackageAction{Type: CleanupAction, Content: "holo apply"},
+		build.PackageAction{Type: build.SetupAction, Content: "holo apply"},
+		build.PackageAction{Type: build.CleanupAction, Content: "holo apply"},
 	)
-}
-
-func (pkg *Package) postponeUnmaterializableFSMetadata() {
-	//When an FSEntry identifies its Owner/Group by name, we cannot materialize
-	//that at build time since we don't know the UID/GID to write into the
-	//archive. Therefore, remove the Owner/Group from the FS entry and add a
-	//chown(1)/chgrp(1) call to the setupScript to apply ownership at install
-	//time.
-	pkg.WalkFSWithAbsolutePaths(func(path string, node FSNode) error {
-		var script string
-		switch n := node.(type) {
-		case *FSDirectory:
-			script = n.Metadata.PostponeUnmaterializable(path)
-		case *FSRegularFile:
-			script = n.Metadata.PostponeUnmaterializable(path)
-		default:
-			//don't do anything for FSNodes that don't have metadata
-		}
-		//ensure that ownership is correct before running the actual setup script
-		if script != "" {
-			pkg.PrependActions(PackageAction{Type: SetupAction, Content: script})
-		}
-		return nil
-	})
-
 }

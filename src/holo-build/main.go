@@ -30,20 +30,20 @@ import (
 	"github.com/holocm/holo-build/src/holo-build/debian"
 	"github.com/holocm/holo-build/src/holo-build/pacman"
 	"github.com/holocm/holo-build/src/holo-build/rpm"
+	build "github.com/holocm/libpackagebuild"
 	"github.com/ogier/pflag"
 )
 
 type options struct {
-	generator      common.Generator
-	inputFileName  string //or "" for stdin
-	outputFileName string //or "" for automatic or "-" for stdout
-	filenameOnly   bool
-	withForce      bool
+	generatorFactory build.GeneratorFactory
+	inputFileName    string //or "" for stdin
+	outputFileName   string //or "" for automatic or "-" for stdout
+	filenameOnly     bool
+	withForce        bool
 }
 
 func main() {
 	opts := parseArgs()
-	generator := opts.generator
 
 	//read package definition from stdin
 	input := io.Reader(os.Stdin)
@@ -59,10 +59,13 @@ func main() {
 	}
 	pkg, errs := common.ParsePackageDefinition(input, baseDirectory)
 
+	//initialize generator
+	generator := opts.generatorFactory(pkg)
+
 	//try to validate package
 	var validateErrs []error
 	if pkg != nil {
-		validateErrs = generator.Validate(pkg)
+		validateErrs = generator.Validate()
 	}
 	errs = append(errs, validateErrs...)
 
@@ -75,7 +78,7 @@ func main() {
 	}
 
 	//print filename instead of building package, if requested
-	pkgFile := generator.RecommendedFileName(pkg)
+	pkgFile := generator.RecommendedFileName()
 	if opts.filenameOnly {
 		fmt.Println(pkgFile)
 		return
@@ -95,13 +98,14 @@ func main() {
 	}
 
 	//build package
-	pkgBytes, err := pkg.Build(generator)
+	common.DoMagicalHoloIntegration(pkg)
+	pkgBytes, err := generator.Build()
 	if err != nil {
 		showErrorMsg("cannot build %s: %s", pkgFile, err.Error())
 		os.Exit(2)
 	}
 
-	wasWritten, err := pkg.WriteOutput(generator, pkgBytes, pkgFile, opts.withForce)
+	wasWritten, err := common.WriteOutput(pkgBytes, pkgFile, opts.withForce)
 	if err != nil {
 		showErrorMsg("cannot write %s: %s", pkgFile, err.Error())
 		os.Exit(2)
@@ -183,14 +187,14 @@ func parseArgs() options {
 		*formatString = "rpm"
 	}
 
-	var generator common.Generator
+	var generatorFactory build.GeneratorFactory
 	switch *formatString {
 	case "debian":
-		generator = &debian.Generator{}
+		generatorFactory = debian.GeneratorFactory
 	case "pacman":
-		generator = &pacman.Generator{}
+		generatorFactory = pacman.GeneratorFactory
 	case "rpm":
-		generator = &rpm.Generator{}
+		generatorFactory = rpm.GeneratorFactory
 	case "":
 		showErrorMsg("No package format specified. Use the wrapper script at /usr/bin/holo-build to autoselect a package format.")
 		hasArgsError = true
@@ -214,11 +218,11 @@ func parseArgs() options {
 		os.Exit(1)
 	}
 	return options{
-		generator:      generator,
-		inputFileName:  inputFileName,
-		outputFileName: *outputFileName,
-		filenameOnly:   *suggestFileName,
-		withForce:      *withForce,
+		generatorFactory: generatorFactory,
+		inputFileName:    inputFileName,
+		outputFileName:   *outputFileName,
+		filenameOnly:     *suggestFileName,
+		withForce:        *withForce,
 	}
 }
 

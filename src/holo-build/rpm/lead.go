@@ -24,7 +24,7 @@ import (
 	"bytes"
 	"encoding/binary"
 
-	"github.com/holocm/holo-build/src/holo-build/common"
+	build "github.com/holocm/libpackagebuild"
 )
 
 //Lead represents the RPM lead (the first header of an RPM file, before the
@@ -41,7 +41,7 @@ type Lead struct {
 }
 
 //NewLead creates a lead for the given package.
-func NewLead(pkg *common.Package) *Lead {
+func NewLead(pkg *build.Package) *Lead {
 	lead := &Lead{
 		Magic:        [4]byte{0xed, 0xab, 0xee, 0xdb},
 		Version:      [2]byte{0x03, 0x00},

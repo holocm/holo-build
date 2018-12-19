@@ -1,24 +1,23 @@
 /*******************************************************************************
 *
-* Copyright 2016 Stefan Majewsky <majewsky@gmx.net>
+* Copyright 2015-2018 Stefan Majewsky <majewsky@gmx.net>
 *
-* This file is part of Holo.
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You should have received a copy of the License along with this
+* program. If not, you may obtain a copy of the License at
 *
-* Holo is free software: you can redistribute it and/or modify it under the
-* terms of the GNU General Public License as published by the Free Software
-* Foundation, either version 3 of the License, or (at your option) any later
-* version.
+*     http://www.apache.org/licenses/LICENSE-2.0
 *
-* Holo is distributed in the hope that it will be useful, but WITHOUT ANY
-* WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-* A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License along with
-* Holo. If not, see <http://www.gnu.org/licenses/>.
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
 *
 *******************************************************************************/
 
-package common
+package build
 
 import "regexp"
 
@@ -41,11 +40,13 @@ type compiledRegexSet struct {
 	FormatName     string
 }
 
-//ValidateWith validates the package name, version and related packages with
+//ValidateWith is a helper function provided for generators.
+//
+//It validates the package name, version and related packages with
 //the given set of regexes, and returns a non-empty list of errors if
 //validation fails.
 func (pkg *Package) ValidateWith(r RegexSet, archMap map[Architecture]string) []error {
-	ec := ErrorCollector{}
+	ec := errorCollector{}
 
 	cr := &compiledRegexSet{
 		PackageName:    regexp.MustCompile("^" + r.PackageName + "$"),
@@ -66,6 +67,10 @@ func (pkg *Package) ValidateWith(r RegexSet, archMap map[Architecture]string) []
 		ec.Addf("Package version \"%s\" is not acceptable for %s packages", pkg.Version, cr.FormatName)
 	}
 
+	if pkg.Release == 0 {
+		ec.Addf("Package release may not be zero (numbering of releases starts at 1)")
+	}
+
 	//check if architecture is supported by this generator
 	if _, ok := archMap[pkg.Architecture]; !ok {
 		ec.Addf("Architecture \"%s\" is not acceptable for %s packages", pkg.ArchitectureInput, cr.FormatName)
@@ -79,7 +84,7 @@ func (pkg *Package) ValidateWith(r RegexSet, archMap map[Architecture]string) []
 	return ec.Errors
 }
 
-func validatePackageRelations(r *compiledRegexSet, relType string, rels []PackageRelation, ec *ErrorCollector) {
+func validatePackageRelations(r *compiledRegexSet, relType string, rels []PackageRelation, ec *errorCollector) {
 	for _, rel := range rels {
 		if !r.RelatedName.MatchString(rel.RelatedPackage) {
 			ec.Addf("Package name \"%s\" is not acceptable for %s packages (found in %s)", rel.RelatedPackage, r.FormatName, relType)

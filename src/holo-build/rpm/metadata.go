@@ -25,11 +25,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/holocm/holo-build/src/holo-build/common"
+	build "github.com/holocm/libpackagebuild"
+	"github.com/holocm/libpackagebuild/filesystem"
 )
 
 //MakeHeaderSection produces the header section of an RPM header.
-func MakeHeaderSection(pkg *common.Package, payload *Payload) []byte {
+func MakeHeaderSection(pkg *build.Package, payload *Payload) []byte {
 	h := &Header{}
 
 	addPackageInformationTags(h, pkg)
@@ -45,7 +46,7 @@ func MakeHeaderSection(pkg *common.Package, payload *Payload) []byte {
 }
 
 //see [LSB,25.2.4.1]
-func addPackageInformationTags(h *Header, pkg *common.Package) {
+func addPackageInformationTags(h *Header, pkg *build.Package) {
 	h.AddStringValue(RpmtagName, pkg.Name, false)
 	h.AddStringValue(RpmtagVersion, versionString(pkg), false)
 	h.AddStringValue(RpmtagRelease, fmt.Sprintf("%d", pkg.Release), false)
@@ -79,19 +80,19 @@ func addPackageInformationTags(h *Header, pkg *common.Package) {
 }
 
 //see [LSB,25.2.4.2]
-func addInstallationTags(h *Header, pkg *common.Package) {
-	if script := pkg.Script(common.SetupAction); script != "" {
+func addInstallationTags(h *Header, pkg *build.Package) {
+	if script := pkg.Script(build.SetupAction); script != "" {
 		h.AddStringValue(RpmtagPostIn, script, false)
 		h.AddStringValue(RpmtagPostInProg, "/bin/sh", false)
 	}
-	if script := pkg.Script(common.CleanupAction); script != "" {
+	if script := pkg.Script(build.CleanupAction); script != "" {
 		h.AddStringValue(RpmtagPostUn, script, false)
 		h.AddStringValue(RpmtagPostUnProg, "/bin/sh", false)
 	}
 }
 
 //see [LSB,25.2.4.3]
-func addFileInformationTags(h *Header, pkg *common.Package) {
+func addFileInformationTags(h *Header, pkg *build.Package) {
 	var (
 		sizes       []int32
 		modes       []int16
@@ -113,10 +114,10 @@ func addFileInformationTags(h *Header, pkg *common.Package) {
 
 	//collect attributes for all files in the archive
 	//(NOTE: This traversal works in the same way as the one in MakePayload.)
-	pkg.WalkFSWithAbsolutePaths(func(path string, node common.FSNode) error {
+	pkg.WalkFSWithAbsolutePaths(func(path string, node filesystem.Node) error {
 		//skip implicitly created directories (as rpmbuild-constructed CPIO
 		//archives apparently do)
-		if n, ok := node.(*common.FSDirectory); ok {
+		if n, ok := node.(*filesystem.Directory); ok {
 			if n.Implicit {
 				return nil
 			}
@@ -147,21 +148,21 @@ func addFileInformationTags(h *Header, pkg *common.Package) {
 
 		//type-dependent metadata
 		switch n := node.(type) {
-		case *common.FSDirectory:
+		case *filesystem.Directory:
 			sizes = append(sizes, 4096)
 			md5s = append(md5s, "")
 			linktos = append(linktos, "")
 			flags = append(flags, 0)
 			ownerNames = append(ownerNames, idToString(n.Metadata.UID()))
 			groupNames = append(groupNames, idToString(n.Metadata.GID()))
-		case *common.FSRegularFile:
+		case *filesystem.RegularFile:
 			sizes = append(sizes, int32(len(n.Content)))
 			md5s = append(md5s, n.MD5Digest())
 			linktos = append(linktos, "")
 			flags = append(flags, RpmfileNoReplace)
 			ownerNames = append(ownerNames, idToString(n.Metadata.UID()))
 			groupNames = append(groupNames, idToString(n.Metadata.GID()))
-		case *common.FSSymlink:
+		case *filesystem.Symlink:
 			sizes = append(sizes, int32(len(n.Target)))
 			md5s = append(md5s, "")
 			linktos = append(linktos, n.Target)
@@ -212,7 +213,7 @@ func idToString(id uint32) string {
 }
 
 //see [LSB,25.2.4.4]
-func addDependencyInformationTags(h *Header, pkg *common.Package) {
+func addDependencyInformationTags(h *Header, pkg *build.Package) {
 	serializeRelations(h, pkg.Requires,
 		RpmtagRequireName, RpmtagRequireFlags, RpmtagRequireVersion)
 	serializeRelations(h, pkg.Provides,
@@ -254,17 +255,17 @@ var flagsForConstraintRelation = map[string]int32{
 	"rpmlib": RpmsenseRpmlib | RpmsenseLess | RpmsenseEqual,
 }
 
-func serializeRelations(h *Header, rels []common.PackageRelation, namesTag, flagsTag, versionsTag uint32) {
+func serializeRelations(h *Header, rels []build.PackageRelation, namesTag, flagsTag, versionsTag uint32) {
 	//for the Requires list, we need to add pseudo-dependencies to describe the
 	//structure of our package (because apparently a custom key-value database
 	//wasn't enough, so they built a second key-value database inside the
 	//requirements array -- BRILLIANT!)
 	if namesTag == RpmtagRequireName {
 		for _, dep := range rpmlibPseudoDependencies {
-			rels = append(rels, common.PackageRelation{
+			rels = append(rels, build.PackageRelation{
 				RelatedPackage: "rpmlib(" + dep.Name + ")",
-				Constraints: []common.VersionConstraint{
-					common.VersionConstraint{Relation: "rpmlib", Version: dep.Version},
+				Constraints: []build.VersionConstraint{
+					build.VersionConstraint{Relation: "rpmlib", Version: dep.Version},
 				},
 			})
 		}

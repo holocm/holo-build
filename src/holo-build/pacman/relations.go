@@ -27,11 +27,11 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/holocm/holo-build/src/holo-build/common"
+	build "github.com/holocm/libpackagebuild"
 )
 
 //Renders package relations into .PKGINFO.
-func compilePackageRelations(relType string, rels []common.PackageRelation) string {
+func compilePackageRelations(relType string, rels []build.PackageRelation) string {
 	if len(rels) == 0 {
 		return ""
 	}
@@ -53,14 +53,14 @@ func compilePackageRelations(relType string, rels []common.PackageRelation) stri
 
 //Like compilePackageRelations, but resolve special syntax for requirements
 //(references to groups, exclusion of packages and groups).
-func compilePackageRequirements(relType string, rels []common.PackageRelation) (string, error) {
+func compilePackageRequirements(relType string, rels []build.PackageRelation) (string, error) {
 	//acceptRel marks which packages will be included in the result
 	//(e.g. "not:foo" sets acceptPkg["foo"] = false)
 	acceptPkg := make(map[string]bool, len(rels))
 
 	//read all input relations, and filter plain package relations (those that
 	//are not groups or negations)
-	actualRels := make([]common.PackageRelation, len(rels))
+	actualRels := make([]build.PackageRelation, len(rels))
 	for _, rel := range rels {
 		name := rel.RelatedPackage
 		isNegated := strings.HasPrefix(name, "except:")
@@ -88,7 +88,7 @@ func compilePackageRequirements(relType string, rels []common.PackageRelation) (
 	}
 
 	//prune all not-accepted packages from actualRels
-	prunedRels := make([]common.PackageRelation, 0, len(actualRels))
+	prunedRels := make([]build.PackageRelation, 0, len(actualRels))
 	for _, rel := range actualRels {
 		if acceptPkg[rel.RelatedPackage] {
 			prunedRels = append(prunedRels, rel)
@@ -98,10 +98,10 @@ func compilePackageRequirements(relType string, rels []common.PackageRelation) (
 
 	//add all missing relations (these are all pkgName with acceptPkg[pkgName]
 	//= true since we removed existing rels from acceptPkg in the last step)
-	additionalRels := make([]common.PackageRelation, 0, len(acceptPkg))
+	additionalRels := make([]build.PackageRelation, 0, len(acceptPkg))
 	for pkgName, accepted := range acceptPkg {
 		if accepted {
-			additionalRels = append(additionalRels, common.PackageRelation{RelatedPackage: pkgName})
+			additionalRels = append(additionalRels, build.PackageRelation{RelatedPackage: pkgName})
 		}
 	}
 	sort.Sort(byRelatedPackage(additionalRels))
@@ -129,7 +129,7 @@ func resolvePackageGroup(groupName string) ([]string, error) {
 }
 
 //implement sort.Sort interface for package relations
-type byRelatedPackage []common.PackageRelation
+type byRelatedPackage []build.PackageRelation
 
 func (b byRelatedPackage) Len() int           { return len(b) }
 func (b byRelatedPackage) Less(i, j int) bool { return b[i].RelatedPackage < b[j].RelatedPackage }
