@@ -526,8 +526,8 @@ Each one of these sections define an action that can be executed by the
 package manager. For example:
 
     [[action]]
-    on      = "setup"
-    content = "echo Just Installed"
+    on     = "setup"
+    script = "echo Just Installed"
 
 =over 4
 
@@ -542,7 +542,7 @@ valid:
 If there are multiple actions with the same C<on> value, they will be executed
 in the order in which they are given in the package description.
 
-=item B<content> (string, required)
+=item B<script> (string, required)
 
 This field contains a shell script that will be run (as root) when the action
 is executed.

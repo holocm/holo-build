@@ -355,7 +355,7 @@ func parseAction(data ActionSection, ec *ErrorCollector, entryIdx int) (action b
 
 	action.Content = strings.TrimSpace(data.Script)
 	if action.Content == "" {
-		ec.Addf("action %d is invalid: missing or empty \"content\" attribute", entryIdx)
+		ec.Addf("action %d is invalid: missing or empty \"script\" attribute", entryIdx)
 		isValid = false
 	}
 	return
