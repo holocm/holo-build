@@ -1,1 +1,1 @@
-package_1.0-1_all.deb: Debian binary package (format 2.0)
+package_1.0-1_all.deb: Debian binary package (format 2.0), with control.tar.gz, data compression xz  
