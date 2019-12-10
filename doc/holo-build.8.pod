@@ -103,9 +103,9 @@ targeted distribution:
     name = "foo"
     version = "1.0"
 
-    $ holo-build --suggest-filename --format debian < input.toml
+    $ holo-build --suggest-filename --format=debian < input.toml
     foo_1.0-1_any.deb
-    $ holo-build --suggest-filename --format pacman < input.toml
+    $ holo-build --suggest-filename --format=pacman < input.toml
     foo-1.0-1-any.pkg.tar.xz
 
 This option can be used when auto-generating Makefiles, where the output
