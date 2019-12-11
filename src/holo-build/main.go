@@ -41,9 +41,9 @@ type options struct {
 	withForce        bool
 }
 
-func main() {
-	opts := parseArgs()
+var opts = parseArgs()
 
+func main() {
 	//read package definition from stdin
 	input := io.Reader(os.Stdin)
 	baseDirectory := "."
