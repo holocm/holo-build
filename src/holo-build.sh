@@ -28,7 +28,7 @@ for ARG in "$@"; do
 done
 
 # check distribution and choose appropriate package format
-[ -f /etc/os-release ] && source /etc/os-release || source /usr/lib/os-release
+[ -f /etc/os-release ] && . /etc/os-release || . /usr/lib/os-release
 DIST_IDS="$(echo "$ID $ID_LIKE" | tr ' ' ',')"
 
 case ",$DIST_IDS," in
