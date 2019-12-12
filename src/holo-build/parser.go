@@ -414,6 +414,9 @@ func parseFileContent(content string, contentFrom string, dontPruneIndent bool, 
 		//resolve relative paths
 		contentFrom = filepath.Join(baseDirectory, contentFrom)
 	}
+	if opts.filenameOnly {
+		return string("")
+	}
 	bytes, err := ioutil.ReadFile(contentFrom)
 	ec.Add(err)
 	return string(bytes)
