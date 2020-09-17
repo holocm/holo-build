@@ -48,6 +48,27 @@ const (
 	ArchitectureAArch64
 )
 
+//PrerelaseType is an enum that describes whether the package is an alpha, beta or final release.
+type PrereleaseType uint
+
+const (
+	// Final release
+	PrereleaseTypeNone PrereleaseType = iota
+	// Alpha
+	PrereleaseTypeAlpha
+	// Beta
+	PrereleaseTypeBeta
+)
+
+func (pt PrereleaseType) ToString() string {
+	switch pt {
+	case PrereleaseTypeNone: return "none"
+	case PrereleaseTypeAlpha: return "alpha"
+	case PrereleaseTypeBeta: return "beta"
+	}
+    panic("unreachable")
+}
+
 //Package contains all information about a single package. This representation
 //will be passed into the generator backends.
 type Package struct {
@@ -55,6 +76,13 @@ type Package struct {
 	Name string
 	//Version is the version for the package contents.
 	Version string
+	//PrereleaseType specifies whether it's a an alpha, beta or a final release.
+	PrereleaseType PrereleaseType
+	//PrereleaseNo is a counter of prereleases of a given type.
+	//(PrereleaseType=alpha, PrereleaseNo=5) will append "alpha.5" to the
+	//package's version (with a separator appropriate for a given package
+	//format).
+	PrereleaseNo uint
 	//Release is a counter that can be increased when the same version of one
 	//package needs to be rebuilt. The default value shall be 1.
 	Release uint

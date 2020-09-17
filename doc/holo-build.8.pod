@@ -200,6 +200,22 @@ dots:
     version = "0.10"
     version = "20151015"
 
+=item B<prereleaseType> (string)
+
+The prerelease type. Valid values are:
+
+    none
+    alpha
+    beta
+
+"none" means that it's not a prerelease, but a final release.
+
+=item B<prereleaseNo> (unsigned integer)
+
+The prerelease number. Default value is 0. It must be changed for
+prerelease types other than "none". When prerelease type is "none",
+this must be 0.
+
 =item B<epoch> (unsigned integer)
 
 An increase in the epoch (default: 0) can be used to force the package to be

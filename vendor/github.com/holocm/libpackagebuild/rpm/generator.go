@@ -22,6 +22,7 @@ package rpm
 
 import (
 	"fmt"
+	"strings"
 
 	build "github.com/holocm/libpackagebuild"
 )
@@ -81,10 +82,19 @@ func (g *Generator) RecommendedFileName() string {
 }
 
 func versionString(pkg *build.Package) string {
+	var b strings.Builder
+
 	if pkg.Epoch > 0 {
-		return fmt.Sprintf("%d:%s", pkg.Epoch, pkg.Version)
+		fmt.Fprintf(&b, "%d:", pkg.Epoch)
 	}
-	return pkg.Version
+
+	b.WriteString(pkg.Version)
+
+	if pkg.PrereleaseType != build.PrereleaseTypeNone {
+		fmt.Fprintf(&b, "~%s.%d", pkg.PrereleaseType.ToString(), pkg.PrereleaseNo)
+	}
+
+	return b.String()
 }
 
 func fullVersionString(pkg *build.Package) string {

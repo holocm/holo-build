@@ -89,11 +89,21 @@ func (g *Generator) Validate() []error {
 }
 
 func fullVersionString(pkg *build.Package) string {
-	str := fmt.Sprintf("%s-%d", pkg.Version, pkg.Release)
+	var b strings.Builder
+
 	if pkg.Epoch > 0 {
-		str = fmt.Sprintf("%d:%s", pkg.Epoch, str)
+		fmt.Fprintf(&b, "%d:", pkg.Epoch)
 	}
-	return str
+
+	b.WriteString(pkg.Version)
+
+	if pkg.PrereleaseType != build.PrereleaseTypeNone {
+		fmt.Fprintf(&b, "~%s.%d", pkg.PrereleaseType.ToString(), pkg.PrereleaseNo)
+	}
+
+	fmt.Fprintf(&b, "-%d", pkg.Release)
+
+	return b.String()
 }
 
 type arArchiveEntry struct {
