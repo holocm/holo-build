@@ -165,7 +165,7 @@ func ParsePackageDefinition(input io.Reader, baseDirectory string) (*build.Packa
 	pkg := build.Package{
 		Name:              strings.TrimSpace(p.Package.Name),
 		Version:           strings.TrimSpace(p.Package.Version),
-		PrereleaseNo:      p.Package.PrereleaseNo,
+		PrereleaseVersion: p.Package.PrereleaseNo,
 		Release:           p.Package.Release,
 		Epoch:             p.Package.Epoch,
 		Description:       strings.TrimSpace(p.Package.Description),
@@ -186,12 +186,12 @@ func ParsePackageDefinition(input io.Reader, baseDirectory string) (*build.Packa
 		}
 	}
 
-	if pkg.PrereleaseType == build.PrereleaseTypeNone && pkg.PrereleaseNo != 0 {
+	if pkg.PrereleaseType == build.PrereleaseTypeNone && pkg.PrereleaseVersion != 0 {
 		err := fmt.Errorf("Invalid (nonzero) prereleaseNo (%d) for prereleaseType \"none\"", p.Package.PrereleaseNo)
 		return nil, []error{err}
 	}
 
-	if pkg.PrereleaseType != build.PrereleaseTypeNone && pkg.PrereleaseNo == 0 {
+	if pkg.PrereleaseType != build.PrereleaseTypeNone && pkg.PrereleaseVersion == 0 {
 		err := fmt.Errorf("Invalid prereleaseNo (0) for prereleaseType \"%s\" (not \"none\")", p.Package.PrereleaseType)
 		return nil, []error{err}
 	}

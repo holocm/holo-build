@@ -91,7 +91,7 @@ func versionString(pkg *build.Package) string {
 	b.WriteString(pkg.Version)
 
 	if pkg.PrereleaseType != build.PrereleaseTypeNone {
-		fmt.Fprintf(&b, "~%s.%d", pkg.PrereleaseType.ToString(), pkg.PrereleaseNo)
+		fmt.Fprintf(&b, "~%s.%d", pkg.PrereleaseType.String(), pkg.PrereleaseVersion)
 	}
 
 	return b.String()

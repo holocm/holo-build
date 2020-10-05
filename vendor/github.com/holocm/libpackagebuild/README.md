@@ -1,5 +1,6 @@
 # libpackagebuild
 
+[![Build Status](https://travis-ci.org/holocm/libpackagebuild.svg?branch=master)](https://travis-ci.org/holocm/libpackagebuild)
 [![GoDoc](https://godoc.org/github.com/holocm/libpackagebuild?status.svg)](https://godoc.org/github.com/holocm/libpackagebuild)
 
 This [Go](https://golang.org) library generates packages that can be installed by a system package manager. Supported formats include:
@@ -53,5 +54,3 @@ fmt.Println(generator.RecommendedFileName())
 bytes, err := generator.Build()
   // `bytes` contains the resulting package as a bytestring
 ```
-
-TODO Travis CI
