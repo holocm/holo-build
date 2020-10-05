@@ -53,6 +53,8 @@ type PackageDefinition struct {
 type PackageSection struct {
 	Name           string
 	Version        string
+	Alpha          uint
+	Beta           uint
 	Release        uint
 	Epoch          uint
 	Description    string
@@ -212,6 +214,22 @@ func ParsePackageDefinition(input io.Reader, baseDirectory string) (*build.Packa
 	//given, check the format
 	if pkg.Author != "" && !authorRx.MatchString(pkg.Author) {
 		ec.Addf("Invalid package author \"%s\" (should look like \"Jane Doe <jane.doe@example.org>\")", pkg.Author)
+	}
+
+	//validate/translate prerelease versions
+	if p.Package.Alpha != 0 {
+		if p.Package.Beta != 0 {
+			ec.Addf("Package cannot have both \"alpha\" and \"beta\" version")
+		}
+		pkg.PrereleaseType = build.PrereleaseTypeAlpha
+		pkg.PrereleaseVersion = p.Package.Alpha
+	} else if p.Package.Beta != 0 {
+		pkg.PrereleaseType = build.PrereleaseTypeBeta
+		pkg.PrereleaseVersion = p.Package.Beta
+	} else {
+		//these are the default values anyway, but let's be verbose about it
+		pkg.PrereleaseType = build.PrereleaseTypeNone
+		pkg.PrereleaseVersion = 0
 	}
 
 	//parse architecture string

@@ -48,13 +48,52 @@ const (
 	ArchitectureAArch64
 )
 
+//PrereleaseType is an enum that describes whether the package is an alpha, beta or final release.
+type PrereleaseType uint
+
+const (
+	//PrereleaseTypeNone indicates a final release that does not have "alpha" or "beta" added to its version number.
+	PrereleaseTypeNone PrereleaseType = iota
+	//PrereleaseTypeAlpha indicates an alpha release.
+	PrereleaseTypeAlpha
+	//PrereleaseTypeBeta indicates a beta release.
+	PrereleaseTypeBeta
+)
+
+func (pt PrereleaseType) String() string {
+	switch pt {
+	case PrereleaseTypeNone:
+		return "none"
+	case PrereleaseTypeAlpha:
+		return "alpha"
+	case PrereleaseTypeBeta:
+		return "beta"
+	}
+	panic(fmt.Sprintf("unexpected value for PrereleaseType: %d", uint(pt)))
+}
+
 //Package contains all information about a single package. This representation
 //will be passed into the generator backends.
 type Package struct {
 	//Name is the package name.
 	Name string
-	//Version is the version for the package contents.
+	//Version is the version for the package contents. This field shall contain
+	//only numbered versions separated by dots (e.g. "1.0" or "0.9.184.5" or
+	//"2020.10.05"). Other version strings cannot be guaranteed to generate valid
+	//outputs for all package formats. To specify an alpha or beta version, set
+	//the PrereleaseType and PrereleaseVersion fields. For instance,
+	//"1.2.0-beta.1" shall be encoded as (.Version = "1.2.0",
+	//.PrereleaseType = PrereleaseTypeBeta, .PrereleaseVersion = 1).
 	Version string
+	//PrereleaseType specifies whether this package is an alpha, beta or a final
+	//release.
+	PrereleaseType PrereleaseType
+	//PrereleaseVersion is a counter of prereleases of a given type.
+	//(.PrereleaseType = PrereleaseTypeAlpha, .PrereleaseVersion = 5) will append
+	//"alpha.5" to the package's version (with a separator appropriate for a
+	//given package format). The value in this field is ignored when
+	//.PrereleaseType is PrereleaseTypeNone.
+	PrereleaseVersion uint
 	//Release is a counter that can be increased when the same version of one
 	//package needs to be rebuilt. The default value shall be 1.
 	Release uint

@@ -200,6 +200,16 @@ dots:
     version = "0.10"
     version = "20151015"
 
+=item B<alpha>, B<beta> (unsigned integer)
+
+If one of these is non-zero, the package is a prerelease version. For instance,
+the following corresponds to the full version C<1.2.0-beta.3>:
+
+    version = "1.2.0"
+    beta = 3
+
+The exact rendition of the version string depends on the output format.
+
 =item B<epoch> (unsigned integer)
 
 An increase in the epoch (default: 0) can be used to force the package to be

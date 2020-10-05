@@ -5,6 +5,8 @@ New features:
 - The `-o/--output` option now accepts directory names in addition to file
   names. If a directory is given, the package will be placed in there using the
   naming convention for the selected package format.
+- The fields `alpha` and `beta` have been added to the pkg.toml section
+  `[[package]]`.
 
 # v1.5.1 (2017-08-22)
 

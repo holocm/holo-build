@@ -121,7 +121,7 @@ func resolvePackageGroup(groupName string) ([]string, error) {
 	cmd.Stderr = os.Stderr
 	out, err := cmd.Output()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Error resolving package group %q: %s", groupName, err.Error())
 	}
 
 	return strings.Fields(string(out)), nil

@@ -45,9 +45,9 @@ run_testcase() {
     local EXIT_CODE=0
     for FILE in $FILES_TO_DIFF; do
         if [ -f $FILE ]; then
-            if diff -q expected-$FILE $FILE >/dev/null; then true; else
+            if diff -w -q expected-$FILE $FILE >/dev/null; then true; else
                 echo "!! The $FILE deviates from our expectation. Diff follows:"
-                diff -u expected-$FILE $FILE 2>&1 | sed 's/^/    /'
+                diff -w -u expected-$FILE $FILE 2>&1 | sed 's/^/    /'
                 EXIT_CODE=1
             fi
         fi
