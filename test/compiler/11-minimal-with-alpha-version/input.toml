@@ -1,0 +1,8 @@
+# This testcase is like 01-minimal, but with an alpha version instead of a
+# final version.
+
+[package]
+name = "the-package"
+version = "1.0"
+alpha = 42
+author = "Holo Build <holo.build@example.org>"
