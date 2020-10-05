@@ -200,21 +200,15 @@ dots:
     version = "0.10"
     version = "20151015"
 
-=item B<prereleaseType> (string)
+=item B<alpha>, B<beta> (unsigned integer)
 
-The prerelease type. Valid values are:
+If one of these is non-zero, the package is a prerelease version. For instance,
+the following corresponds to the full version C<1.2.0-beta.3>:
 
-    none
-    alpha
-    beta
+    version = "1.2.0"
+    beta = 3
 
-"none" means that it's not a prerelease, but a final release.
-
-=item B<prereleaseNo> (unsigned integer)
-
-The prerelease number. Default value is 0. It must be changed for
-prerelease types other than "none". When prerelease type is "none",
-this must be 0.
+The exact rendition of the version string depends on the output format.
 
 =item B<epoch> (unsigned integer)
 

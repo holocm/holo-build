@@ -53,8 +53,8 @@ type PackageDefinition struct {
 type PackageSection struct {
 	Name           string
 	Version        string
-	PrereleaseType string
-	PrereleaseNo   uint
+	Alpha          uint
+	Beta           uint
 	Release        uint
 	Epoch          uint
 	Description    string
@@ -140,13 +140,6 @@ var archMap = map[string]build.Architecture{
 	//END ARCH
 }
 
-//map supported input strings for prerelease types to internal prerelease type enum
-var prerelTypeMap = map[string]build.PrereleaseType{
-	"none":  build.PrereleaseTypeNone,
-	"alpha": build.PrereleaseTypeAlpha,
-	"beta":  build.PrereleaseTypeBeta,
-}
-
 //ParsePackageDefinition parses a package definition from the given input.
 //The operation is successful if the returned []error is empty.
 func ParsePackageDefinition(input io.Reader, baseDirectory string) (*build.Package, []error) {
@@ -165,7 +158,6 @@ func ParsePackageDefinition(input io.Reader, baseDirectory string) (*build.Packa
 	pkg := build.Package{
 		Name:              strings.TrimSpace(p.Package.Name),
 		Version:           strings.TrimSpace(p.Package.Version),
-		PrereleaseVersion: p.Package.PrereleaseNo,
 		Release:           p.Package.Release,
 		Epoch:             p.Package.Epoch,
 		Description:       strings.TrimSpace(p.Package.Description),
@@ -175,26 +167,6 @@ func ParsePackageDefinition(input io.Reader, baseDirectory string) (*build.Packa
 		FSRoot:            filesystem.NewDirectory(),
 	}
 	pkg.FSRoot.Implicit = true
-
-	//parse prerelease type string
-	if p.Package.PrereleaseType != "" {
-		var ok bool
-		pkg.PrereleaseType, ok = prerelTypeMap[p.Package.PrereleaseType]
-		if !ok {
-			err := fmt.Errorf("Invalid prereleaseType \"%s\"", p.Package.PrereleaseType)
-			return nil, []error{err}
-		}
-	}
-
-	if pkg.PrereleaseType == build.PrereleaseTypeNone && pkg.PrereleaseVersion != 0 {
-		err := fmt.Errorf("Invalid (nonzero) prereleaseNo (%d) for prereleaseType \"none\"", p.Package.PrereleaseNo)
-		return nil, []error{err}
-	}
-
-	if pkg.PrereleaseType != build.PrereleaseTypeNone && pkg.PrereleaseVersion == 0 {
-		err := fmt.Errorf("Invalid prereleaseNo (0) for prereleaseType \"%s\" (not \"none\")", p.Package.PrereleaseType)
-		return nil, []error{err}
-	}
 
 	if script := strings.TrimSpace(p.Package.SetupScript); script != "" {
 		WarnDeprecatedKey("package.setupScript")
@@ -242,6 +214,22 @@ func ParsePackageDefinition(input io.Reader, baseDirectory string) (*build.Packa
 	//given, check the format
 	if pkg.Author != "" && !authorRx.MatchString(pkg.Author) {
 		ec.Addf("Invalid package author \"%s\" (should look like \"Jane Doe <jane.doe@example.org>\")", pkg.Author)
+	}
+
+	//validate/translate prerelease versions
+	if p.Package.Alpha != 0 {
+		if p.Package.Beta != 0 {
+			ec.Addf("Package cannot have both \"alpha\" and \"beta\" version")
+		}
+		pkg.PrereleaseType = build.PrereleaseTypeAlpha
+		pkg.PrereleaseVersion = p.Package.Alpha
+	} else if p.Package.Beta != 0 {
+		pkg.PrereleaseType = build.PrereleaseTypeBeta
+		pkg.PrereleaseVersion = p.Package.Beta
+	} else {
+		//these are the default values anyway, but let's be verbose about it
+		pkg.PrereleaseType = build.PrereleaseTypeNone
+		pkg.PrereleaseVersion = 0
 	}
 
 	//parse architecture string
