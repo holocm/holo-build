@@ -1,0 +1,19 @@
+# github.com/BurntSushi/toml v0.3.1
+## explicit
+github.com/BurntSushi/toml
+# github.com/blakesmith/ar v0.0.0-20190502131153-809d4375e1fb
+## explicit
+github.com/blakesmith/ar
+# github.com/holocm/libpackagebuild v1.1.0
+## explicit
+github.com/holocm/libpackagebuild
+github.com/holocm/libpackagebuild/debian
+github.com/holocm/libpackagebuild/filesystem
+github.com/holocm/libpackagebuild/pacman
+github.com/holocm/libpackagebuild/rpm
+# github.com/ogier/pflag v0.0.1
+## explicit
+github.com/ogier/pflag
+# github.com/surma/gocpio v1.0.2-0.20160926205914-fcb68777e7dc
+## explicit
+github.com/surma/gocpio

@@ -1,0 +1,10 @@
+github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ=
+github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
+github.com/blakesmith/ar v0.0.0-20190502131153-809d4375e1fb h1:m935MPodAbYS46DG4pJSv7WO+VECIWUQ7OJYSoTrMh4=
+github.com/blakesmith/ar v0.0.0-20190502131153-809d4375e1fb/go.mod h1:PkYb9DJNAwrSvRx5DYA+gUcOIgTGVMNkfSCbZM8cWpI=
+github.com/holocm/libpackagebuild v1.1.0 h1:NH1qA1fQjL0VDAXDfeUJG/As0L9Cdz2Cqy5HDLAKVr4=
+github.com/holocm/libpackagebuild v1.1.0/go.mod h1:yzhtFoA7S73pA1QI34yIeaC/MFef0a+f1DSQOkupRU8=
+github.com/ogier/pflag v0.0.1 h1:RW6JSWSu/RkSatfcLtogGfFgpim5p7ARQ10ECk5O750=
+github.com/ogier/pflag v0.0.1/go.mod h1:zkFki7tvTa0tafRvTBIZTvzYyAu6kQhPZFnshFFPE+g=
+github.com/surma/gocpio v1.0.2-0.20160926205914-fcb68777e7dc h1:iA3Eg1OVd2o0M4M+0PBsBBssMz98L8CUH7x0xVkuyUA=
+github.com/surma/gocpio v1.0.2-0.20160926205914-fcb68777e7dc/go.mod h1:zaLNaN+EDnfSnNdWPJJf9OZxWF817w5dt8JNzF9LCVI=

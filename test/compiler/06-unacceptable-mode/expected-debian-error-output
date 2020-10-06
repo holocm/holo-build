@@ -1,1 +1,1 @@
-!! Type mismatch for 'main.PackageDefinition.File': Type mismatch for 'main.FileSection.Mode': Expected string but found 'int64'.
+!! toml: cannot load TOML value of type int64 into a Go string

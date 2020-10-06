@@ -34,4 +34,8 @@ install: default src/holo-build.sh util/autocomplete.bash util/autocomplete.zsh
 	install -D -m 0644 util/autocomplete.bash "$(DESTDIR)/usr/share/bash-completion/completions/holo-build"
 	install -D -m 0644 util/autocomplete.zsh  "$(DESTDIR)/usr/share/zsh/site-functions/_holo-build"
 
-.PHONY: prepare-build test check install FORCE
+vendor: FORCE
+	$(GOCC) mod tidy
+	$(GOCC) mod vendor
+
+.PHONY: prepare-build test check install vendor FORCE
