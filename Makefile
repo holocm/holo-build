@@ -1,29 +1,33 @@
-default: prepare-build
 default: build/holo-build build/man/holo-build.8
 
 VERSION := $(shell ./util/find_version.sh)
-# force people to use golangvend
-GOCC := env GOPATH=$(CURDIR)/.gopath GOBIN=$(CURDIR)/build go
+GO_BUILDFLAGS = -mod vendor
 
 env:
 	@env
 
-prepare-build:
-	@mkdir -p build/man
-build/holo-build: FORCE
-	$(GOCC) install --ldflags "-s -w -X github.com/holocm/holo-build/src/holo-build/common.version=$(VERSION)" github.com/holocm/holo-build/src/holo-build
-build/dump-package: FORCE
-	$(GOCC) install --ldflags "-s -w" github.com/holocm/holo-build/src/dump-package
+build/%: FORCE
+	go build $(GO_BUILDFLAGS) -ldflags "-s -w -X github.com/holocm/holo-build/src/holo-build/common.version=$(VERSION)" -o build/$* ./src/$*
 
 # manpages are generated using pod2man (which comes with Perl and therefore
 # should be readily available on almost every Unix system)
 build/man/%: doc/%.pod
+	@mkdir -p build/man
 	pod2man --name="$(shell echo $* | cut -d. -f1)" --section=$(shell echo $* | cut -d. -f2) \
 		--center="Configuration Management" --release="holo-build $(VERSION)" \
 		$< $@
 
+GO_ALLPKGS := $(shell go list ./...)
+
 test: check # just a synonym
 check: default build/dump-package
+	@if ! hash golint 2>/dev/null; then printf "\e[1;36m>> Installing golint...\e[0m\n"; go get -u golang.org/x/lint/golint; fi
+	@printf "\e[1;36m>> gofmt\e[0m\n"
+	@if s="$$(gofmt -s -l *.go */*.go 2>/dev/null)" && test -n "$$s"; then printf ' => %s\n%s\n' gofmt  "$$s"; false; fi
+	@printf "\e[1;36m>> golint\e[0m\n"
+	@if s="$$(golint $(GO_ALLPKGS) 2>/dev/null)"    && test -n "$$s"; then printf ' => %s\n%s\n' golint "$$s"; false; fi
+	@printf "\e[1;36m>> go vet\e[0m\n"
+	@go vet $(GO_ALLPKGS)
 	@bash test/compiler/run_tests.sh
 	@bash test/interface/run_tests.sh
 
@@ -38,4 +42,4 @@ vendor: FORCE
 	$(GOCC) mod tidy
 	$(GOCC) mod vendor
 
-.PHONY: prepare-build test check install vendor FORCE
+.PHONY: test check install vendor FORCE

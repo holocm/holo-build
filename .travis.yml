@@ -2,15 +2,10 @@ language: go
 sudo: false
 
 go:
-    - '1.9'
-    - '1.10'
-    - '1.11'
-
-install:
-    - go get -u github.com/golang/lint/golint
-    - go get -u github.com/GeertJohan/fgt
+    - '1.12'
+    - '1.13'
+    - '1.14'
+    - '1.15'
 
 script:
     - make && make check
-    - fgt gofmt -l $(find src -name \*.go)
-    - fgt find src -type d -exec golint {} \;

@@ -9,4 +9,4 @@ Run-time dependencies for this repo:
 Build-time dependencies for this repo:
 
 * `go`
-* `perl` (only required if you run `make check`)
+* `perl` (esp. the `pod2man` tool that ships with Perl)
