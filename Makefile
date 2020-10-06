@@ -21,7 +21,7 @@ GO_ALLPKGS := $(shell go list ./...)
 
 test: check # just a synonym
 check: default build/dump-package
-	@if ! hash golint 2>/dev/null; then printf "\e[1;36m>> Installing golint...\e[0m\n"; go get -u golang.org/x/lint/golint; fi
+	@if ! hash golint 2>/dev/null; then printf "\e[1;36m>> Installing golint...\e[0m\n"; cd $$(mktemp -d); go get -u golang.org/x/lint/golint; rm -rf $$PWD; fi
 	@printf "\e[1;36m>> gofmt\e[0m\n"
 	@if s="$$(gofmt -s -l *.go */*.go 2>/dev/null)" && test -n "$$s"; then printf ' => %s\n%s\n' gofmt  "$$s"; false; fi
 	@printf "\e[1;36m>> golint\e[0m\n"
