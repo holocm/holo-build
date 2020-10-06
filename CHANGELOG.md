@@ -1,4 +1,4 @@
-# v1.6 (TBD)
+# v1.6.0 (TBD)
 
 New features:
 
@@ -7,6 +7,13 @@ New features:
   naming convention for the selected package format.
 - The fields `alpha` and `beta` have been added to the pkg.toml section
   `[[package]]`.
+
+Changes:
+
+- The minimum required Go version is now 1.13. Earlier versions may still work,
+  but are not tested for anymore.
+- Subsequent versions will now honor SemVer and always carry a patch version
+  number.
 
 # v1.5.1 (2017-08-22)
 
