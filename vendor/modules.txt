@@ -4,7 +4,7 @@ github.com/BurntSushi/toml
 # github.com/blakesmith/ar v0.0.0-20190502131153-809d4375e1fb
 ## explicit
 github.com/blakesmith/ar
-# github.com/holocm/libpackagebuild v1.1.0
+# github.com/holocm/libpackagebuild v1.1.1
 ## explicit
 github.com/holocm/libpackagebuild
 github.com/holocm/libpackagebuild/debian
