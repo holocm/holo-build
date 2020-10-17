@@ -63,7 +63,7 @@ is read from standard input instead.
 
 =over 4
 
-=item B<--output>=I<filename>
+=item B<-o>, B<--output>=I<filename>
 
 Write the resulting package to I<filename>. If not given, write the package into
 the working directory using the naming convention for the corresponding output
@@ -71,7 +71,7 @@ package format. If I<filename> refers to a directory, write the package into thi
 directory using the naming convention for the corresponding output package format.
 If the I<filename> is C<->, write the package to standard output.
 
-=item B<--force>/B<--no-force>
+=item B<-f>, B<--force>/B<--no-force>
 
 By default, C<holo-build> will fail if the target file already exists. This
 behavior protects against the user forgetting to increase the version when
@@ -116,7 +116,7 @@ resolution).
 
 Print out usage information.
 
-=item B<--version>
+=item B<-V>, B<--version>
 
 Print out holo-build's version string.
 
