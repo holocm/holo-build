@@ -1,6 +1,6 @@
 default: build/holo-build build/man/holo-build.8
 
-VERSION := $(shell ./util/find_version.sh)
+VERSION ?= $(shell ./util/find_version.sh)
 GO_BUILDFLAGS = -mod vendor
 
 env:
