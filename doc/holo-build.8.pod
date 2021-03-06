@@ -152,9 +152,7 @@ Use C<--output -> instead.
 
 =head1 PACKAGE DESCRIPTION FORMAT
 
-Package descriptions are written in TOML format.
-
-=for html <p class="follow"><a href="https://github.com/toml-lang/toml">TOML specification »</a></p>
+Package descriptions are written in L<the TOML format|https://github.com/toml-lang/toml>.
 
 Only the C<[package]> section is required. All other sections (and all fields
 not marked as required) are optional.
@@ -612,14 +610,6 @@ functionally equivalent to:
 The actual syntax and semantics of C<[[user]]> and C<[[group]]> sections is
 described in L<holo-users-groups(8)>.
 
-=for Comment
-################################################################################
-# NOTE: This document generates both the manpage and the website's             #
-#       man-holo.html. The following sections only appear in the manpage.      #
-################################################################################
-
-=begin :man
-
 =head1 SEE ALSO
 
 L<holo(8)>
@@ -628,10 +618,8 @@ L<holo(8)>
 
 Stefan Majewsky
 
-Further documentation is available at the project homepage: http://holocm.org
+Further documentation is available at the project homepage: L<https://holocm.org>
 
-Please report any issues and feature requests at Github: http://github.com/holocm/holo/issues
-
-=end :man
+Please report any issues and feature requests at GitHub: L<https://github.com/holocm/holo-build/issues>
 
 =cut
