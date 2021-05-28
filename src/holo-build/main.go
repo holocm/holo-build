@@ -121,9 +121,9 @@ func parseArgs() options {
 	//TODO: remove everything that is flagged as deprecated
 	withForce := pflag.BoolP("force", "f", false, "Overwrite existing output file")
 	formatString := pflag.String("format", "", "Output file format (\"debian\", \"pacman\" or \"rpm\")")
-	formatDebian := pflag.Bool("debian", false, "Generate Debian package (deprecated, use \"--format debian\" instead)")
-	formatPacman := pflag.Bool("pacman", false, "Generate Pacman package (deprecated, use \"--format pacman\" instead)")
-	formatRPM := pflag.Bool("rpm", false, "Generate RPM package (deprecated, use \"--format rpm\" instead)")
+	formatDebian := pflag.Bool("debian", false, "Generate Debian package (deprecated, use \"--format=debian\" instead)")
+	formatPacman := pflag.Bool("pacman", false, "Generate Pacman package (deprecated, use \"--format=pacman\" instead)")
+	formatRPM := pflag.Bool("rpm", false, "Generate RPM package (deprecated, use \"--format=rpm\" instead)")
 	outputFileName := pflag.StringP("output", "o", "", "Output file name (or \"-\" for standard output)")
 	outputStdout := pflag.Bool("stdout", false, "Write package to standard output (deprecated, use \"-o -\" instead)")
 	noOutputStdout := pflag.Bool("no-stdout", false, "Revert --stdout (deprecated, use \"-o\" instead)")
@@ -135,7 +135,7 @@ func parseArgs() options {
 	pflag.Parse()
 
 	if *noOutputStdout {
-		showErrorMsg("--no-stdout is deprecated - use \"--output ''\" instead")
+		showErrorMsg("--no-stdout is deprecated - use \"--output=''\" instead")
 		*outputStdout = false
 	}
 	if *noReproducible {
@@ -154,7 +154,7 @@ func parseArgs() options {
 
 	var hasArgsError bool
 	if *outputStdout {
-		showErrorMsg("--stdout is deprecated - use \"--output -\" instead")
+		showErrorMsg("--stdout is deprecated - use \"--output=-\" instead")
 		if *outputFileName != "" {
 			showErrorMsg("--output and --stdout may not be used at the same time")
 			hasArgsError = true
@@ -164,21 +164,21 @@ func parseArgs() options {
 
 	switch {
 	case *formatDebian:
-		showErrorMsg("--debian is deprecated - use \"--format debian\" instead")
+		showErrorMsg("--debian is deprecated - use \"--format=debian\" instead")
 		if *formatString != "" {
 			showErrorMsg("--debian and --format may not be used at the same time")
 			hasArgsError = true
 		}
 		*formatString = "debian"
 	case *formatPacman:
-		showErrorMsg("--pacman is deprecated - use \"--format pacman\" instead")
+		showErrorMsg("--pacman is deprecated - use \"--format=pacman\" instead")
 		if *formatString != "" {
 			showErrorMsg("--pacman and --format may not be used at the same time")
 			hasArgsError = true
 		}
 		*formatString = "pacman"
 	case *formatRPM:
-		showErrorMsg("--rpm is deprecated - use \"--format rpm\" instead")
+		showErrorMsg("--rpm is deprecated - use \"--format=rpm\" instead")
 		if *formatString != "" {
 			showErrorMsg("--rpm and --format may not be used at the same time")
 			hasArgsError = true
